@@ -50,7 +50,7 @@ class ArthropodDescriber(QMainWindow):
         self.ui.imageListView.verticalScrollBar().sliderReleased.connect(self.handle_image_list_slider_released)
         self.thumbnail_delegate = ThumbnailDelegate(self.thumbnail_storage)
         self.ui.imageListView.setItemDelegate(self.thumbnail_delegate)
-        self.ui.imageListView.setUniformItemSizes(True)
+        self.ui.imageListView.setUniformItemSizes(False)
         self.ui.imageListView.setSizePolicy(QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Preferred))
 
         self.ui.actionOpen_folder.triggered.connect(self.handle_action_open_folder_triggered)
@@ -70,7 +70,6 @@ class ArthropodDescriber(QMainWindow):
 
     def handle_current_changed(self, current: QModelIndex, previous: QModelIndex):
         row = current.row()
-        print(f'now showing {self.storage.image_names[row]}')
         photo = self.storage.get_photo_by_idx(row)
         self.current_photo = photo
         self.mask_editor.set_photo(photo)

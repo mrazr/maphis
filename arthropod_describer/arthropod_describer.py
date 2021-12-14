@@ -3,8 +3,9 @@ import typing
 
 from PySide2.QtGui import QCloseEvent
 from PySide2.QtWidgets import QMainWindow, QApplication, QWidget, QHBoxLayout, QSizePolicy
-from PySide2.QtCore import QModelIndex, QPoint
+from PySide2.QtCore import QModelIndex, QPoint, Slot, QItemSelectionModel
 
+from model.photo import Photo
 from view.ui_arthropod_describer import Ui_ArhtropodDescriber
 from view.ui_mask_edit_view import Ui_MaskEditor
 from dbg_utils import MockStorage
@@ -28,6 +29,8 @@ class ArthropodDescriber(QMainWindow):
         #self.editor_ui.setupUi(self.editor)
 
         self.mask_editor = MaskEditor()
+        self.mask_editor.signal_prev_photo.connect(self.handle_editor_prev_photo_request)
+        self.mask_editor.signal_next_photo.connect(self.handle_editor_next_photo_request)
 
         hbox = QHBoxLayout()
         hbox.addWidget(self.mask_editor.widget)
@@ -35,7 +38,11 @@ class ArthropodDescriber(QMainWindow):
         self.ui.pgEditor.setLayout(hbox)
 
         self.storage: typing.Optional[Storage] = None
+        self.current_photo: typing.Optional[Photo] = None
+        self.current_idx: typing.Optional[QModelIndex] = None
+
         self.thumbnail_storage: typing.Optional[ThumbnailStorage] = ThumbnailStorage()
+
         self.image_list_model = ImageListModel()
         self.ui.imageListView.setModel(self.image_list_model)
         self.ui.imageListView.selectionModel().currentChanged.connect(self.handle_current_changed)
@@ -52,6 +59,8 @@ class ArthropodDescriber(QMainWindow):
         self.storage = storage
         self.thumbnail_storage.initialize(self.storage)
         self.image_list_model.initialize(self.storage.image_paths, self.thumbnail_storage, 0)
+        self.current_idx = self.image_list_model.index(0, 0)
+        self.ui.imageListView.selectionModel().setCurrentIndex(self.current_idx, QItemSelectionModel.Select)
 
     def handle_action_open_folder_triggered(self, checked: bool):
         maybe_path = choose_folder(self)
@@ -63,12 +72,25 @@ class ArthropodDescriber(QMainWindow):
         row = current.row()
         print(f'now showing {self.storage.image_names[row]}')
         photo = self.storage.get_photo_by_idx(row)
+        self.current_photo = photo
         self.mask_editor.set_photo(photo)
 
     def handle_image_list_slider_released(self):
         first_idx = self.ui.imageListView.indexAt(QPoint(0, 0))
         last_idx = self.ui.imageListView.indexAt(self.ui.imageListView.viewport().rect().bottomLeft())
         self.image_list_model.handle_slider_released(first_idx, last_idx)
+
+    def handle_editor_next_photo_request(self):
+        row = min(self.current_idx.row() + 1, self.storage.image_count - 1)
+        idx = self.image_list_model.index(row, 0)
+        self.current_idx = idx
+        self.ui.imageListView.selectionModel().setCurrentIndex(idx, QItemSelectionModel.SelectCurrent)
+
+    def handle_editor_prev_photo_request(self):
+        row = max(self.current_idx.row() - 1, 0)
+        idx = self.image_list_model.index(row, 0)
+        self.current_idx = idx
+        self.ui.imageListView.selectionModel().setCurrentIndex(idx, QItemSelectionModel.SelectCurrent)
 
     def closeEvent(self, event: QCloseEvent):
         self.thumbnail_storage.stop()

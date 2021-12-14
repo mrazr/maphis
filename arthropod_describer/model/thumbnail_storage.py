@@ -1,3 +1,4 @@
+import typing
 from enum import IntEnum
 from multiprocessing import Process, Queue
 from pathlib import Path
@@ -99,7 +100,7 @@ class ThumbnailStorage(QObject):
         self.in_queue: Queue = Queue()
         self.out_queue: Queue = Queue()
         self.preload_queue: Queue = Queue()
-        self.load_process = Process()
+        self.load_process: typing.Optional[Process] = None
         self.last_thumbnail_sweep: int = 0
         self.recent_thumbnail_idxs: List[int] = []
         self.recent_thumbnail_flags: List[bool] = []
@@ -229,7 +230,8 @@ class ThumbnailStorage(QObject):
             self.last_thumbnail_sweep = time()
 
     def stop(self):
-        self.load_process.kill()
+        if self.load_process is not None:
+            self.load_process.kill()
 
 
 class ThumbnailDelegate(QStyledItemDelegate):

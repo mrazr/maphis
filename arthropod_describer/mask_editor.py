@@ -4,6 +4,7 @@ from PySide2.QtCore import Signal, QObject
 from PySide2.QtGui import Qt
 from PySide2.QtWidgets import QWidget, QGraphicsScene
 
+from custom_graphics_view import CustomGraphicsView
 from canvas_widget import CanvasWidget
 from view.ui_mask_edit_view import Ui_MaskEditor
 from model.photo import Photo, MaskType
@@ -25,9 +26,13 @@ class MaskEditor(QObject):
         self.ui.btnNext.clicked.connect(lambda: self.signal_next_photo.emit())
         self.ui.btnPrevious.clicked.connect(lambda: self.signal_prev_photo.emit())
 
-        self.photo_view = self.ui.maskEditor
         self._scene = QGraphicsScene()
+
+        self.photo_view = CustomGraphicsView()
+        self.ui.center.addWidget(self.photo_view)
         self.photo_view.setScene(self._scene)
+
+        self.photo_view.setInteractive(True)
 
         self.canvas = CanvasWidget()
         self._scene.addItem(self.canvas)

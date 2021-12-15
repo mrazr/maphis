@@ -1,11 +1,12 @@
 from typing import Optional
 
-from PySide2.QtCore import QPointF, Qt, QMargins, Signal, QObject
-from PySide2.QtGui import QPixmap
-from PySide2.QtWidgets import QWidget, QGraphicsScene, QGraphicsPixmapItem
+from PySide2.QtCore import Signal, QObject
+from PySide2.QtGui import Qt
+from PySide2.QtWidgets import QWidget, QGraphicsScene
 
+from canvas_widget import CanvasWidget
 from view.ui_mask_edit_view import Ui_MaskEditor
-from model.photo import Photo, LocalPhoto
+from model.photo import Photo, MaskType
 
 
 class MaskEditor(QObject):
@@ -28,35 +29,30 @@ class MaskEditor(QObject):
         self._scene = QGraphicsScene()
         self.photo_view.setScene(self._scene)
 
+        self.canvas = CanvasWidget()
+        self._scene.addItem(self.canvas)
+        self.canvas.initialize()
+
         self.current_photo: Optional[Photo] = None
-        self._pixmap = QPixmap()
-        self._scene_pixmap = self._scene.addPixmap(self._pixmap)
 
     def set_photo(self, photo: Photo):
         self.current_photo = photo
-        self._pixmap.convertFromImage(photo.image, Qt.ColorOnly)
-        self._scene_pixmap.setPos(QPointF(0.0, 0.0))
-        self._scene_pixmap.setPixmap(self._pixmap)
-        self._scene_pixmap.setTransformOriginPoint(self._pixmap.rect().center())
-        print(f'before trans {self._scene_pixmap.sceneBoundingRect()}')
-        rect1 = self._pixmap.rect()
-        if self._pixmap.height() > self._pixmap.width():
-            self._scene_pixmap.setRotation(90.0)
-            rect1 = rect1.transposed()
-            print(f'after 90 trans {self._scene_pixmap.sceneBoundingRect()}')
-        else:
-            self._scene_pixmap.setRotation(0.0)
-        self._scene_pixmap.update()
-        print(self._scene_pixmap.boundingRect().transposed())
-        self._scene.setSceneRect(self._scene_pixmap.sceneBoundingRect())
+        self.canvas.set_photo(self.current_photo)
+        self.canvas.left_press.connect(lambda: print("hello"))
+        self._scene.setSceneRect(self.canvas.sceneBoundingRect())
         self._scene.update()
-        self.photo_view.fitInView(self._scene_pixmap)
+        self.photo_view.fitInView(self.canvas, Qt.KeepAspectRatio)
 
     def handle_bug_mask_checked(self, checked: bool):
         print(f"bug {checked}")
+        self.canvas.set_mask_shown(MaskType.BUG_MASK, checked)
 
     def handle_segments_mask_checked(self, checked: bool):
         print(f"segments {checked}")
+        self.canvas.set_mask_shown(MaskType.SEGMENTS_MASK, checked)
 
     def handle_reflection_mask_checked(self, checked: bool):
         print(f"reflections {checked}")
+        self.canvas.set_mask_shown(MaskType.REFLECTION_MASK, checked)
+
+

@@ -1,5 +1,5 @@
 import abc
-from enum import IntEnum
+from enum import IntEnum, Enum
 import typing
 from pathlib import Path
 
@@ -12,17 +12,28 @@ class MaskType(IntEnum):
     SEGMENTS_MASK = 1,
     REFLECTION_MASK = 2,
 
+#MaskType = Enum('MaskType', {'MASK': 0, 'SEGMENTS': 1, 'REFLECTIONS': 2})
+
 
 class Mask:
-    def __init__(self, size: typing.Tuple[int, int], mask_type: MaskType):
-        self._mask = QImage(QSize(*size), QImage.Format_Grayscale16)
+    def __init__(self):
+        self._mask = None #QImage(QSize(*size), QImage.Format_Grayscale16)
         self._path: typing.Optional[Path] = None
-        self._type = mask_type
+        self._type = None
+
+    @classmethod
+    def create(cls, size: typing.Tuple[int, int], mask_type) -> 'Mask':
+        mask = Mask()
+        format = QImage.Format_Grayscale16 if mask_type.SEGMENTS_MASK else QImage.Format_Grayscale8
+        mask._mask = QImage(QSize(*size), format)
+        mask._type = mask_type
+        return mask
 
     @classmethod
     def assign_to_photo(cls, photo: 'Photo', mask_type: MaskType) -> 'Mask':
-        mask = Mask(photo.image.size().toTuple(), mask_type=mask_type)
+        mask = Mask.create(photo.image.size().toTuple(), mask_type)
         photo.assign_mask(mask)
+        return mask
 
     @property
     def path(self) -> typing.Optional[Path]:
@@ -37,6 +48,19 @@ class Mask:
     @property
     def mask_type(self) -> MaskType:
         return self._type
+
+    @property
+    def mask(self) -> QImage:
+        return self._mask
+
+    @classmethod
+    def load(cls, path: Path, mask_type: MaskType) -> 'Mask':
+        mask = Mask()
+        img = QImage(str(path))
+        mask._mask = img
+        mask._type = mask_type
+        mask._path = path
+        return mask
 
 
 class Photo(abc.ABC):
@@ -92,14 +116,20 @@ class Photo(abc.ABC):
         else:
             self.reflection_mask = mask
 
+    def mask_dict(self) -> typing.Dict[MaskType, Mask]:
+        return {MaskType.BUG_MASK: self.bug_mask,
+                MaskType.SEGMENTS_MASK: self.segments_mask,
+                MaskType.REFLECTION_MASK: self.reflection_mask}
+
 
 class LocalPhoto(Photo):
-    def __init__(self, path: Path):
-        self._image = QImage(str(path))
-        self._image_path = path
-        self._bug_mask: typing.Optional[Mask] = None
-        self._segments_mask: typing.Optional[Mask] = None
-        self._reflection_mask: typing.Optional[Mask] = None
+    def __init__(self, folder: Path, img_name: str):
+        self._image = QImage(str(folder / 'images' / img_name))
+        self._image_path = folder / 'images' /  img_name
+        #self._bug_mask: typing.Optional[Mask] = QImage(str(folder / 'bug_masks' / f'maska - {img_name}'))
+        self._bug_mask = Mask.load(folder / 'bug_masks' / f'maska - {img_name}', MaskType.BUG_MASK)
+        self._segments_mask: typing.Optional[Mask] = Mask.load(folder / 'bug_masks' / f'maska - {img_name}', MaskType.BUG_MASK) #None
+        self._reflection_mask: typing.Optional[Mask] = Mask.load(folder / 'bug_masks' / f'maska - {img_name}', MaskType.BUG_MASK) #None
 
     @property
     def image(self) -> QImage:
@@ -115,6 +145,8 @@ class LocalPhoto(Photo):
 
     @property
     def bug_mask(self) -> typing.Optional[Mask]:
+        if self._bug_mask is None:
+            self._bug_mask = Mask.create(self.image.size().toTuple(), MaskType.BUG_MASK) #QImage(self.image.size(), QImage.Format_Grayscale8)
         return self._bug_mask
 
     @bug_mask.setter
@@ -123,6 +155,8 @@ class LocalPhoto(Photo):
 
     @property
     def segments_mask(self) -> typing.Optional[Mask]:
+        if self._segments_mask is None:
+            self._segments_mask = Mask.create(self.image.size().toTuple(), MaskType.SEGMENTS_MASK) #QImage(self.image.size(), QImage.Format_Grayscale16)
         return self._segments_mask
 
     @segments_mask.setter
@@ -132,6 +166,8 @@ class LocalPhoto(Photo):
 
     @property
     def reflection_mask(self) -> typing.Optional[Mask]:
+        if self._reflection_mask is None:
+            self._reflection_mask = Mask.create(self.image.size().toTuple(), MaskType.REFLECTION_MASK) #QImage(self.image.size(), QImage.Format_Grayscale8)
         return self._reflection_mask
 
     @reflection_mask.setter

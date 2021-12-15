@@ -98,7 +98,7 @@ class LocalStorage(Storage):
         self._reflection_masks_folder = self._location / 'reflection_masks'
 
     def _load_photo(self, img_name: str) -> LocalPhoto:
-        return LocalPhoto(self._location / 'images' / img_name) # TODO handle loading masks
+        return LocalPhoto(self._location, img_name) # TODO handle loading masks
 
     @property
     def location(self) -> Path:

@@ -40,37 +40,14 @@ class Ui_MaskEditor(object):
 
         self.toolBar.addWidget(self.tbtnRedo)
 
-        self.groupBox = QGroupBox(MaskEditor)
-        self.groupBox.setObjectName(u"groupBox")
-        self.groupBox.setFlat(False)
-        self.groupBox.setCheckable(False)
-        self.horizontalLayout = QHBoxLayout(self.groupBox)
+        self.toolBox = QGroupBox(MaskEditor)
+        self.toolBox.setObjectName(u"toolBox")
+        self.toolBox.setFlat(False)
+        self.toolBox.setCheckable(False)
+        self.horizontalLayout = QHBoxLayout(self.toolBox)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.tbtnBrush = QToolButton(self.groupBox)
-        self.tbtnBrush.setObjectName(u"tbtnBrush")
-        self.tbtnBrush.setCheckable(True)
-        self.tbtnBrush.setAutoRepeat(False)
-        self.tbtnBrush.setAutoExclusive(True)
-        self.tbtnBrush.setAutoRaise(False)
 
-        self.horizontalLayout.addWidget(self.tbtnBrush)
-
-        self.tbtnBucket = QToolButton(self.groupBox)
-        self.tbtnBucket.setObjectName(u"tbtnBucket")
-        self.tbtnBucket.setCheckable(True)
-        self.tbtnBucket.setAutoExclusive(True)
-
-        self.horizontalLayout.addWidget(self.tbtnBucket)
-
-        self.tbtnKnife = QToolButton(self.groupBox)
-        self.tbtnKnife.setObjectName(u"tbtnKnife")
-        self.tbtnKnife.setCheckable(True)
-        self.tbtnKnife.setAutoExclusive(True)
-
-        self.horizontalLayout.addWidget(self.tbtnKnife)
-
-
-        self.toolBar.addWidget(self.groupBox)
+        self.toolBar.addWidget(self.toolBox)
 
         self.MaskGroup = QGroupBox(MaskEditor)
         self.MaskGroup.setObjectName(u"MaskGroup")
@@ -150,10 +127,7 @@ class Ui_MaskEditor(object):
         MaskEditor.setWindowTitle(QCoreApplication.translate("MaskEditor", u"Form", None))
         self.tbtnUndo.setText(QCoreApplication.translate("MaskEditor", u"Undo", None))
         self.tbtnRedo.setText(QCoreApplication.translate("MaskEditor", u"Redo", None))
-        self.groupBox.setTitle(QCoreApplication.translate("MaskEditor", u"Mask tools", None))
-        self.tbtnBrush.setText(QCoreApplication.translate("MaskEditor", u"Brush", None))
-        self.tbtnBucket.setText(QCoreApplication.translate("MaskEditor", u"Bucket", None))
-        self.tbtnKnife.setText(QCoreApplication.translate("MaskEditor", u"Knife", None))
+        self.toolBox.setTitle(QCoreApplication.translate("MaskEditor", u"Mask tools", None))
         self.MaskGroup.setTitle(QCoreApplication.translate("MaskEditor", u"Active mask", None))
         self.tbtnBugMask.setText(QCoreApplication.translate("MaskEditor", u"Bug", None))
         self.tbtnSegmentsMask.setText(QCoreApplication.translate("MaskEditor", u"Segments", None))

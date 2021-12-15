@@ -160,16 +160,12 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="center">
-     <item>
-      <widget class="QGraphicsView" name="maskEditor"/>
-     </item>
-    </layout>
+    <layout class="QHBoxLayout" name="center"/>
    </item>
    <item>
     <layout class="QHBoxLayout" name="controls">
      <item>
-      <widget class="QPushButton" name="btnNext">
+      <widget class="QPushButton" name="btnPrevious">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -208,7 +204,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="btnPrevious">
+      <widget class="QPushButton" name="btnNext">
        <property name="text">
         <string>&gt;</string>
        </property>

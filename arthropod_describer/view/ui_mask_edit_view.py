@@ -109,25 +109,20 @@ class Ui_MaskEditor(object):
 
         self.center = QHBoxLayout()
         self.center.setObjectName(u"center")
-        self.maskEditor = QGraphicsView(MaskEditor)
-        self.maskEditor.setObjectName(u"maskEditor")
-
-        self.center.addWidget(self.maskEditor)
-
 
         self.verticalLayout.addLayout(self.center)
 
         self.controls = QHBoxLayout()
         self.controls.setObjectName(u"controls")
-        self.btnNext = QPushButton(MaskEditor)
-        self.btnNext.setObjectName(u"btnNext")
+        self.btnPrevious = QPushButton(MaskEditor)
+        self.btnPrevious.setObjectName(u"btnPrevious")
         sizePolicy1 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
         sizePolicy1.setHorizontalStretch(0)
         sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.btnNext.sizePolicy().hasHeightForWidth())
-        self.btnNext.setSizePolicy(sizePolicy1)
+        sizePolicy1.setHeightForWidth(self.btnPrevious.sizePolicy().hasHeightForWidth())
+        self.btnPrevious.setSizePolicy(sizePolicy1)
 
-        self.controls.addWidget(self.btnNext)
+        self.controls.addWidget(self.btnPrevious)
 
         self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
@@ -137,10 +132,10 @@ class Ui_MaskEditor(object):
 
         self.controls.addItem(self.horizontalSpacer)
 
-        self.btnPrevious = QPushButton(MaskEditor)
-        self.btnPrevious.setObjectName(u"btnPrevious")
+        self.btnNext = QPushButton(MaskEditor)
+        self.btnNext.setObjectName(u"btnNext")
 
-        self.controls.addWidget(self.btnPrevious)
+        self.controls.addWidget(self.btnNext)
 
 
         self.verticalLayout.addLayout(self.controls)
@@ -163,7 +158,7 @@ class Ui_MaskEditor(object):
         self.tbtnBugMask.setText(QCoreApplication.translate("MaskEditor", u"Bug", None))
         self.tbtnSegmentsMask.setText(QCoreApplication.translate("MaskEditor", u"Segments", None))
         self.tbtnReflectionMask.setText(QCoreApplication.translate("MaskEditor", u"Reflections", None))
-        self.btnNext.setText(QCoreApplication.translate("MaskEditor", u"<", None))
-        self.btnPrevious.setText(QCoreApplication.translate("MaskEditor", u">", None))
+        self.btnPrevious.setText(QCoreApplication.translate("MaskEditor", u"<", None))
+        self.btnNext.setText(QCoreApplication.translate("MaskEditor", u">", None))
     # retranslateUi
 

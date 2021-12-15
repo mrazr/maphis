@@ -1,5 +1,5 @@
 from PySide2.QtCore import Signal, QPointF, Qt, QEvent
-from PySide2.QtGui import QPainter, QWheelEvent, QResizeEvent, QMouseEvent, QKeyEvent
+from PySide2.QtGui import QPainter, QWheelEvent, QResizeEvent, QMouseEvent, QKeyEvent, QCursor
 from PySide2.QtWidgets import QGraphicsView, QWidget, QSizePolicy
 
 
@@ -18,9 +18,11 @@ class CustomGraphicsView(QGraphicsView):
         self.setRenderHint(QPainter.Antialiasing)
 
         self.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
+        self.setInteractive(True)
 
         self.verticalScrollBar().valueChanged.connect(lambda _: self.view_changed.emit())
         self.horizontalScrollBar().valueChanged.connect(lambda _: self.view_changed.emit())
+        #self.setCursor(QCursor(Qt.CursorShape.BlankCursor))
         
     def wheelEvent(self, event: QWheelEvent) -> None:
         delta = 1

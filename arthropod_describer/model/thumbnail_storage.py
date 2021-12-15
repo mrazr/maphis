@@ -48,30 +48,13 @@ def thumbnail_load_loop(folder: Path, in_queue: Queue, out_queue: Queue, storage
             if not (folder / img_name).exists():
                 with Image.open(storage.location / 'images' / img_name) as o_img:
                     thumb_size = list(thumbnail_size.toTuple())
-                    #ratio = o_img.height / o_img.width
-                    #if o_img.width >= o_img.height:
-                    #    thumb_size[1] = int(ratio * thumb_size[1])
-                    #    #o_img.rotate(90)
-                    #    #pass
-                    #else:
-                    #    o_img = o_img.rotate(-90)
-                    #    # thumb_size[0] = int((1.0 / ratio) * thumb_size[0])
-                    #    thumb_size[0] = int(ratio * thumb_size[0])
-                    #if o_img.height > o_img.width:
-                    #    o_img = o_img.rotate(-90)
-                    #    ratio = 1.0 / ratio
-                    #thumb_size[1] = int(ratio * thumb_size[1])
                     if o_img.height < o_img.width:
                         thumb_size = thumb_size[::-1]
                     o_img.thumbnail(tuple(thumb_size))
                     o_img.save(folder / img_name, 'JPEG')
 
-            #out_queue.put_nowait((idx, QImage(str(folder / img_name))))
             with Image.open(folder / img_name) as img:
                 out_queue.put_nowait((idx, np.asarray(img)))
-            #with open(folder / img_name, "rb") as f:
-            #    tags = exifread.process_file(f)
-            #out_queue.put_nowait((idx, tags['JPEGThumbnail']))
 
 
 class ThumbnailState(IntEnum):
@@ -121,8 +104,6 @@ class ThumbnailStorage(QObject):
                                           self.thumbnail_size))
         self.load_process.start()
         self.startTimer(50)
-        dec = self.thumbnail_bytes[0][1]
-        #self.thumbnail_size = QSize(*dec.shape[:-1][::-1])
         self.thumbnail_placeholder = self.thumbnail_placeholder.scaledToHeight(self.thumbnail_size.height(), Qt.SmoothTransformation)
         self.last_thumbnail_sweep = time()
         return self.thumbnail_size
@@ -141,11 +122,8 @@ class ThumbnailStorage(QObject):
             return self.thumbnails[idx]
         if state == ThumbnailState.Loading:
             return self.thumbnail_placeholder
-        #pix = QImage()
-        #pix.loadFromData(thumb)
         np_img = self.thumbnail_bytes[idx][1]
         pix = QImage(np_img, np_img.shape[1], np_img.shape[0], QImage.Format_RGB888)
-        #pix = self.thumbnail_bytes[idx]
         self.thumbnails[idx] = pix
         self.thumbnail_hits[idx] += 1
         self.thumbnail_bytes[idx] = (ThumbnailState.Decoded, self.thumbnail_bytes[idx][1])
@@ -159,25 +137,12 @@ class ThumbnailStorage(QObject):
         if not (self._thumbnail_folder / img_name).exists():
             with Image.open(self.storage.location / 'images' / img_name) as o_img:
                 thumb_size = [256, 128]
-                #ratio = o_img.height / o_img.width
-                #if o_img.width >= o_img.height:
-                #    thumb_size[1] = int(ratio * thumb_size[1])
-                #    #pass
-                #else:
-                #    o_img = o_img.rotate(-90)
-                #    #thumb_size[0] = int((1.0 / ratio) * thumb_size[0])
-                #    thumb_size[0] = int(ratio * thumb_size[0])
                 if o_img.height < o_img.width:
                     thumb_size = thumb_size[::-1]
                 o_img.thumbnail(tuple(thumb_size))
                 o_img.save(self._thumbnail_folder / img_name, 'JPEG')
-        #thumb = QImage(str(self._thumbnail_folder / img_name)) #Image.open(self._thumbnail_folder / img_name)
         thumb = np.asarray(Image.open(self._thumbnail_folder / img_name))
         self.thumbnail_bytes[idx] = (ThumbnailState.LoadedBytes, thumb)
-        #with open(self.camera.folder / self.camera.image_list[idx], "rb") as f:
-        #    tags = exifread.process_file(f)
-        #thumb = tags['JPEGThumbnail']
-        #self.thumbnail_bytes[idx] = (ThumbnailState.LoadedBytes, thumb)
 
     def load_thumbnails(self, first_idx: int, last_idx: int):
         for idx in range(first_idx, last_idx+1):
@@ -238,13 +203,10 @@ class ThumbnailDelegate(QStyledItemDelegate):
     def __init__(self, thumbnails: ThumbnailStorage, parent: QObject = None):
         QStyledItemDelegate.__init__(self, parent)
         self.thumbnails = thumbnails
-        #self.snow_indicator = QImage(':/icons/snowflake.svg')
-        #self.snow_indicator = self.snow_indicator.scaledToWidth(24)
 
     def sizeHint(self, option: QStyleOptionViewItem, index: QtCore.QModelIndex) -> QtCore.QSize:
         thumbnail: QImage = index.data(Qt.DecorationRole)
         sz = thumbnail.size()
-        #sz = QSize(self.thumbnails.thumbnail_size)
         sz.setHeight(sz.height() + 32)
         sz.setWidth(sz.width())
         return sz
@@ -254,28 +216,17 @@ class ThumbnailDelegate(QStyledItemDelegate):
         thumbnail: QImage = index.data(Qt.DecorationRole)
         quality_color = QColor(255, 255, 255) #index.data(Qt.BackgroundRole)
         rect = option.rect
-        #pic_rect = QRectF(rect.center().x() - 0.5 * self.thumbnails.thumbnail_size.width(),
-        #                  rect.y() - 0.0 * self.thumbnails.thumbnail_size.height(),
-        #                  self.thumbnails.thumbnail_size.width(),
-        #                  self.thumbnails.thumbnail_size.height())
         pic_rect = QRectF(rect.center().x() - 0.5 * thumbnail.size().width(),
                           rect.y() - 0.0 * thumbnail.size().height(),
                           thumbnail.size().width(),
                           thumbnail.size().height())
         text_rect = QRectF(0, rect.y() + pic_rect.height(),
                            rect.width(), 32)
-        #text_rect = QRectF(pic_rect.x(), rect.y() + pic_rect.height() - self.snow_indicator.height(),
-        #                   pic_rect.width(), self.snow_indicator.height())
         painter.setRenderHint(painter.SmoothPixmapTransform, True)
         painter.drawImage(pic_rect, thumbnail)
         quality_color = QColor(00, 00, 00, 200) if quality_color is None else quality_color
         painter.fillRect(text_rect, quality_color)
-        #painter.setPen(QColor(255, 255, 255, 255))
         painter.setPen(QColor(0, 0, 0, 255))
-        #if index.data(Qt.UserRole + 1):
-        #    indic_rect = QRectF(text_rect.topLeft(),
-        #                        QSizeF(self.snow_indicator.size()))
-        #    painter.drawImage(indic_rect, self.snow_indicator)
         painter.drawText(text_rect, Qt.AlignCenter, img_name)
         if option.state & QStyle.State_Selected:
             color = option.palette.highlight().color()

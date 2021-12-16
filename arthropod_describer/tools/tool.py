@@ -3,6 +3,7 @@ import enum
 import typing
 
 import numpy as np
+import skimage.morphology as M
 
 
 class ParamType(enum.IntEnum):
@@ -55,6 +56,11 @@ class Tool(abc.ABC):
     def left_press(self, pos: typing.Tuple[int, int], img: np.ndarray, label: int):
         pass
 
+    @property
+    @abc.abstractmethod
+    def active(self) -> bool:
+        pass
+
     def left_release(self, pos: typing.Tuple[int, int], label: int):
         pass
 
@@ -76,12 +82,13 @@ class Brush(Tool):
         Tool.__init__(self)
         self._tool_name = "Brush"
         self._user_params = {'radius': ToolUserParam('radius', ParamType.INT, 9)}
-                             #'invert': ToolUserParam('invert', ParamType.BOOL, False)}
         self._current_img = None
         radius = self._user_params['radius'].value
-        self._brush_mask = 255 * np.ones((radius, radius), np.uint8)
+        self._brush_mask = 255 * M.disk(radius)
         self._brush_center = np.array([radius // 2, radius // 2])
         self._brush_coords = np.argwhere(self._brush_mask > 0) - self._brush_center
+        self.modified_coords: typing.List[np.ndarray] = []
+        self._active = False
 
     @property
     def tool_name(self) -> str:
@@ -90,7 +97,7 @@ class Brush(Tool):
     @property
     def cursor_image(self) -> np.ndarray:
         radius = self._user_params['radius'].value
-        self._brush_mask = 255 * np.ones((radius, radius), np.uint8)
+        self._brush_mask = 255 * M.disk(radius)
         self._brush_center = np.array([radius // 2, radius // 2])
         self._brush_coords = np.argwhere(self._brush_mask > 0) - self._brush_center
         return self._brush_mask
@@ -109,11 +116,26 @@ class Brush(Tool):
             self._user_params[param_name].value = value
         elif param.param_type == ParamType.BOOL:
             pass
-            #print(f'{"checked" if value else "unchecked"} bool param {param_name}')
         self._user_params[param_name].value = value
         return value
 
-    def left_press(self, pos: typing.Tuple[int, int], img: np.ndarray, label: int):
+    def left_press(self, pos: typing.Tuple[int, int], img: np.ndarray, label: int) -> typing.List[np.ndarray]:
+        self._active = True
+        self.modified_coords.clear()
         self._current_img = img
-        coords = self._brush_coords + np.array(pos)
-        img[coords[:, 0], coords[:, 1]] = label
+        return self.mouse_move(pos, label)
+
+    def mouse_move(self, pos: typing.Tuple[int, int], label: int) -> typing.List[np.ndarray]:
+        if not self.active:
+            return []
+        coords = list(self._brush_coords + np.array(pos))
+        self.modified_coords.extend(coords)
+        return coords
+
+    def left_release(self, pos: typing.Tuple[int, int], label: int) -> typing.List[np.ndarray]:
+        self._active = False
+        return self.modified_coords
+
+    @property
+    def active(self) -> bool:
+        return self._active

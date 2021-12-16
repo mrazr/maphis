@@ -49,6 +49,7 @@ class MaskEditor(QObject):
         self._scene.addItem(self.canvas)
         self.canvas.initialize()
         self.canvas.left_press.connect(self.handle_left_press)
+        self.photo_view.view_dragging.connect(self.canvas.handle_view_dragging)
 
         self.current_photo: Optional[Photo] = None
         self._toolbox = QToolBox()
@@ -61,6 +62,9 @@ class MaskEditor(QObject):
 
         self._current_tool = self._tools[0]
         self.canvas.set_current_tool(self._tools[0])
+        self.ui.tbtnBugMask.animateClick()
+        self.handle_reflection_mask_checked(False)
+        self.handle_segments_mask_checked(False)
 
     def _mock_load_tools(self) -> typing.List[Tool]:
         return [self._mock_load_tool(i) for i in range(1)]

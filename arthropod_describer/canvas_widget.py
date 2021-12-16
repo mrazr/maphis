@@ -1,6 +1,6 @@
 import typing
 
-from PySide2.QtCore import QPointF, Signal, QRectF, QPoint
+from PySide2.QtCore import QPointF, Signal, QRectF, QPoint, Slot
 from PySide2.QtGui import QPixmap, QColor, QImage, QPainter, Qt, QCursor
 from PySide2.QtWidgets import QGraphicsItem, QGraphicsScene, QGraphicsPixmapItem, QGraphicsSceneMouseEvent, \
     QStyleOptionGraphicsItem, QWidget, QGraphicsObject, QGraphicsSceneHoverEvent
@@ -26,18 +26,22 @@ class ToolCursor(QGraphicsItem):
         QGraphicsItem.__init__(self, parent)
         self.cursor_image: QImage = QImage()
         self.cursor_pos = QPoint()
+        self.setAcceptedMouseButtons(Qt.NoButton)
 
     def boundingRect(self) -> QRectF:
         return self.cursor_image.rect()
 
     def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget:typing.Optional[QWidget]=...):
-        print("paint")
-        painter.drawImage(self.cursor_pos.x() - self.cursor_image.width() // 2,
-                          self.cursor_pos.y() - self.cursor_image.height() // 2,
+        #painter.drawImage(self.cursor_pos.x() - self.cursor_image.width() // 2,
+        #                  self.cursor_pos.y() - self.cursor_image.height() // 2,
+        #                  self.cursor_image)
+        painter.drawImage(self.boundingRect().x() - self.cursor_image.width() // 2,
+                          self.boundingRect().y() - self.cursor_image.height() // 2,
                           self.cursor_image)
 
     def set_pos(self, pos: QPoint):
-        self.cursor_pos = pos
+        self.cursor_pos = self.mapFromScene(pos)
+        self.setPos(pos)
         self.update()
 
     def set_cursor(self, curs: QImage):
@@ -82,13 +86,12 @@ class CanvasWidget(QGraphicsObject):
         self.canvas_rect = QRectF()
 
         self.cursor_image: typing.Optional[QImage] = None
-        #self.cursor_gpixmap = QGraphicsPixmapItem()
 
         self.cur_mouse_pos: QPoint = QPoint()
         self.setAcceptHoverEvents(True)
 
         self.cursor__ = None
-        self.setCursor(QCursor(Qt.CursorShape.BlankCursor))
+        #self.setCursor(QCursor(Qt.CursorShape.BlankCursor))
 
     def initialize(self):
         self._image_pixmap = QPixmap()
@@ -137,7 +140,6 @@ class CanvasWidget(QGraphicsObject):
         mask_w.setPos(0, 0)
         mask_w.setZValue(3)
 
-        #self.cursor_gpixmap.setZValue(42)
         self.cursor__ = ToolCursor(None)
         self.scene().addItem(self.cursor__)
         self.cursor__.setPos(0, 0)
@@ -149,11 +151,6 @@ class CanvasWidget(QGraphicsObject):
         return QRectF()
 
     def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget:typing.Optional[QWidget]=...):
-        #if self.cursor_image is not None:
-        #    print("paint")
-        #    painter.drawImage(self.cur_mouse_pos.x() - self.cursor_image.width() // 2,
-        #                      self.cur_mouse_pos.y() - self.cursor_image.height() // 2,
-        #                      self.cursor_image)
         pass
 
     def set_photo(self, photo: Photo):
@@ -165,7 +162,6 @@ class CanvasWidget(QGraphicsObject):
 
         for mask_type in self.masks.keys():
             self.mask_gpixmaps[mask_type].setVisible(False)
-            #self._set_pixmaps(self.masks[mask_type].mask, self.mask_pixmaps[mask_type], self.mask_gpixmaps[mask_type])
             self.mask_widgets[mask_type].set_mask_image(self.masks[mask_type].mask)
             self.mask_widgets[mask_type].set_color_map([QColor.fromRgb(*np.random.randint(0, 255, (3,)), 150).rgba()])
 
@@ -187,14 +183,42 @@ class CanvasWidget(QGraphicsObject):
         self.scene().update()
 
     def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
-        self.left_press.emit(event.pos())
-        super().mousePressEvent(event)
+        self.left_press.emit(event.scenePos())
+        if event.buttons() & Qt.MouseButton.MiddleButton == 0:
+            if self._current_tool is not None:
+                pos = self.mapFromScene(event.scenePos())
+                coords = self._current_tool.left_press(pos.toPoint().toTuple(),
+                                                       None, 1)
+                print(pos.toPoint())
+                print(coords)
+                mask = self.mask_widgets[MaskType.BUG_MASK]
+                for x, y in coords:
+                    mask._mask_image.setPixel(x, y, 1)
+        else:
+            super().mousePressEvent(event)
 
     def mouseMoveEvent(self, event: QGraphicsSceneMouseEvent):
-        print('hell')
-        super().mouseMoveEvent(event)
+        if self._current_tool is not None:
+            if self._current_tool.active:
+                self.cur_mouse_pos = self.cursor__.mapFromScene(event.scenePos().toPoint())
+                self.cursor__.set_pos(event.scenePos())
+                coords = self._current_tool.left_press(event.pos().toPoint().toTuple(),
+                                                       None, 1)
+                mask = self.mask_widgets[MaskType.BUG_MASK]
+                for x, y in coords:
+                    mask._mask_image.setPixel(x, y, 1)
+            else:
+                super().mouseMoveEvent(event)
+            self.update()
+        else:
+            super().mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, event: QGraphicsSceneMouseEvent):
+        if self._current_tool is not None:
+            self._current_tool.left_release(event.pos().toPoint().toTuple(), 1)
+        #self.cursor__.setVisible(True)
+        #self.cursor__.update()
+        #self.update()
         super().mouseReleaseEvent(event)
 
     def hoverEnterEvent(self, event: QGraphicsSceneHoverEvent):
@@ -224,3 +248,10 @@ class CanvasWidget(QGraphicsObject):
     def set_mask_shown(self, mask_type: MaskType, is_shown: bool):
         #self.mask_gpixmaps[mask_type].setVisible(is_shown)
         self.mask_widgets[mask_type].setVisible(is_shown)
+
+    @Slot(bool, QPoint)
+    def handle_view_dragging(self, dragging: bool, mouse_pos: QPoint):
+        print("handle view drag")
+        self.cursor__.set_pos(mouse_pos)
+        self.cursor__.setVisible(not dragging)
+        self.update()

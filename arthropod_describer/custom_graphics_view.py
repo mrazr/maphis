@@ -1,4 +1,4 @@
-from PySide2.QtCore import Signal, QPointF, Qt, QEvent
+from PySide2.QtCore import Signal, QPointF, Qt, QEvent, QPoint
 from PySide2.QtGui import QPainter, QWheelEvent, QResizeEvent, QMouseEvent, QKeyEvent, QCursor
 from PySide2.QtWidgets import QGraphicsView, QWidget, QSizePolicy
 
@@ -8,6 +8,7 @@ class CustomGraphicsView(QGraphicsView):
     view_changed = Signal()
     rubber_band_started = Signal()
     mouse_move = Signal(QPointF)
+    view_dragging = Signal(bool, QPoint)
 
     def __init__(self, parent: QWidget = None):
         QGraphicsView.__init__(self, parent)
@@ -55,6 +56,7 @@ class CustomGraphicsView(QGraphicsView):
             self.original_event = event
             handmade_event = QMouseEvent(QEvent.MouseButtonPress, QPointF(event.pos()), Qt.LeftButton, event.buttons(),
                                          Qt.KeyboardModifiers())
+            self.view_dragging.emit(True, self.mapToScene(event.pos()))
             self.mousePressEvent(handmade_event)
             return None
         super().mousePressEvent(event)
@@ -70,6 +72,7 @@ class CustomGraphicsView(QGraphicsView):
                                          event.buttons(), Qt.KeyboardModifiers())
             self.mouseReleaseEvent(handmade_event)
             self.setDragMode(QGraphicsView.NoDrag)
+            self.view_dragging.emit(False, self.mapToScene(event.pos()))
         super().mouseReleaseEvent(event)
 
     def mouseMoveEvent(self, event: QMouseEvent):

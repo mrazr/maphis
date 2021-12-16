@@ -85,7 +85,7 @@ class Brush(Tool):
         self._current_img = None
         radius = self._user_params['radius'].value
         self._brush_mask = 255 * M.disk(radius)
-        self._brush_center = np.array([radius // 2, radius // 2])
+        self._brush_center = np.array([radius, radius])
         self._brush_coords = np.argwhere(self._brush_mask > 0) - self._brush_center
         self.modified_coords: typing.List[np.ndarray] = []
         self._active = False
@@ -98,7 +98,7 @@ class Brush(Tool):
     def cursor_image(self) -> np.ndarray:
         radius = self._user_params['radius'].value
         self._brush_mask = 255 * M.disk(radius)
-        self._brush_center = np.array([radius // 2, radius // 2])
+        self._brush_center = np.array([radius, radius])
         self._brush_coords = np.argwhere(self._brush_mask > 0) - self._brush_center
         return self._brush_mask
 

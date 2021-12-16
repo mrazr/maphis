@@ -1,9 +1,11 @@
 import abc
 import enum
 import typing
+from typing import Tuple
 
 import numpy as np
 import skimage.morphology as M
+from skimage import draw
 
 
 class ParamType(enum.IntEnum):
@@ -73,7 +75,7 @@ class Tool(abc.ABC):
     def middle_click(self, pos: typing.Tuple[int, int], label: int):
         pass
 
-    def mouse_move(self, pos: typing.Tuple[int, int], label: int):
+    def mouse_move(self, new_pos: typing.Tuple[int, int], old_pos: typing.Tuple[int, int], label: int):
         pass
 
 
@@ -123,9 +125,9 @@ class Brush(Tool):
         self._active = True
         self.modified_coords.clear()
         self._current_img = img
-        return self.mouse_move(pos, label)
+        return self.mouse_move(pos, pos, label)
 
-    def mouse_move(self, pos: typing.Tuple[int, int], label: int) -> typing.List[np.ndarray]:
+    def mouse_move(self, pos: typing.Tuple[int, int], old_pos: typing.Tuple[int, int], label: int) -> typing.List[np.ndarray]:
         if not self.active:
             return []
         coords = list(self._brush_coords + np.array(pos))

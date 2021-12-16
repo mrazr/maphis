@@ -1,10 +1,11 @@
 import typing
 
 from PySide2.QtCore import QPointF, Signal, QRectF, QPoint, Slot
-from PySide2.QtGui import QPixmap, QColor, QImage, QPainter, Qt, QCursor
+from PySide2.QtGui import QPixmap, QColor, QImage, QPainter, Qt, QCursor, QBrush
 from PySide2.QtWidgets import QGraphicsItem, QGraphicsScene, QGraphicsPixmapItem, QGraphicsSceneMouseEvent, \
     QStyleOptionGraphicsItem, QWidget, QGraphicsObject, QGraphicsSceneHoverEvent
 import numpy as np
+from skimage import draw
 
 from tools.tool import Tool
 from mask_widget import MaskWidget
@@ -42,6 +43,7 @@ class ToolCursor(QGraphicsItem):
     def set_pos(self, pos: QPoint):
         self.cursor_pos = self.mapFromScene(pos)
         self.setPos(pos)
+        self.setVisible(False)
         self.update()
 
     def set_cursor(self, curs: QImage):
@@ -61,9 +63,9 @@ class CanvasWidget(QGraphicsObject):
         self.photo: typing.Optional[Photo] = None
 
         self.masks: typing.Optional[typing.Dict[MaskType, Mask]] = None
-        self.colormaps = {MaskType.BUG_MASK: [],
-                          MaskType.SEGMENTS_MASK: [],
-                          MaskType.REFLECTION_MASK: []}
+        self.colormaps = {MaskType.BUG: [],
+                          MaskType.REGIONS: [],
+                          MaskType.REFLECTION: []}
 
         self._image_pixmap = None
         self.image_gpixmap = None
@@ -111,32 +113,32 @@ class CanvasWidget(QGraphicsObject):
         self._reflection_gpixmap.setZValue(3)
 
         self.mask_pixmaps: typing.Dict[MaskType, QPixmap] = {
-            MaskType.BUG_MASK: self._mask_pixmap,
-            MaskType.SEGMENTS_MASK: self._segments_pixmap,
-            MaskType.REFLECTION_MASK: self._reflection_pixmap
+            MaskType.BUG: self._mask_pixmap,
+            MaskType.REGIONS: self._segments_pixmap,
+            MaskType.REFLECTION: self._reflection_pixmap
         }
 
         self.mask_gpixmaps: typing.Dict[MaskType, QGraphicsPixmapItem] = {
-            MaskType.BUG_MASK: self._mask_gpixmap,
-            MaskType.SEGMENTS_MASK: self._segments_gpixmap,
-            MaskType.REFLECTION_MASK: self._reflection_gpixmap
+            MaskType.BUG: self._mask_gpixmap,
+            MaskType.REGIONS: self._segments_gpixmap,
+            MaskType.REFLECTION: self._reflection_gpixmap
         }
 
         mask_w = MaskWidget()
         self.scene().addItem(mask_w)
-        self.mask_widgets[MaskType.BUG_MASK] = mask_w
+        self.mask_widgets[MaskType.BUG] = mask_w
         mask_w.setPos(0, 0)
         mask_w.setZValue(1)
 
         mask_w = MaskWidget()
         self.scene().addItem(mask_w)
-        self.mask_widgets[MaskType.SEGMENTS_MASK] = mask_w
+        self.mask_widgets[MaskType.REGIONS] = mask_w
         mask_w.setPos(0, 0)
         mask_w.setZValue(2)
 
         mask_w = MaskWidget()
         self.scene().addItem(mask_w)
-        self.mask_widgets[MaskType.REFLECTION_MASK] = mask_w
+        self.mask_widgets[MaskType.REFLECTION] = mask_w
         mask_w.setPos(0, 0)
         mask_w.setZValue(3)
 
@@ -186,27 +188,56 @@ class CanvasWidget(QGraphicsObject):
         self.left_press.emit(event.scenePos())
         if event.buttons() & Qt.MouseButton.MiddleButton == 0:
             if self._current_tool is not None:
-                pos = self.mapFromScene(event.scenePos())
-                coords = self._current_tool.left_press(pos.toPoint().toTuple(),
-                                                       None, 1)
-                print(pos.toPoint())
-                print(coords)
-                mask = self.mask_widgets[MaskType.BUG_MASK]
-                for x, y in coords:
-                    mask._mask_image.setPixel(x, y, 1)
+                img = self.mask_widgets[MaskType.BUG]._mask_image
+                painter = QPainter(self.mask_widgets[MaskType.BUG]._mask_image)
+                painter.setBrush(QBrush(img.color(1)))
+                painter.drawEllipse(event.pos(), self._current_tool.user_params['radius'].value,
+                                    self._current_tool.user_params['radius'].value)
+                #pos = self.mapFromScene(event.scenePos())
+                #coords = self._current_tool.left_press(pos.toPoint().toTuple(),
+                #                                       None, 1)
+                #mask = self.mask_widgets[MaskType.BUG]
+                #for x, y in coords:
+                #    mask._mask_image.setPixel(x, y, 1)
         else:
             super().mousePressEvent(event)
 
     def mouseMoveEvent(self, event: QGraphicsSceneMouseEvent):
+        img = self.mask_widgets[MaskType.BUG]._mask_image
+        painter = QPainter(self.mask_widgets[MaskType.BUG]._mask_image)
+        painter.setBrush(QBrush(img.color(1)))
+        old_pos = event.lastPos().toPoint()
+        new_pos = event.pos().toPoint()
+        rr, cc = draw.line(old_pos.y(), old_pos.x(),
+                           new_pos.y(), new_pos.x())
+        for x, y in zip(cc, rr):
+            print("OOOO")
+            painter.drawEllipse(QPoint(x, y), self._current_tool.user_params['radius'].value,
+                                self._current_tool.user_params['radius'].value)
         if self._current_tool is not None:
             if self._current_tool.active:
                 self.cur_mouse_pos = self.cursor__.mapFromScene(event.scenePos().toPoint())
                 self.cursor__.set_pos(event.scenePos())
-                coords = self._current_tool.left_press(event.pos().toPoint().toTuple(),
-                                                       None, 1)
-                mask = self.mask_widgets[MaskType.BUG_MASK]
-                for x, y in coords:
-                    mask._mask_image.setPixel(x, y, 1)
+
+                img = self.mask_widgets[MaskType.BUG]._mask_image
+                painter = QPainter(self.mask_widgets[MaskType.BUG]._mask_image)
+                painter.setBrush(QBrush(img.color(1)))
+                old_pos = event.lastPos().toPoint()
+                new_pos = event.pos().toPoint()
+                rr, cc = draw.line(old_pos.y(), old_pos.x(),
+                                        new_pos.y(), new_pos.x())
+                for x, y in zip(cc, rr):
+                    print("OOOO")
+                    painter.drawEllipse(QPoint(x, y), self._current_tool.user_params['radius'].value,
+                                        self._current_tool.user_params['radius'].value)
+                #print(f'coords len {len(coords)}')
+                ##coords = self._current_tool.mouse_move(event.pos().toPoint().toTuple(),
+                ##                                       event.lastPos().toPoint().toTuple(),
+                ##                                       1)
+                #mask = self.mask_widgets[MaskType.BUG]
+                #for x, y in coords:
+                #    mask._mask_image.setPixel(x, y, 1)
+                super().mouseMoveEvent(event)
             else:
                 super().mouseMoveEvent(event)
             self.update()
@@ -216,6 +247,7 @@ class CanvasWidget(QGraphicsObject):
     def mouseReleaseEvent(self, event: QGraphicsSceneMouseEvent):
         if self._current_tool is not None:
             self._current_tool.left_release(event.pos().toPoint().toTuple(), 1)
+            super().mouseReleaseEvent(event)
         #self.cursor__.setVisible(True)
         #self.cursor__.update()
         #self.update()
@@ -227,7 +259,6 @@ class CanvasWidget(QGraphicsObject):
 
     def hoverMoveEvent(self, event: QGraphicsSceneHoverEvent):
         self.cur_mouse_pos = event.pos().toPoint()
-        #self.cursor_gpixmap.setPos(event.pos().toPoint())
         self.cursor__.set_pos(self.cur_mouse_pos)
         self.update()
 

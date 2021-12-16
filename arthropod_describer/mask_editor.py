@@ -176,15 +176,15 @@ class MaskEditor(QObject):
 
     def handle_bug_mask_checked(self, checked: bool):
         print(f"bug {checked}")
-        self.canvas.set_mask_shown(MaskType.BUG_MASK, checked)
+        self.canvas.set_mask_shown(MaskType.BUG, checked)
 
     def handle_segments_mask_checked(self, checked: bool):
         print(f"segments {checked}")
-        self.canvas.set_mask_shown(MaskType.SEGMENTS_MASK, checked)
+        self.canvas.set_mask_shown(MaskType.REGIONS, checked)
 
     def handle_reflection_mask_checked(self, checked: bool):
         print(f"reflections {checked}")
-        self.canvas.set_mask_shown(MaskType.REFLECTION_MASK, checked)
+        self.canvas.set_mask_shown(MaskType.REFLECTION, checked)
 
     def handle_tool_activated(self, checked: bool, tool_id: int):
         self._current_tool = self._tools[tool_id]

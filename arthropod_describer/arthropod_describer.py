@@ -24,10 +24,6 @@ class ArthropodDescriber(QMainWindow):
         self.ui = Ui_ArhtropodDescriber()
         self.ui.setupUi(self)
 
-        #self.editor_ui = Ui_MaskEditor()
-        #self.editor = QWidget()
-        #self.editor_ui.setupUi(self.editor)
-
         self.mask_editor = MaskEditor()
         self.mask_editor.signal_prev_photo.connect(self.handle_editor_prev_photo_request)
         self.mask_editor.signal_next_photo.connect(self.handle_editor_next_photo_request)
@@ -73,6 +69,7 @@ class ArthropodDescriber(QMainWindow):
         photo = self.storage.get_photo_by_idx(row)
         self.current_photo = photo
         self.mask_editor.set_photo(photo)
+        self.current_idx = current
 
     def handle_image_list_slider_released(self):
         first_idx = self.ui.imageListView.indexAt(QPoint(0, 0))
@@ -94,12 +91,9 @@ class ArthropodDescriber(QMainWindow):
     def closeEvent(self, event: QCloseEvent):
         self.thumbnail_storage.stop()
 
+
 if __name__ == "__main__":
     app = QApplication([])
-    #app.setStyle(TooltipProxyStyle(app.style()))
-    #strg = MockStorage.create()
     window = ArthropodDescriber()
-    #window.set_storage(strg)
     window.showMaximized()
-    #strg.destroy()
     sys.exit(app.exec_())

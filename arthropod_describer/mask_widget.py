@@ -1,7 +1,7 @@
 import typing
 
 from PySide2.QtCore import QRectF
-from PySide2.QtGui import QPixmap, QImage, QPainter, QColor
+from PySide2.QtGui import QPixmap, QImage, QPainter, QColor, Qt
 from PySide2.QtWidgets import QGraphicsPixmapItem, QGraphicsItem, QWidget, QStyleOptionGraphicsItem
 
 
@@ -10,6 +10,7 @@ class MaskWidget(QGraphicsItem):
         QGraphicsItem.__init__(self)
         self._mask_image: typing.Optional[QImage] = None
         self._colormap = None
+        self.setAcceptedMouseButtons(Qt.NoButton)
 
     def set_mask_image(self, mask: QImage):
         self.prepareGeometryChange()

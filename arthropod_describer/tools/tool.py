@@ -17,11 +17,17 @@ class ParamType(enum.IntEnum):
 
 
 class ToolUserParam:
-    def __init__(self, name: str, param_type: ParamType, default_value):
+    def __init__(self, name: str, param_type: ParamType, default_value, min_val: int=-1, max_val: int=-1, step:int=1):
         self.name = name
         self.param_type = param_type
         self.default_value = default_value
         self.value = self.default_value
+        if self.param_type == ParamType.INT:
+            assert min_val >= 0
+            assert max_val >= 0
+        self.min_value = min_val
+        self.max_value = max_val
+        self.value_step = step
 
 
 class Tool(abc.ABC):
@@ -100,7 +106,7 @@ class Brush(Tool):
     def __init__(self):
         Tool.__init__(self)
         self._tool_name = "Brush"
-        self._user_params = {'radius': ToolUserParam('radius', ParamType.INT, 9)}
+        self._user_params = {'radius': ToolUserParam('radius', ParamType.INT, 9, min_val=1, max_val=75, step=2)}
         self._current_img = None
         self.edit_mask = QImage()
         self.edit_painter = QPainter(self.edit_mask)

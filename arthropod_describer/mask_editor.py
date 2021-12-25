@@ -158,9 +158,9 @@ class MaskEditor(QObject):
             lay.addWidget(label, row, 0)
             if param.param_type == ParamType.INT:
                 entry = QSpinBox()
-                entry.setMinimum(1)
-                entry.setMaximum(55)
-                entry.setSingleStep(2)
+                entry.setMinimum(param.min_value)
+                entry.setMaximum(param.max_value)
+                entry.setSingleStep(param.value_step)
                 entry.setValue(param.default_value)
                 entry.setObjectName(param_name)
                 entry.valueChanged.connect(lambda: self._handle_param_changed(tool.tool_id))

@@ -5,6 +5,8 @@ import typing
 import os
 import logging
 
+import cv2 as cv
+import numpy as np
 from PySide2.QtGui import QImage
 
 from .photo import LocalPhoto, Photo
@@ -97,6 +99,8 @@ class LocalStorage(Storage):
 
         self._reflection_masks_folder = self._location / 'reflection_masks'
 
+        self._loaded_photo: typing.Optional[Photo] = None #only for now
+
     def _load_photo(self, img_name: str) -> LocalPhoto:
         return LocalPhoto(self._location, img_name) # TODO handle loading masks
 
@@ -112,7 +116,23 @@ class LocalStorage(Storage):
 
     def get_photo_by_idx(self, idx: int) -> Photo:
         assert 0 <= idx < len(self._image_names)
-        return self._images[idx]
+        photo = self._images[idx]
+
+        if self._loaded_photo is not None:
+            self._loaded_photo._image = None
+            self._loaded_photo.bug_mask.label_image = None
+            self._loaded_photo.segments_mask.label_image = None
+            self._loaded_photo.reflection_mask.label_image = None
+
+        photo._image = QImage(str(photo.image_path))
+        photo.bug_mask.reload()
+        photo.segments_mask.reload()
+        photo.reflection_mask.reload()
+
+        #show_imgs([255 * resize(photo.bug_mask.label_img.astype(np.uint8))])
+
+        self._loaded_photo = photo
+        return self._loaded_photo
 
     def get_photo_by_name(self, name: str) -> Photo:
         assert name in self._image_names
@@ -140,3 +160,16 @@ class MockStorage(LocalStorage):
         strg = MockStorage(folder, image_regex)
         strg._images = [QImage(256, 256, QImage.Format_Grayscale16) for _ in range(strg.image_count)]
         return strg
+
+
+def resize(img: np.ndarray) -> np.ndarray:
+    return cv.resize(img, (0, 0), fx=0.5, fy=0.5, interpolation=cv.INTER_NEAREST)
+
+
+def show_imgs(imgs):
+    if isinstance(imgs, np.ndarray):
+        imgs = [imgs]
+    for i, img in enumerate(imgs):
+        cv.imshow(f'img_{i}', img)
+    cv.waitKey(0)
+    cv.destroyAllWindows()

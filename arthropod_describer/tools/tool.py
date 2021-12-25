@@ -5,7 +5,9 @@ from typing import Tuple
 
 import numpy as np
 import skimage.morphology as M
-from skimage import draw
+from PySide2.QtCore import QByteArray, QPoint, Slot
+from PySide2.QtGui import QBitmap, QPainter, QBrush, QImage, QColor
+from skimage import draw, io
 
 
 class ParamType(enum.IntEnum):
@@ -37,7 +39,7 @@ class Tool(abc.ABC):
 
     @property
     @abc.abstractmethod
-    def cursor_image(self) -> np.ndarray:
+    def cursor_image(self) -> QImage:
         pass
 
     #@property
@@ -55,7 +57,7 @@ class Tool(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def left_press(self, pos: typing.Tuple[int, int], img: np.ndarray, label: int):
+    def left_press(self, painter: QPainter, pos: QPoint, img: QImage, label: int):
         pass
 
     @property
@@ -63,19 +65,34 @@ class Tool(abc.ABC):
     def active(self) -> bool:
         pass
 
-    def left_release(self, pos: typing.Tuple[int, int], label: int):
+    def left_release(self, painter: QPainter, pos: QPoint, label: int) -> typing.Tuple[np.ndarray, int]:
         pass
 
-    def right_press(self, pos: typing.Tuple[int, int], img: np.ndarray, label: int):
+    def right_press(self, painter: QPainter, pos: QPoint, img: QImage, label: int):
         pass
 
-    def right_release(self, pos: typing.Tuple[int, int], label: int):
+    def right_release(self, painter: QPainter, pos: QPoint, label: int):
         pass
 
-    def middle_click(self, pos: typing.Tuple[int, int], label: int):
+    def middle_click(self, painter: QPainter, pos: QPoint, label: int):
         pass
 
-    def mouse_move(self, new_pos: typing.Tuple[int, int], old_pos: typing.Tuple[int, int], label: int):
+    def mouse_move(self, painter: QPainter, new_pos: QPoint, old_pos: QPoint, label: int):
+        pass
+
+    @Slot(int)
+    @abc.abstractmethod
+    def update_primary_label(self, label: int):
+        pass
+
+    @Slot(int)
+    @abc.abstractmethod
+    def update_secondary_label(self, label: int):
+        pass
+
+    @Slot(dict)
+    @abc.abstractmethod
+    def color_map_changed(self, cmap: typing.Dict[int, typing.Tuple[int, int, int]]):
         pass
 
 
@@ -85,24 +102,37 @@ class Brush(Tool):
         self._tool_name = "Brush"
         self._user_params = {'radius': ToolUserParam('radius', ParamType.INT, 9)}
         self._current_img = None
+        self.edit_mask = QImage()
+        self.edit_painter = QPainter(self.edit_mask)
         radius = self._user_params['radius'].value
-        self._brush_mask = 255 * M.disk(radius)
+
+        self._primary_label: int = 1
+        self._secondary_label: int = 0
+
+        self._brush_mask: np.ndarray = M.disk(radius, np.uint16)
+        self._brush_icon = QImage()
         self._brush_center = np.array([radius, radius])
         self._brush_coords = np.argwhere(self._brush_mask > 0) - self._brush_center
         self.modified_coords: typing.List[np.ndarray] = []
         self._active = False
+
+        self.cmap: typing.Dict[int, typing.Tuple[int, int, int]] = dict()
+
+        self._update_icon()
+
 
     @property
     def tool_name(self) -> str:
         return self._tool_name
 
     @property
-    def cursor_image(self) -> np.ndarray:
+    def cursor_image(self) -> QImage:
         radius = self._user_params['radius'].value
-        self._brush_mask = 255 * M.disk(radius)
+        self._brush_mask = M.disk(radius, np.uint16)
         self._brush_center = np.array([radius, radius])
         self._brush_coords = np.argwhere(self._brush_mask > 0) - self._brush_center
-        return self._brush_mask
+        self._update_icon()
+        return self._brush_icon
 
     @property
     def user_params(self) -> typing.Dict[str, ToolUserParam]:
@@ -121,23 +151,87 @@ class Brush(Tool):
         self._user_params[param_name].value = value
         return value
 
-    def left_press(self, pos: typing.Tuple[int, int], img: np.ndarray, label: int) -> typing.List[np.ndarray]:
+    def left_press(self, painter: QPainter, pos: QPoint, img: QImage, label) -> typing.List[np.ndarray]:
         self._active = True
-        self.modified_coords.clear()
         self._current_img = img
-        return self.mouse_move(pos, pos, label)
+        if self.edit_mask.size() == img.size():
+            self.edit_mask.fill(QColor(0, 0, 0))
+        else:
+            self.edit_mask = QImage(img.width(), img.height(), QImage.Format_Grayscale8)
+            self.edit_mask.fill(QColor(0, 0, 0))
+        return self.mouse_move(painter, pos, pos, label)
 
-    def mouse_move(self, pos: typing.Tuple[int, int], old_pos: typing.Tuple[int, int], label: int) -> typing.List[np.ndarray]:
+    def mouse_move(self, painter: QPainter, new_pos: QPoint, old_pos: QPoint, label: int) -> typing.List[np.ndarray]:
         if not self.active:
             return []
-        coords = list(self._brush_coords + np.array(pos))
-        self.modified_coords.extend(coords)
-        return coords
+        painter.save()
+        brush_color = QColor.fromRgba(self.cmap[self._primary_label])
+        painter.setPen(brush_color)
+        painter.setBrush(QBrush(brush_color))
+        rr, cc = draw.line(old_pos.y(), old_pos.x(),
+                           new_pos.y(), new_pos.x())
 
-    def left_release(self, pos: typing.Tuple[int, int], label: int) -> typing.List[np.ndarray]:
+        self.edit_painter.save()
+        self.edit_painter.begin(self.edit_mask)
+        self.edit_painter.setBrush(QBrush(QColor(255, 255, 255)))
+        self.edit_painter.setPen(QColor(255, 255, 255))
+        if painter.hasClipping():
+            self.edit_painter.setClipRegion(painter.clipRegion())
+        for x, y in zip(cc, rr):
+            painter.drawEllipse(QPoint(x, y), self.user_params['radius'].value,
+                                self.user_params['radius'].value)
+            self.edit_painter.drawEllipse(QPoint(x, y), self.user_params['radius'].value,
+                                self.user_params['radius'].value)
+        self.edit_painter.end()
+        self.edit_painter.restore()
+        painter.restore()
+        return []
+
+    def left_release(self, painter: QPainter, pos: QPoint, label: int) -> typing.Tuple[np.ndarray, int]:
         self._active = False
-        return self.modified_coords
+        #im = self.edit_mask
+        #nd_ = np.reshape(np.frombuffer(im.constBits(), np.uint8), im.size().toTuple()[::-1]).astype(np.uint8)
+        #io.imsave('/home/radoslav/what.png', nd_)
+        return np.where(qimage2ndarray(self.edit_mask) > 0, self._primary_label, -1), self._primary_label
 
     @property
     def active(self) -> bool:
         return self._active
+
+    @Slot(int)
+    def update_primary_label(self, label: int):
+        self._primary_label = label
+        self._update_icon()
+
+    @Slot(int)
+    def update_secondary_label(self, label: int):
+        self._secondary_label = label
+
+    def _update_icon(self):
+        if len(self.cmap.keys()) > 0:
+            sz = self._brush_mask.shape
+            self._brush_mask = self._primary_label * self._brush_mask
+            self._brush_icon = QImage(sz[1], sz[0], QImage.Format_ARGB32)
+            self._brush_icon.fill(QColor(0, 0, 0, 0))
+            brush_color = QColor.fromRgba(self.cmap[self._primary_label])
+            painter = QPainter(self._brush_icon)
+            painter.setPen(brush_color)
+            radius = self.user_params['radius'].value
+            painter.setBrush(QBrush(brush_color))
+            painter.drawEllipse(QPoint(radius, radius), radius, radius)
+
+    @Slot(dict)
+    def color_map_changed(self, cmap: typing.Dict[int, typing.Tuple[int, int, int]]):
+        if cmap is None:
+            return
+        self.cmap = cmap
+        self._update_icon()
+
+
+def qimage2ndarray(img: QImage) -> np.ndarray:
+    img_ = img
+    dtype = np.uint8
+    if img.format() == QImage.Format_ARGB32:
+        img_ = img.convertToFormat(QImage.Format_RGB32)
+        dtype = np.uint32
+    return np.reshape(np.frombuffer(img_.constBits(), dtype), img_.size().toTuple()[::-1]).astype(dtype)

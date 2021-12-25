@@ -1,16 +1,22 @@
+import time
+from enum import IntEnum
 import typing
 from typing import Optional
+from dataclasses import dataclass, field
 
+import cv2 as cv
 from PySide2.QtCore import Signal, QObject, QPointF
 from PySide2.QtGui import Qt
 from PySide2.QtWidgets import QWidget, QGraphicsScene, QToolButton, QGroupBox, QVBoxLayout, QSpinBox, QLineEdit, \
     QCheckBox, QGridLayout, QLabel, QSizePolicy, QToolBox
+import numpy as np
+from skimage import io
 
 from tools.tool import Tool, Brush, ToolUserParam, ParamType
 from custom_graphics_view import CustomGraphicsView
 from canvas_widget import CanvasWidget
 from view.ui_mask_edit_view import Ui_MaskEditor
-from model.photo import Photo, MaskType
+from model.photo import Photo, LabelType
 
 
 class ToolEntry:
@@ -18,6 +24,31 @@ class ToolEntry:
         self.tool = tool
         self.toolbutton = toolbutton
         self.param_widget = param_widget
+
+
+@dataclass(eq=False)
+class LabelChange:
+    coords: typing.Tuple[np.ndarray, np.ndarray]
+    new_label: int
+    old_label: int
+    label_type: LabelType
+
+    def swap_labels(self) -> 'LabelChange':
+        return LabelChange(self.coords, self.old_label, self.new_label, self.label_type)
+
+
+class DoType(IntEnum):
+    Do = 0,
+    Undo = 1,
+
+
+@dataclass(eq=False)
+class CommandEntry:
+    change_chain: typing.List[LabelChange] = field(default_factory=list)
+    do_type: DoType = DoType.Do
+
+    def add_label_change(self, change: LabelChange):
+        self.change_chain.append(change)
 
 
 class MaskEditor(QObject):
@@ -49,6 +80,7 @@ class MaskEditor(QObject):
         self._scene.addItem(self.canvas)
         self.canvas.initialize()
         self.canvas.left_press.connect(self.handle_left_press)
+        self.canvas.label_changed.connect(self.handle_label_changed)
         self.photo_view.view_dragging.connect(self.canvas.handle_view_dragging)
 
         self.current_photo: Optional[Photo] = None
@@ -65,6 +97,12 @@ class MaskEditor(QObject):
         self.ui.tbtnBugMask.animateClick()
         self.handle_reflection_mask_checked(False)
         self.handle_segments_mask_checked(False)
+
+        self.undo_stack: typing.List[CommandEntry] = []
+        self.redo_stack: typing.List[CommandEntry] = []
+
+        self.ui.tbtnUndo.clicked.connect(self.handle_undo_clicked)
+        self.ui.tbtnRedo.clicked.connect(self.handle_redo_clicked)
 
     def _mock_load_tools(self) -> typing.List[Tool]:
         return [self._mock_load_tool(i) for i in range(1)]
@@ -83,10 +121,8 @@ class MaskEditor(QObject):
     def _create_param_widgets(self):
         for tool in self._tools:
             param_widget = self._create_param_widget(tool)
-            #self.ui.center.addWidget(param_widget)
             self._toolbox.addItem(param_widget, tool.tool_name)
             self._tool_param_widgets.append(param_widget)
-            #param_widget.setVisible(False)
 
     def _handle_param_changed(self, tool_id: int):
         tool = self._tools[tool_id]
@@ -127,9 +163,6 @@ class MaskEditor(QObject):
                 entry.setSingleStep(2)
                 entry.setValue(param.default_value)
                 entry.setObjectName(param_name)
-                #entry.valueChanged.connect(lambda val: self._handle_spinbox_value_changed(tool.tool_id,
-                #                                                                          str(param_name), val))
-                #entry.valueChanged.connect(lambda val: self._handle_spinbox_value_changed(tool.tool_id, entry))
                 entry.valueChanged.connect(lambda: self._handle_param_changed(tool.tool_id))
                 lay.addWidget(entry, row, 1)
                 entry = None
@@ -138,8 +171,6 @@ class MaskEditor(QObject):
                 entry.setText(param.default_value)
                 entry.setObjectName(param_name)
                 entry.textChanged.connect(lambda: self._handle_param_changed(tool.tool_id))
-                #entry.textChanged.connect(lambda text: self._handle_lineedit_text_changed(tool.tool_id,
-                #                                                                  str(param_name), text))
                 lay.addWidget(entry, row, 1)
                 entry = None
             elif param.param_type == ParamType.BOOL:
@@ -147,8 +178,6 @@ class MaskEditor(QObject):
                 entry.setChecked(param.default_value)
                 entry.setObjectName(param_name)
                 entry.stateChanged.connect(lambda: self._handle_param_changed(tool.tool_id))
-                #entry.stateChanged.connect(lambda state: self._handle_checkbox_toggled(tool.tool_id,
-                #                                                                       str(param_name), state))
                 lay.addWidget(entry, row, 1)
                 entry = None
         return param_widget
@@ -169,22 +198,21 @@ class MaskEditor(QObject):
     def set_photo(self, photo: Photo):
         self.current_photo = photo
         self.canvas.set_photo(self.current_photo)
-        #self.canvas.left_press.connect(lambda: print("hello"))
         self._scene.setSceneRect(self.canvas.sceneBoundingRect())
         self._scene.update()
         self.photo_view.fitInView(self.canvas, Qt.KeepAspectRatio)
 
     def handle_bug_mask_checked(self, checked: bool):
         print(f"bug {checked}")
-        self.canvas.set_mask_shown(MaskType.BUG, checked)
+        self.canvas.set_mask_shown(LabelType.BUG, checked)
 
     def handle_segments_mask_checked(self, checked: bool):
         print(f"segments {checked}")
-        self.canvas.set_mask_shown(MaskType.REGIONS, checked)
+        self.canvas.set_mask_shown(LabelType.REGIONS, checked)
 
     def handle_reflection_mask_checked(self, checked: bool):
         print(f"reflections {checked}")
-        self.canvas.set_mask_shown(MaskType.REFLECTION, checked)
+        self.canvas.set_mask_shown(LabelType.REFLECTION, checked)
 
     def handle_tool_activated(self, checked: bool, tool_id: int):
         self._current_tool = self._tools[tool_id]
@@ -194,3 +222,59 @@ class MaskEditor(QObject):
     def handle_left_press(self, pos: QPointF):
         pos = pos.toPoint()
 
+    def handle_label_changed(self, edit_img: np.ndarray):
+        label_img = self.current_photo.label_dict[self.canvas.current_mask_shown].label_img
+
+        new_labels = np.unique(edit_img)[1:] # filter out the -1 label which is the first on in the returned array
+        command = CommandEntry()
+
+        for label in new_labels:
+            old_and_new = np.where(edit_img == label, label_img, -1)
+            old_labels = np.unique(old_and_new)[1:] # filter out -1
+            for old_label in old_labels:
+                coords = np.nonzero(old_and_new == old_label)
+                change = LabelChange(coords, label, old_label, self.canvas.current_mask_shown)
+                command.add_label_change(change)
+        self.redo_stack.clear() # copying GIMP's behaviour: when the user paints something, the redo stack is cleared
+        self.ui.tbtnRedo.setEnabled(False)
+        self.do_command(command, update_canvas=False)
+
+    def handle_undo_clicked(self):
+        command = self.undo_stack.pop()
+        self.do_command(command)
+        if len(self.undo_stack) == 0:
+            self.ui.tbtnUndo.setEnabled(False)
+
+    def handle_redo_clicked(self):
+        command = self.redo_stack.pop()
+        self.do_command(command)
+        if len(self.redo_stack) == 0:
+            self.ui.tbtnRedo.setEnabled(False)
+
+    def change_labels(self, label_img: np.ndarray, change: LabelChange):
+        label_img[change.coords[0], change.coords[1]] = change.new_label
+
+    def do_command(self, command: CommandEntry, update_canvas: bool=True):
+        reverse_command = CommandEntry()
+        labels_changed = set()
+        for change in command.change_chain:
+            label_img = self.current_photo.label_dict[change.label_type].label_img
+            #io.imsave('/home/radoslav/pre_change.png', 255 * label_img.astype(np.uint8))
+            self.change_labels(label_img, change)
+            reverse_command.add_label_change(change.swap_labels())
+            labels_changed.add(change.label_type)
+        reverse_command.do_type = DoType.Undo if command.do_type == DoType.Do else DoType.Do
+        if reverse_command.do_type == DoType.Undo:
+            self.undo_stack.append(reverse_command)
+            self.ui.tbtnUndo.setEnabled(True)
+        else:
+            self.redo_stack.append(reverse_command)
+            self.ui.tbtnRedo.setEnabled(True)
+
+        if update_canvas:
+            for label_type in labels_changed:
+                self.canvas.update_label(label_type)
+                #io.imsave(f'/home/radoslav/change_{label_type}.png', 255 * self.current_photo.label_dict[label_type].label_img.astype(np.uint8))
+        else:
+            if LabelType.BUG in labels_changed:
+                self.canvas.update_clip_mask()

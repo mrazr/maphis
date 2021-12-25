@@ -24,6 +24,9 @@
     <layout class="QHBoxLayout" name="toolBar">
      <item>
       <widget class="QToolButton" name="tbtnUndo">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
         <string>Undo</string>
        </property>
@@ -31,6 +34,9 @@
      </item>
      <item>
       <widget class="QToolButton" name="tbtnRedo">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
         <string>Redo</string>
        </property>

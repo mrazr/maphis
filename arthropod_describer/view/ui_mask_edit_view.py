@@ -32,11 +32,13 @@ class Ui_MaskEditor(object):
         self.toolBar.setObjectName(u"toolBar")
         self.tbtnUndo = QToolButton(MaskEditor)
         self.tbtnUndo.setObjectName(u"tbtnUndo")
+        self.tbtnUndo.setEnabled(False)
 
         self.toolBar.addWidget(self.tbtnUndo)
 
         self.tbtnRedo = QToolButton(MaskEditor)
         self.tbtnRedo.setObjectName(u"tbtnRedo")
+        self.tbtnRedo.setEnabled(False)
 
         self.toolBar.addWidget(self.tbtnRedo)
 

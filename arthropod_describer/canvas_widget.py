@@ -8,6 +8,8 @@ from PySide2.QtWidgets import QGraphicsItem, QGraphicsScene, QGraphicsPixmapItem
 import numpy as np
 from skimage import draw, io
 
+from model.colormap import Colormap
+from state import State
 from tools.tool import Tool
 from mask_widget import MaskWidget
 from model.photo import Photo, LabelImg, LabelType
@@ -58,8 +60,9 @@ class CanvasWidget(QGraphicsObject):
     wheel_move = Signal()
     label_changed = Signal(np.ndarray)
 
-    def __init__(self, parent=None):
+    def __init__(self, state: State, parent=None):
         QGraphicsObject.__init__(self, parent)
+        self.state = state
         self._current_tool: typing.Optional[Tool] = None
         self.photo: typing.Optional[Photo] = None
 
@@ -152,6 +155,9 @@ class CanvasWidget(QGraphicsObject):
         self.cursor__.setPos(0, 0)
         self.cursor__.setZValue(10)
 
+        self.state.photo_changed.connect(self.set_photo)
+        self.state.colormap_changed.connect(self._handle_colormap_changed)
+
     def boundingRect(self) -> QRectF:
         if self.photo is not None:
             return self.canvas_rect
@@ -183,10 +189,6 @@ class CanvasWidget(QGraphicsObject):
             #self.cursor__.update()
         self.update_clip_mask()
         self.set_mask_shown(self.current_mask_shown, True)
-
-    def set_color_map(self, color_map: typing.List[QColor], mask_type: LabelType):
-        self.colormaps[mask_type] = color_map
-        self.masks[mask_type].label_image.setColorTable(color_map)
 
     def _set_pixmaps(self, image: QImage, pixmap: QPixmap, gpixmap: QGraphicsPixmapItem):
         pixmap.convertFromImage(image, Qt.MonoOnly)
@@ -263,11 +265,13 @@ class CanvasWidget(QGraphicsObject):
         self.cursor_image = self._current_tool.cursor_image #QImage(tool.cursor_image.data, sz[1], sz[0], sz[1], QImage.Format_Grayscale16)
         self.cursor_image.setColorTable(self.colormaps[LabelType.BUG])
         self.cursor__.set_cursor(self.cursor_image)
+        self.cursor__.setOpacity(0.5)
         self.update()
 
     def set_mask_shown(self, mask_type: LabelType, is_shown: bool):
         #self.mask_gpixmaps[mask_type].setVisible(is_shown)
         self.mask_widgets[mask_type].setVisible(is_shown)
+        self.mask_widgets[mask_type].setOpacity(0.25)
         if self.masks is None:
             print("away")
             return
@@ -275,15 +279,15 @@ class CanvasWidget(QGraphicsObject):
             print(f'setting cmap for {mask_type}')
             self.current_mask_shown = mask_type
             self.cursor__.cursor_image.setColorTable(self.colormaps[mask_type])
-            self._current_tool.color_map_changed(self.masks[mask_type].color_map)
+            #self._current_tool.color_map_changed(self.masks[mask_type].color_map)
             self.cursor__.set_cursor(self._current_tool.cursor_image)
             #print(f'cmap for cursor is now {self.cursor__.cursor_image.colorTable()}')
-            if mask_type == LabelType.BUG:
-                self.mask_widgets[LabelType.BUG]._mask_image.save(f'/home/radoslav/mask_bug.png')
-            elif mask_type == LabelType.REGIONS:
-                self.mask_widgets[LabelType.REGIONS]._mask_image.save(f'/home/radoslav/mask_reg.png')
-            else:
-                self.mask_widgets[LabelType.REFLECTION]._mask_image.save(f'/home/radoslav/mask_reflection.png')
+            #if mask_type == LabelType.BUG:
+            #    self.mask_widgets[LabelType.BUG]._mask_image.save(f'/home/radoslav/mask_bug.png')
+            #elif mask_type == LabelType.REGIONS:
+            #    self.mask_widgets[LabelType.REGIONS]._mask_image.save(f'/home/radoslav/mask_reg.png')
+            #else:
+            #    self.mask_widgets[LabelType.REFLECTION]._mask_image.save(f'/home/radoslav/mask_reflection.png')
             print(f'cmap is {self.masks[mask_type].color_map}')
 
     @Slot(bool, QPoint)
@@ -306,3 +310,7 @@ class CanvasWidget(QGraphicsObject):
         self._clip_qimg.invertPixels()
         #self._clip_qimg.save('/home/radoslav/clip_mask.png')
         self.clip_mask = QBitmap.fromImage(self._clip_qimg, Qt.AutoColor)
+
+    def _handle_colormap_changed(self, colormap: Colormap):
+        for mask_widget in self.mask_widgets.values():
+            mask_widget.set_color_map(colormap)

@@ -4,9 +4,10 @@ from typing import Literal
 
 import cv2 as cv
 import numpy as np
-from PySide2.QtCore import QAbstractItemModel, QObject
+from PySide2.QtCore import QAbstractItemModel, QObject, Signal, Slot, QModelIndex
 from PySide2.QtGui import QImage, QPixmap, Qt, QPainter, QIcon, QColor
-from PySide2.QtWidgets import QWidget, QComboBox, QLabel, QHBoxLayout, QVBoxLayout, QMenu
+from PySide2.QtWidgets import QWidget, QComboBox, QLabel, QHBoxLayout, QVBoxLayout, QMenu, QCompleter, QLineEdit, \
+    QListView
 from skimage import io
 
 from tools.tool import qimage2ndarray
@@ -15,6 +16,10 @@ from view.ui_colormap_widget import Ui_ColormapWidget
 
 
 class ColormapWidget(QWidget):
+    primary_label_changed = Signal(int)
+    secondary_label_changed = Signal(int)
+    label_search_finished = Signal()
+
     def __init__(self, parent: typing.Optional[QWidget] = None):
         QWidget.__init__(self, parent=parent)
 
@@ -65,6 +70,15 @@ class ColormapWidget(QWidget):
 
        # self.setLayout(self.widget_layout)
 
+        self.colormap_line_edit = QLineEdit()
+        #self.colormap_list_view = QListView()
+
+        self.completer = QCompleter()
+        self.completer.activated[QModelIndex].connect(self._handle_label_search_confirmed)
+        #self.completer.setPopup(self.colormap_list_view)
+
+        self.colormap_line_edit.setCompleter(self.completer)
+
     def _build_label_pick_widget(self):
         self.mouse_img = QImage(':/images/mouse.png')
         self.mouse_np = qimage2ndarray(self.mouse_img)
@@ -114,6 +128,18 @@ class ColormapWidget(QWidget):
         self.ui.leftComboBox.setModel(self.current_colormap)
         self.ui.rightComboBox.setModel(self.current_colormap)
 
+        self.completer.setModel(self.current_colormap)
+        self.completer.setCaseSensitivity(Qt.CaseInsensitive)
+        self.completer.setFilterMode(Qt.MatchContains)
+        #self.completer.highlighted.connect(lambda _: print("highlight"))
+        #completer.setCompletionMode(QCompleter.InlineCompletion)
+
+        tpl = self.colormap_line_edit.topLevelWidget()
+        self.colormap_line_edit.completer().popup().setParent(tpl, Qt.Popup)
+
+        #self.ui.leftComboBox.setCompleter(QCompleter(self.current_colormap))
+        #self.ui.rightComboBox.setCompleter(QCompleter(self.current_colormap))
+
         self.set_label_by_idx(1, 'left')
         self.set_label_by_idx(random.randint(0, self.current_colormap.color_count), 'right')
 
@@ -135,12 +161,10 @@ class ColormapWidget(QWidget):
         self.ui.colormapComboBox.setCurrentIndex(idx)
 
     def _handle_left_label_changed(self, idx: int):
-        self.left_label = self.current_colormap.labels[idx]
-        self._paint_label_indicator('left')
+        self.change_primary_label(self.current_colormap.labels[idx])
 
     def _handle_right_label_changed(self, idx: int):
-        self.right_label = self.current_colormap.labels[idx]
-        self._paint_label_indicator('right')
+        self.change_secondary_label(self.current_colormap.labels[idx])
 
     def _handle_swap_labels_clicked(self):
         left_idx = self.ui.rightComboBox.currentIndex()
@@ -148,3 +172,19 @@ class ColormapWidget(QWidget):
 
         self.set_label_by_idx(left_idx, 'left')
         self.set_label_by_idx(right_idx, 'right')
+
+    def change_primary_label(self, label: int):
+        self.left_label = label
+        self._paint_label_indicator('left')
+        self.primary_label_changed.emit(self.left_label)
+
+    def change_secondary_label(self, label: int):
+        self.right_label = label
+        self._paint_label_indicator('right')
+        self.secondary_label_changed.emit(self.right_label)
+
+    @Slot(QModelIndex)
+    def _handle_label_search_confirmed(self, idx: QModelIndex):
+        label = self.current_colormap.data(idx)
+        print(label)
+        self.change_primary_label(label)

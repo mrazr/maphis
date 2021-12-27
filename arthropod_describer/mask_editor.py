@@ -5,14 +5,15 @@ from typing import Optional
 from dataclasses import dataclass, field
 
 import cv2 as cv
-from PySide2.QtCore import Signal, QObject, QPointF
+from PySide2.QtCore import Signal, QObject, QPointF, QPoint, QTimer
 from PySide2.QtGui import Qt, QImage, QPixmap
 from PySide2.QtWidgets import QWidget, QGraphicsScene, QToolButton, QGroupBox, QVBoxLayout, QSpinBox, QLineEdit, \
-    QCheckBox, QGridLayout, QLabel, QSizePolicy, QToolBox
+    QCheckBox, QGridLayout, QLabel, QSizePolicy, QToolBox, QGraphicsProxyWidget, QGraphicsItem, QListView
 import numpy as np
 from skimage import io
 
 import tools.tool
+from state import State
 from colormap_widget import ColormapWidget
 from tools.tool import Tool, Brush, ToolUserParam, ParamType
 from custom_graphics_view import CustomGraphicsView
@@ -57,7 +58,7 @@ class MaskEditor(QObject):
     signal_next_photo = Signal()
     signal_prev_photo = Signal()
 
-    def __init__(self):
+    def __init__(self, state: State):
         QObject.__init__(self)
         self.widget = QWidget()
         self.ui = Ui_MaskEditor()
@@ -69,6 +70,9 @@ class MaskEditor(QObject):
         self.ui.btnNext.clicked.connect(lambda: self.signal_next_photo.emit())
         self.ui.btnPrevious.clicked.connect(lambda: self.signal_prev_photo.emit())
 
+        self.state = state
+        self.state.colormap_changed.connect(lambda cmap: self._current_tool.color_map_changed(cmap.colormap))
+
         self._scene = QGraphicsScene()
 
         self.photo_view = CustomGraphicsView()
@@ -79,7 +83,11 @@ class MaskEditor(QObject):
 
         self.photo_view.setInteractive(True)
 
-        self.canvas = CanvasWidget()
+        self.photo_view.view_changed.connect(self._handle_view_changed)
+        self.photo_view.double_shift.connect(self._show_label_search_bar)
+        self.photo_view.escape_pressed.connect(self._hide_label_search_bar)
+
+        self.canvas = CanvasWidget(self.state)
         self._scene.addItem(self.canvas)
         self.canvas.initialize()
         self.canvas.left_press.connect(self.handle_left_press)
@@ -99,6 +107,8 @@ class MaskEditor(QObject):
         #vbox.addWidget(self.mouse_label)
 
         self.colormap_widget = ColormapWidget()
+        self.colormap_widget.primary_label_changed.connect(self._handle_primary_label_changed)
+        self.colormap_widget.secondary_label_changed.connect(self._handle_secondary_label_changed)
         vbox.addWidget(self.colormap_widget)
 
         self.current_photo: Optional[Photo] = None
@@ -129,6 +139,38 @@ class MaskEditor(QObject):
 
         self.ui.tbtnUndo.clicked.connect(self.handle_undo_clicked)
         self.ui.tbtnRedo.clicked.connect(self.handle_redo_clicked)
+
+        self._label_line_edit = self.colormap_widget.colormap_line_edit
+        #self._label_line_edit.textChanged.connect(lambda _: self._handle_view_changed())
+        self._glabel_line_edit = QGraphicsProxyWidget()
+        self._glabel_line_edit.setWidget(self._label_line_edit)
+        self._scene.addItem(self._glabel_line_edit)
+
+        self._label_list_view = self.colormap_widget.completer.popup()
+        self._glabel_list_view = QGraphicsProxyWidget(self._glabel_line_edit)
+        self._glabel_list_view.setWidget(self._label_list_view)
+        #self._scene.addItem(self._glabel_list_view)
+
+        rect = self.photo_view.viewport().rect()
+        point = QPoint(rect.center().x() - self._glabel_line_edit.boundingRect().width() // 2,
+                       rect.center().y() - self._glabel_line_edit.boundingRect().height() // 2)
+        scene_point = self.photo_view.mapToScene(point)
+        self._glabel_line_edit.setPos(scene_point)
+        self._glabel_line_edit.setFlag(QGraphicsItem.ItemIgnoresTransformations, True)
+        self._glabel_line_edit.setVisible(False)
+
+
+        #point.setY(point.y() + self._glabel_line_edit.boundingRect().y())
+        #scene_point = self.photo_view.mapToScene( )
+        self._glabel_list_view.setPos(QPoint(0, self._glabel_line_edit.boundingRect().height()))
+        self._glabel_list_view.setFlag(QGraphicsItem.ItemIgnoresTransformations, True)
+        self._glabel_list_view.setVisible(False)
+
+        self.qtimer = QTimer()
+        self.qtimer.setInterval(100)
+        self.qtimer.setSingleShot(False)
+        self.qtimer.timeout.connect(self._handle_view_changed)
+        self.qtimer.stop()
 
     def _build_label_pick_widget(self) -> QWidget:
         self.mouse_img = QImage(':/images/mouse.png')
@@ -250,6 +292,20 @@ class MaskEditor(QObject):
         self._scene.update()
         self.photo_view.fitInView(self.canvas, Qt.KeepAspectRatio)
 
+        rect = self.photo_view.viewport().rect()
+        point = QPoint(rect.center().x() - self._glabel_line_edit.boundingRect().width() // 2,
+                       rect.center().y() - self._glabel_line_edit.boundingRect().height() // 2)
+        scene_point = self.photo_view.mapToScene(point)
+        self._glabel_line_edit.setPos(scene_point)
+        #self._glabel_line_edit.setFlag(QGraphicsItem.ItemIgnoresTransformations, True)
+        self._glabel_line_edit.setZValue(100)
+
+        point.setY(point.y()) # + self._glabel_line_edit.boundingRect().height())
+        scene_point = self.photo_view.mapToScene(point)
+        self._glabel_list_view.setPos(scene_point)
+        #self._glabel_list_view.setFlag(QGraphicsItem.ItemIgnoresTransformations, True)
+        self._glabel_list_view.setZValue(100)
+
     def handle_bug_mask_checked(self, checked: bool):
         print(f"bug {checked}")
         self.canvas.set_mask_shown(LabelType.BUG, checked)
@@ -271,7 +327,8 @@ class MaskEditor(QObject):
         pos = pos.toPoint()
 
     def handle_label_changed(self, edit_img: np.ndarray):
-        label_img = self.current_photo.label_dict[self.canvas.current_mask_shown].label_img
+        label_img = self.state.current_photo.label_dict[self.canvas.current_mask_shown].label_img
+        #self.current_photo.label_dict[self.canvas.current_mask_shown].label_img
 
         new_labels = np.unique(edit_img)[1:] # filter out the -1 label which is the first on in the returned array
         command = CommandEntry()
@@ -326,3 +383,45 @@ class MaskEditor(QObject):
         else:
             if LabelType.BUG in labels_changed:
                 self.canvas.update_clip_mask()
+
+    def _handle_primary_label_changed(self, label: int):
+        self._current_tool.update_primary_label(label)
+        self.canvas.cursor__.set_cursor(self._current_tool.cursor_image)
+
+    def _handle_secondary_label_changed(self, label: int):
+        self._current_tool.update_secondary_label(label)
+        self.canvas.update()
+
+    def _handle_view_changed(self):
+        rect = self.photo_view.viewport().rect()
+        point = QPoint(rect.center().x() - self._glabel_line_edit.boundingRect().width() // 2,
+                       rect.center().y() - self._glabel_line_edit.boundingRect().height() // 2)
+        scene_point = self.photo_view.mapToScene(point)
+        self._glabel_line_edit.setPos(scene_point)
+        #self._glabel_line_edit.setFlag(QGraphicsItem.ItemIgnoresTransformations, True)
+        self._glabel_line_edit.setZValue(100)
+
+        point2 = QPoint(rect.center().x() - self._glabel_list_view.boundingRect().width() // 2,
+                        point.y() + self._glabel_line_edit.boundingRect().height())
+        #point.setY(point.y()) # + self._glabel_line_edit.boundingRect().height())
+        scene_point = self.photo_view.mapToScene(point2)
+        self._glabel_list_view.setPos(QPoint(0, self._glabel_line_edit.boundingRect().height()))
+        #self._glabel_list_view.setPos(scene_point)
+        #self._glabel_list_view.setFlag(QGraphicsItem.ItemIgnoresTransformations, True)
+        self._glabel_list_view.setZValue(102)
+
+        self._glabel_line_edit.update()
+        self._glabel_list_view.update()
+        #self._glabel_list_view.widget().raise_()
+        #self._label_line_edit.setFocus()
+        #self._label_line_edit.raise_()
+
+    def _show_label_search_bar(self):
+        self._glabel_line_edit.setVisible(True)
+        self._label_line_edit.setFocus()
+
+    def _hide_label_search_bar(self):
+        self.qtimer.stop()
+        self._glabel_line_edit.setVisible(False)
+        self._glabel_line_edit.ungrabKeyboard()
+        self._glabel_list_view.ungrabMouse()

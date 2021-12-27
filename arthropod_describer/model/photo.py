@@ -64,7 +64,8 @@ class LabelImg:
 
     # only for now
     def reload(self):
-        img = 1 * np.logical_not(io.imread(str(self._path)))
+        # TODO remove the `1000 * ` part
+        img = 1000 * np.logical_not(io.imread(str(self._path)))
         self.label_img = img
         self.color_map = {label: QColor.fromRgb(*tuple(np.random.randint(0, 256, (3,))), 100).rgba() for label in np.unique(self.label_img)}
         self.color_map[0] = QColor.fromRgb(0, 0, 0, 0).rgba()

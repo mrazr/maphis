@@ -1,3 +1,5 @@
+import time
+
 from PySide2.QtCore import Signal, QPointF, Qt, QEvent, QPoint
 from PySide2.QtGui import QPainter, QWheelEvent, QResizeEvent, QMouseEvent, QKeyEvent, QCursor
 from PySide2.QtWidgets import QGraphicsView, QWidget, QSizePolicy
@@ -9,6 +11,8 @@ class CustomGraphicsView(QGraphicsView):
     rubber_band_started = Signal()
     mouse_move = Signal(QPointF)
     view_dragging = Signal(bool, QPoint)
+    double_shift = Signal()
+    escape_pressed = Signal()
 
     def __init__(self, parent: QWidget = None):
         QGraphicsView.__init__(self, parent)
@@ -23,9 +27,14 @@ class CustomGraphicsView(QGraphicsView):
 
         self.verticalScrollBar().valueChanged.connect(lambda _: self.view_changed.emit())
         self.horizontalScrollBar().valueChanged.connect(lambda _: self.view_changed.emit())
+        self.time_of_first_shift = -1
+        self._allow_zoom: bool = True
         #self.setCursor(QCursor(Qt.CursorShape.BlankCursor))
         
     def wheelEvent(self, event: QWheelEvent) -> None:
+        if not self._allow_zoom:
+            QGraphicsView.wheelEvent(self, event)
+            return
         delta = 1
         if event.angleDelta().y() < 0:
             delta = -1
@@ -45,7 +54,7 @@ class CustomGraphicsView(QGraphicsView):
             self.fitInView(srect, Qt.KeepAspectRatio)
         self.scene().update()
         self.view_changed.emit()
-    
+
     def resizeEvent(self, event: QResizeEvent):
         self.view_changed.emit()
 
@@ -91,4 +100,14 @@ class CustomGraphicsView(QGraphicsView):
     def keyReleaseEvent(self, event: QKeyEvent) -> None:
         if event.key() == Qt.Key_Control or event.key() == Qt.Key_Shift:
             self.setDragMode(QGraphicsView.NoDrag)
+            if self.time_of_first_shift < 0:
+                self.time_of_first_shift = time.time() * 1000
+            else:
+                if 1000 * time.time() - self.time_of_first_shift < 500:
+                    self.double_shift.emit()
+                    self.time_of_first_shift = -1
+                    self._allow_zoom = False
+        if event.key() == Qt.Key_Escape:
+            self.escape_pressed.emit()
+            self._allow_zoom = True
         QGraphicsView.keyReleaseEvent(self, event)

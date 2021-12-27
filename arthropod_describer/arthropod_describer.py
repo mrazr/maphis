@@ -5,6 +5,7 @@ from PySide2.QtGui import QCloseEvent
 from PySide2.QtWidgets import QMainWindow, QApplication, QWidget, QHBoxLayout, QSizePolicy
 from PySide2.QtCore import QModelIndex, QPoint, Slot, QItemSelectionModel
 
+from state import State
 from model.photo import Photo
 from view.ui_arthropod_describer import Ui_ArhtropodDescriber
 from view.ui_mask_edit_view import Ui_MaskEditor
@@ -24,9 +25,10 @@ class ArthropodDescriber(QMainWindow):
         self.ui = Ui_ArhtropodDescriber()
         self.ui.setupUi(self)
 
-        self.mask_editor = MaskEditor()
-        self.mask_editor.signal_prev_photo.connect(self.handle_editor_prev_photo_request)
-        self.mask_editor.signal_next_photo.connect(self.handle_editor_next_photo_request)
+        self.state = State()
+
+        self.mask_editor = MaskEditor(self.state)
+        self._setup_label_editor()
 
         hbox = QHBoxLayout()
         hbox.addWidget(self.mask_editor.widget)
@@ -40,20 +42,37 @@ class ArthropodDescriber(QMainWindow):
         self.thumbnail_storage: typing.Optional[ThumbnailStorage] = ThumbnailStorage()
 
         self.image_list_model = ImageListModel()
+        self._setup_image_list()
+
+        self.ui.actionOpen_folder.triggered.connect(self.handle_action_open_folder_triggered)
+
+    def _setup_label_editor(self):
+        self.mask_editor.signal_prev_photo.connect(self.handle_editor_prev_photo_request)
+        self.mask_editor.signal_next_photo.connect(self.handle_editor_next_photo_request)
+
+        self.state.photo_changed.connect(self.mask_editor.set_photo)
+
+    def _setup_image_list(self):
         self.ui.imageListView.setModel(self.image_list_model)
         self.ui.imageListView.selectionModel().currentChanged.connect(self.handle_current_changed)
         self.ui.imageListView.verticalScrollBar().sliderPressed.connect(self.image_list_model.handle_slider_pressed)
         self.ui.imageListView.verticalScrollBar().sliderReleased.connect(self.handle_image_list_slider_released)
+
         self.thumbnail_delegate = ThumbnailDelegate(self.thumbnail_storage)
         self.ui.imageListView.setItemDelegate(self.thumbnail_delegate)
         self.ui.imageListView.setUniformItemSizes(False)
         self.ui.imageListView.setSizePolicy(QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Preferred))
+        #self.context.storage_changed.connect(self.thumbnail_storage.initialize)
 
-        self.ui.actionOpen_folder.triggered.connect(self.handle_action_open_folder_triggered)
+        #self.context.storage_changed.connect(lambda storage: self.image_list_model.initialize(storage.image_paths,
+        #                                                                                      self.thumbnail_storage,
+        #                                                                                      0))
 
     def set_storage(self, storage: Storage):
         self.storage = storage
         self.thumbnail_storage.initialize(self.storage)
+        self.state.storage = storage
+        self.state.colormap = self.storage.colormap
         self.image_list_model.initialize(self.storage.image_paths, self.thumbnail_storage, 0)
         self.current_idx = self.image_list_model.index(0, 0)
         self.ui.imageListView.selectionModel().setCurrentIndex(self.current_idx, QItemSelectionModel.Select)
@@ -70,7 +89,8 @@ class ArthropodDescriber(QMainWindow):
         row = current.row()
         photo = self.storage.get_photo_by_idx(row)
         self.current_photo = photo
-        self.mask_editor.set_photo(photo)
+        #self.mask_editor.set_photo(photo)
+        self.state.current_photo = photo
         self.current_idx = current
 
     def handle_image_list_slider_released(self):

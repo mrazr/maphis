@@ -112,7 +112,7 @@ class Brush(Tool):
         self.edit_painter = QPainter(self.edit_mask)
         radius = self._user_params['radius'].value
 
-        self._primary_label: int = 1
+        self._primary_label: int = 1000
         self._secondary_label: int = 0
 
         self._brush_mask: np.ndarray = M.disk(radius, np.uint16)
@@ -171,7 +171,7 @@ class Brush(Tool):
         if not self.active:
             return []
         painter.save()
-        brush_color = QColor.fromRgba(self.cmap[self._primary_label])
+        brush_color = QColor.fromRgb(*self.cmap[self._primary_label])
         painter.setPen(brush_color)
         painter.setBrush(QBrush(brush_color))
         rr, cc = draw.line(old_pos.y(), old_pos.x(),
@@ -219,7 +219,7 @@ class Brush(Tool):
             self._brush_mask = self._primary_label * self._brush_mask
             self._brush_icon = QImage(sz[1], sz[0], QImage.Format_ARGB32)
             self._brush_icon.fill(QColor(0, 0, 0, 0))
-            brush_color = QColor.fromRgba(self.cmap[self._primary_label])
+            brush_color = QColor.fromRgb(*self.cmap[self._primary_label])
             painter = QPainter(self._brush_icon)
             painter.setPen(brush_color)
             radius = self.user_params['radius'].value

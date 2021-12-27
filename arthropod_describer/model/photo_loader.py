@@ -10,6 +10,7 @@ import numpy as np
 from PySide2.QtGui import QImage
 
 from .photo import LocalPhoto, Photo
+from .colormap import Colormap
 
 logger = logging.getLogger("model.photo_loader")
 
@@ -79,6 +80,11 @@ class Storage(abc.ABC):
     def load_from(cls, folder: Path, image_regex: re.Pattern=TIF_REGEX):
         pass
 
+    @property
+    @abc.abstractmethod
+    def colormap(self) -> Colormap:
+        pass
+
 
 class LocalStorage(Storage):
     def __init__(self, folder: Path, image_regex: re.Pattern=TIF_REGEX):
@@ -100,6 +106,12 @@ class LocalStorage(Storage):
         self._reflection_masks_folder = self._location / 'reflection_masks'
 
         self._loaded_photo: typing.Optional[Photo] = None #only for now
+
+        self._colormap = None
+        cmap_path = self._location / 'colormap.json'
+        if cmap_path.exists():
+            self._colormap = Colormap(cmap_path=cmap_path)
+            print("hej")
 
     def _load_photo(self, img_name: str) -> LocalPhoto:
         return LocalPhoto(self._location, img_name) # TODO handle loading masks
@@ -149,6 +161,10 @@ class LocalStorage(Storage):
     @property
     def image_names(self) -> typing.List[str]:
         return self._image_names
+
+    @property
+    def colormap(self) -> Colormap:
+        return self._colormap
 
 
 class MockStorage(LocalStorage):

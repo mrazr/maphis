@@ -57,6 +57,8 @@ class ArthropodDescriber(QMainWindow):
         self.image_list_model.initialize(self.storage.image_paths, self.thumbnail_storage, 0)
         self.current_idx = self.image_list_model.index(0, 0)
         self.ui.imageListView.selectionModel().setCurrentIndex(self.current_idx, QItemSelectionModel.Select)
+        self.mask_editor.colormap_widget.register_colormap(self.storage.colormap)
+        self.mask_editor.colormap_widget.set_colormap(0)
 
     def handle_action_open_folder_triggered(self, checked: bool):
         maybe_path = choose_folder(self)
@@ -77,12 +79,16 @@ class ArthropodDescriber(QMainWindow):
         self.image_list_model.handle_slider_released(first_idx, last_idx)
 
     def handle_editor_next_photo_request(self):
+        if self.storage is None:
+            return
         row = min(self.current_idx.row() + 1, self.storage.image_count - 1)
         idx = self.image_list_model.index(row, 0)
         self.current_idx = idx
         self.ui.imageListView.selectionModel().setCurrentIndex(idx, QItemSelectionModel.SelectCurrent)
 
     def handle_editor_prev_photo_request(self):
+        if self.storage is None:
+            return
         row = max(self.current_idx.row() - 1, 0)
         idx = self.image_list_model.index(row, 0)
         self.current_idx = idx

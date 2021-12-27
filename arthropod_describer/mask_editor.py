@@ -6,12 +6,14 @@ from dataclasses import dataclass, field
 
 import cv2 as cv
 from PySide2.QtCore import Signal, QObject, QPointF
-from PySide2.QtGui import Qt
+from PySide2.QtGui import Qt, QImage, QPixmap
 from PySide2.QtWidgets import QWidget, QGraphicsScene, QToolButton, QGroupBox, QVBoxLayout, QSpinBox, QLineEdit, \
     QCheckBox, QGridLayout, QLabel, QSizePolicy, QToolBox
 import numpy as np
 from skimage import io
 
+import tools.tool
+from colormap_widget import ColormapWidget
 from tools.tool import Tool, Brush, ToolUserParam, ParamType
 from custom_graphics_view import CustomGraphicsView
 from canvas_widget import CanvasWidget
@@ -72,6 +74,7 @@ class MaskEditor(QObject):
         self.photo_view = CustomGraphicsView()
         self.ui.center.addWidget(self.photo_view)
         self.photo_view.setScene(self._scene)
+
         self.photo_view.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         self.photo_view.setInteractive(True)
@@ -83,14 +86,37 @@ class MaskEditor(QObject):
         self.canvas.label_changed.connect(self.handle_label_changed)
         self.photo_view.view_dragging.connect(self.canvas.handle_view_dragging)
 
+        vbox = QVBoxLayout()
+
+        #self.mouse_label = QLabel()
+        #self.mouse_img: QImage = QImage()
+        #self.mouse_np: np.ndarray = None
+        #self.mouse_left_coords: typing.Tuple[np.ndarray] = None
+        #self.mouse_right_coords: typing.Tuple[np.ndarray] = None
+
+        #self._build_label_pick_widget()
+
+        #vbox.addWidget(self.mouse_label)
+
+        self.colormap_widget = ColormapWidget()
+        vbox.addWidget(self.colormap_widget)
+
         self.current_photo: Optional[Photo] = None
         self._toolbox = QToolBox()
-        self.ui.center.addWidget(self._toolbox)
         self._toolbox.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
         self._tools: typing.List[Tool] = self._mock_load_tools()
         self._tool_param_widgets: typing.List[QWidget] = []
         self._create_param_widgets()
         self._current_tool: typing.Optional[Tool] = None
+
+        vbox.addWidget(self._toolbox)
+        vbox.addStretch(2)
+
+        side_widget = QWidget()
+        side_widget.setLayout(vbox)
+        side_widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
+
+        self.ui.center.addWidget(side_widget)
 
         self._current_tool = self._tools[0]
         self.canvas.set_current_tool(self._tools[0])
@@ -103,6 +129,28 @@ class MaskEditor(QObject):
 
         self.ui.tbtnUndo.clicked.connect(self.handle_undo_clicked)
         self.ui.tbtnRedo.clicked.connect(self.handle_redo_clicked)
+
+    def _build_label_pick_widget(self) -> QWidget:
+        self.mouse_img = QImage(':/images/mouse.png')
+        self.mouse_np = tools.tool.qimage2ndarray(self.mouse_img)
+        self.mouse_np = cv.resize(self.mouse_np, (0, 0), fx=0.25, fy=0.25, interpolation=cv.INTER_NEAREST)
+
+        self.mouse_left_coords = np.nonzero(self.mouse_np == 127)
+        self.mouse_right_coords = np.nonzero(self.mouse_np == 255)
+
+        black = np.nonzero(self.mouse_np == 42)
+
+        self.mouse_np = np.dstack((self.mouse_np, self.mouse_np, self.mouse_np, 255 * np.zeros_like(self.mouse_np))).astype(np.uint8)
+
+        # BGRA, I guess
+        self.mouse_np[black] = [0, 0, 0, 255]
+        self.mouse_np[self.mouse_left_coords] = [0, 0, 125, 255]
+        self.mouse_np[self.mouse_right_coords] = [0, 125, 0, 255]
+
+        self.mouse_img = QImage(self.mouse_np.data, self.mouse_np.shape[1], self.mouse_np.shape[0],
+                                4 * self.mouse_np.shape[1], QImage.Format_ARGB32)
+
+        self.mouse_label.setPixmap(QPixmap.fromImage(self.mouse_img, Qt.AutoColor))
 
     def _mock_load_tools(self) -> typing.List[Tool]:
         return [self._mock_load_tool(i) for i in range(1)]

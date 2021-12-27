@@ -2,5 +2,6 @@
 <RCC version="1.0">
     <qresource prefix="images">
         <file alias="thumbnail.png">resources/thumbnail.png</file>
+        <file alias="mouse.png">resources/mouse.png</file>
     </qresource>
 </RCC>

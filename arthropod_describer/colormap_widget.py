@@ -70,14 +70,16 @@ class ColormapWidget(QWidget):
 
        # self.setLayout(self.widget_layout)
 
-        self.colormap_line_edit = QLineEdit()
+        self.label_search_bar = QLineEdit()
         #self.colormap_list_view = QListView()
 
         self.completer = QCompleter()
         self.completer.activated[QModelIndex].connect(self._handle_label_search_confirmed)
         #self.completer.setPopup(self.colormap_list_view)
 
-        self.colormap_line_edit.setCompleter(self.completer)
+        #self.completer2 = QCompleter()
+
+        self.label_search_bar.setCompleter(self.completer)
 
     def _build_label_pick_widget(self):
         self.mouse_img = QImage(':/images/mouse.png')
@@ -134,17 +136,14 @@ class ColormapWidget(QWidget):
         #self.completer.highlighted.connect(lambda _: print("highlight"))
         #completer.setCompletionMode(QCompleter.InlineCompletion)
 
-        tpl = self.colormap_line_edit.topLevelWidget()
-        self.colormap_line_edit.completer().popup().setParent(tpl, Qt.Popup)
-
-        #self.ui.leftComboBox.setCompleter(QCompleter(self.current_colormap))
-        #self.ui.rightComboBox.setCompleter(QCompleter(self.current_colormap))
+        tpl = self.label_search_bar.topLevelWidget()
+        self.label_search_bar.completer().popup().setParent(tpl, Qt.Popup)
 
         self.set_label_by_idx(1, 'left')
         self.set_label_by_idx(random.randint(0, self.current_colormap.color_count), 'right')
 
         self.ui.leftComboBox.setCurrentIndex(1)
-        self.ui.rightComboBox.setCurrentIndex(4)
+        self.ui.rightComboBox.setCurrentIndex(1)
 
     def set_label_by_idx(self, idx: int, side: typing.Union[Literal['left'], Literal['right']]):
         if side == 'left':
@@ -185,6 +184,8 @@ class ColormapWidget(QWidget):
 
     @Slot(QModelIndex)
     def _handle_label_search_confirmed(self, idx: QModelIndex):
-        label = self.current_colormap.data(idx)
-        print(label)
-        self.change_primary_label(label)
+        label = self.completer.completionModel().data(idx, Qt.UserRole)
+        label_index = self.current_colormap.labels.index(label)
+        self.set_label_by_idx(label_index, 'left')
+        self.label_search_bar.clearFocus()
+        self.label_search_finished.emit()

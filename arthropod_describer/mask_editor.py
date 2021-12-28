@@ -96,16 +96,6 @@ class MaskEditor(QObject):
 
         vbox = QVBoxLayout()
 
-        #self.mouse_label = QLabel()
-        #self.mouse_img: QImage = QImage()
-        #self.mouse_np: np.ndarray = None
-        #self.mouse_left_coords: typing.Tuple[np.ndarray] = None
-        #self.mouse_right_coords: typing.Tuple[np.ndarray] = None
-
-        #self._build_label_pick_widget()
-
-        #vbox.addWidget(self.mouse_label)
-
         self.colormap_widget = ColormapWidget()
         self.colormap_widget.primary_label_changed.connect(self._handle_primary_label_changed)
         self.colormap_widget.secondary_label_changed.connect(self._handle_secondary_label_changed)
@@ -140,11 +130,13 @@ class MaskEditor(QObject):
         self.ui.tbtnUndo.clicked.connect(self.handle_undo_clicked)
         self.ui.tbtnRedo.clicked.connect(self.handle_redo_clicked)
 
-        self._label_line_edit = self.colormap_widget.colormap_line_edit
+        self._label_line_edit = self.colormap_widget.label_search_bar
         #self._label_line_edit.textChanged.connect(lambda _: self._handle_view_changed())
         self._glabel_line_edit = QGraphicsProxyWidget()
         self._glabel_line_edit.setWidget(self._label_line_edit)
         self._scene.addItem(self._glabel_line_edit)
+
+        self.colormap_widget.label_search_finished.connect(self._hide_label_search_bar)
 
         self._label_list_view = self.colormap_widget.completer.popup()
         self._glabel_list_view = QGraphicsProxyWidget(self._glabel_line_edit)
@@ -401,10 +393,10 @@ class MaskEditor(QObject):
         #self._glabel_line_edit.setFlag(QGraphicsItem.ItemIgnoresTransformations, True)
         self._glabel_line_edit.setZValue(100)
 
-        point2 = QPoint(rect.center().x() - self._glabel_list_view.boundingRect().width() // 2,
-                        point.y() + self._glabel_line_edit.boundingRect().height())
-        #point.setY(point.y()) # + self._glabel_line_edit.boundingRect().height())
-        scene_point = self.photo_view.mapToScene(point2)
+       # point2 = QPoint(rect.center().x() - self._glabel_list_view.boundingRect().width() // 2,
+       #                 point.y() + self._glabel_line_edit.boundingRect().height())
+       # #point.setY(point.y()) # + self._glabel_line_edit.boundingRect().height())
+       # scene_point = self.photo_view.mapToScene(point2)
         self._glabel_list_view.setPos(QPoint(0, self._glabel_line_edit.boundingRect().height()))
         #self._glabel_list_view.setPos(scene_point)
         #self._glabel_list_view.setFlag(QGraphicsItem.ItemIgnoresTransformations, True)
@@ -419,9 +411,9 @@ class MaskEditor(QObject):
     def _show_label_search_bar(self):
         self._glabel_line_edit.setVisible(True)
         self._label_line_edit.setFocus()
+        self.photo_view.allow_zoom(False)
 
     def _hide_label_search_bar(self):
         self.qtimer.stop()
         self._glabel_line_edit.setVisible(False)
-        self._glabel_line_edit.ungrabKeyboard()
-        self._glabel_list_view.ungrabMouse()
+        self.photo_view.allow_zoom(True)

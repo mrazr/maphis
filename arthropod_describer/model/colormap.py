@@ -70,11 +70,11 @@ class Colormap(QAbstractItemModel):
         name, color = self.get_named_color(label)
 
         if role == Qt.DisplayRole:
-            return f'{name} ({label})'
+            return f'{name} {label}'
         elif role == Qt.DecorationRole:
             return QColor.fromRgb(*color)
         elif role == Qt.EditRole:
-            return name
+            return f'{name} {label}'
         elif role == Qt.UserRole:
             return label
         else:

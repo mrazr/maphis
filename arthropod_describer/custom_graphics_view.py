@@ -105,9 +105,14 @@ class CustomGraphicsView(QGraphicsView):
             else:
                 if 1000 * time.time() - self.time_of_first_shift < 500:
                     self.double_shift.emit()
-                    self.time_of_first_shift = -1
                     self._allow_zoom = False
+                self.time_of_first_shift = -1
         if event.key() == Qt.Key_Escape:
             self.escape_pressed.emit()
             self._allow_zoom = True
         QGraphicsView.keyReleaseEvent(self, event)
+
+    def allow_zoom(self, allow: bool):
+        self._allow_zoom = allow
+        self.horizontalScrollBar().setEnabled(allow)
+        self.verticalScrollBar().setEnabled(allow)

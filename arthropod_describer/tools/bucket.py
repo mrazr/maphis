@@ -4,7 +4,7 @@ import numpy as np
 from PySide2.QtCore import QPoint
 from PySide2.QtGui import QImage, QPainter
 
-from .tool import Tool, qimage2ndarray, ToolUserParam
+from arthropod_describer.tools.tool import Tool, qimage2ndarray, ToolUserParam
 
 TOOL_CLASS_NAME = 'Bucket'
 

@@ -5,17 +5,16 @@ from pathlib import Path
 from time import sleep, time
 from typing import List, Optional, Tuple
 import tempfile
-import shutil
 
 import exifread
 import numpy as np
 from PySide2 import QtGui, QtCore
-from PySide2.QtCore import QObject, QThread, Qt, QSize, QRectF, QSizeF, QTimerEvent, Signal
+from PySide2.QtCore import QObject, QThread, Qt, QSize, QRectF, QTimerEvent, Signal
 from PySide2.QtGui import QImage, QColor
 from PySide2.QtWidgets import QStyledItemDelegate, QStyleOptionViewItem, QStyle
 from PIL import Image
 
-from .photo_loader import Storage
+from arthropod_describer.common.photo_loader import Storage
 
 
 class ThumbnailLoader(QThread):

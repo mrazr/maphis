@@ -2,9 +2,9 @@ import typing
 
 from PySide2.QtCore import QObject, Signal
 
-from colormap_widget import Colormap
-from model.photo_loader import Storage
-from model.photo import Photo, LabelImg
+from arthropod_describer.common.photo_loader import Storage
+from arthropod_describer.common.photo import Photo, LabelImg
+from arthropod_describer.common.colormap import Colormap
 
 
 class State(QObject):

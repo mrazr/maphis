@@ -3,10 +3,9 @@ from typing import List, Optional
 
 from PySide2.QtCore import QAbstractListModel, QModelIndex, Qt
 from PySide2.QtWidgets import QWidget
-from PySide2.QtGui import QBrush, QColor, QIcon, QPixmap, QPainter
 
 #from thumbnail_storage import ThumbnailStorage
-from .thumbnail_storage import ThumbnailStorage
+from arthropod_describer.thumbnail_storage import ThumbnailStorage
 
 class ImageListModel(QAbstractListModel):
 

@@ -6,21 +6,19 @@ import inspect
 from pathlib import Path
 
 from PySide2.QtGui import QCloseEvent
-from PySide2.QtWidgets import QMainWindow, QApplication, QWidget, QHBoxLayout, QSizePolicy
-from PySide2.QtCore import QModelIndex, QPoint, Slot, QItemSelectionModel
+from PySide2.QtWidgets import QMainWindow, QApplication, QHBoxLayout, QSizePolicy
+from PySide2.QtCore import QModelIndex, QPoint, QItemSelectionModel
 
-from tools.tool import Tool
-from state import State
-from model.photo import Photo
-from view.ui_arthropod_describer import Ui_ArhtropodDescriber
-from view.ui_mask_edit_view import Ui_MaskEditor
-from dbg_utils import MockStorage
-from model.photo_loader import Storage, LocalStorage
-from utils import choose_folder
-from model.image_list_model import ImageListModel
-from model.thumbnail_storage import ThumbnailStorage, ThumbnailDelegate
-from mask_editor import MaskEditor
-import resources
+from arthropod_describer.tools.tool import Tool
+from arthropod_describer.common.state import State
+from arthropod_describer.common.photo import Photo
+from arthropod_describer.ui_arthropod_describer import Ui_ArhtropodDescriber
+from arthropod_describer.common.photo_loader import Storage, LocalStorage
+from arthropod_describer.common.utils import choose_folder
+from arthropod_describer.image_list_model import ImageListModel
+from arthropod_describer.thumbnail_storage import ThumbnailStorage, ThumbnailDelegate
+from arthropod_describer.label_editor.mask_editor import MaskEditor
+import arthropod_describer.resources
 
 
 class ArthropodDescriber(QMainWindow):

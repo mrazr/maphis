@@ -4,15 +4,13 @@ from typing import Literal
 
 import cv2 as cv
 import numpy as np
-from PySide2.QtCore import QAbstractItemModel, QObject, Signal, Slot, QModelIndex
-from PySide2.QtGui import QImage, QPixmap, Qt, QPainter, QIcon, QColor
-from PySide2.QtWidgets import QWidget, QComboBox, QLabel, QHBoxLayout, QVBoxLayout, QMenu, QCompleter, QLineEdit, \
-    QListView
-from skimage import io
+from PySide2.QtCore import Signal, Slot, QModelIndex
+from PySide2.QtGui import QImage, QPixmap, Qt
+from PySide2.QtWidgets import QWidget, QLabel, QCompleter, QLineEdit
 
-from tools.tool import qimage2ndarray
-from model.colormap import Colormap
-from view.ui_colormap_widget import Ui_ColormapWidget
+from arthropod_describer.tools.tool import qimage2ndarray
+from arthropod_describer.common.colormap import Colormap
+from arthropod_describer.label_editor.ui_colormap_widget import Ui_ColormapWidget
 
 
 class ColormapWidget(QWidget):

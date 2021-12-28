@@ -9,8 +9,8 @@ import cv2 as cv
 import numpy as np
 from PySide2.QtGui import QImage
 
-from .photo import LocalPhoto, Photo
-from .colormap import Colormap
+from arthropod_describer.common.photo import LocalPhoto, Photo
+from arthropod_describer.common.colormap import Colormap
 
 logger = logging.getLogger("model.photo_loader")
 

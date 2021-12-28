@@ -1,25 +1,20 @@
-import time
-from enum import IntEnum
 import typing
 from typing import Optional
-from dataclasses import dataclass, field
 
-import cv2 as cv
 from PySide2.QtCore import Signal, QObject, QPointF, QPoint, QTimer
-from PySide2.QtGui import Qt, QImage, QPixmap
+from PySide2.QtGui import Qt
 from PySide2.QtWidgets import QWidget, QGraphicsScene, QToolButton, QGroupBox, QVBoxLayout, QSpinBox, QLineEdit, \
-    QCheckBox, QGridLayout, QLabel, QSizePolicy, QToolBox, QGraphicsProxyWidget, QGraphicsItem, QListView
+    QCheckBox, QGridLayout, QLabel, QSizePolicy, QGraphicsProxyWidget, QGraphicsItem
 import numpy as np
-from skimage import io
 
-import tools.tool
-from state import State
-from colormap_widget import ColormapWidget
-from tools.tool import Tool, ToolUserParam, ParamType
-from custom_graphics_view import CustomGraphicsView
-from canvas_widget import CanvasWidget
-from view.ui_mask_edit_view import Ui_MaskEditor
-from model.photo import Photo, LabelType
+from arthropod_describer.common.label_change import LabelChange, DoType, CommandEntry
+from arthropod_describer.common.state import State
+from arthropod_describer.label_editor.colormap_widget import ColormapWidget
+from arthropod_describer.tools.tool import Tool, ToolUserParam, ParamType
+from arthropod_describer.custom_graphics_view import CustomGraphicsView
+from arthropod_describer.label_editor.canvas_widget import CanvasWidget
+from arthropod_describer.label_editor.ui_mask_edit_view import Ui_MaskEditor
+from arthropod_describer.common.photo import Photo, LabelType
 
 
 class ToolEntry:
@@ -27,31 +22,6 @@ class ToolEntry:
         self.tool = tool
         self.toolbutton = toolbutton
         self.param_widget = param_widget
-
-
-@dataclass(eq=False)
-class LabelChange:
-    coords: typing.Tuple[np.ndarray, np.ndarray]
-    new_label: int
-    old_label: int
-    label_type: LabelType
-
-    def swap_labels(self) -> 'LabelChange':
-        return LabelChange(self.coords, self.old_label, self.new_label, self.label_type)
-
-
-class DoType(IntEnum):
-    Do = 0,
-    Undo = 1,
-
-
-@dataclass(eq=False)
-class CommandEntry:
-    change_chain: typing.List[LabelChange] = field(default_factory=list)
-    do_type: DoType = DoType.Do
-
-    def add_label_change(self, change: LabelChange):
-        self.change_chain.append(change)
 
 
 class MaskEditor(QObject):
@@ -76,6 +46,8 @@ class MaskEditor(QObject):
         self._scene = QGraphicsScene()
 
         self._tools: typing.List[Tool] = []
+
+        self._tools_: typing.List[ToolEntry] = []
 
         self.photo_view = CustomGraphicsView()
         self.ui.center.addWidget(self.photo_view)
@@ -182,6 +154,7 @@ class MaskEditor(QObject):
         param_widget = self._create_param_widget(tool)
         #self._tool_settings.addItem(param_widget, tool.tool_name)
         self._tool_param_widgets.append(param_widget)
+        self._tools_.append(ToolEntry(tool, toolbutton, param_widget))
 
     #def _mock_load_tools(self) -> typing.List[Tool]:
     #    return [self._mock_load_tool(i) for i in range(1)]
@@ -203,7 +176,7 @@ class MaskEditor(QObject):
             self._tool_param_widgets.append(param_widget)
 
     def _handle_param_changed(self, tool_id: int):
-        tool = self._tools[tool_id]
+        tool = self._tools_[tool_id].tool
         param_widget = self._tool_param_widgets[tool_id]
         for param_name, param in tool.user_params.items():
             if param.param_type == ParamType.INT:
@@ -262,15 +235,15 @@ class MaskEditor(QObject):
 
     def _handle_spinbox_value_changed(self, tool_id: int, spbox: QSpinBox):
         print(f'changing {spbox.objectName()} of {tool_id}. tool')
-        tool = self._tools[tool_id]
+        tool = self._tools_[tool_id].tool
         tool.set_user_param(spbox.objectName(), spbox.value())
 
     def _handle_lineedit_text_changed(self, tool_id: int, param_name: str, text: str):
-        tool = self._tools[tool_id]
+        tool = self._tools_[tool_id].tool
         tool.set_user_param(param_name, text)
 
     def _handle_checkbox_toggled(self, tool_id: int, param_name: str, checked: Qt.CheckState):
-        tool = self._tools[tool_id]
+        tool = self._tools_[tool_id].tool
         tool.set_user_param(param_name, checked == Qt.CheckState.Checked)
 
     def set_photo(self, photo: Photo):
@@ -307,7 +280,7 @@ class MaskEditor(QObject):
         self.canvas.set_mask_shown(LabelType.REFLECTION, checked)
 
     def handle_tool_activated(self, checked: bool, tool_id: int):
-        self._current_tool = self._tools[tool_id]
+        self._current_tool = self._tools_[tool_id].tool
         self._current_tool.color_map_changed(self.state.colormap.colormap)
         self._tool_settings.setTitle(f'{self._current_tool.tool_name} settings')
         self._tool_settings.setVisible(True)

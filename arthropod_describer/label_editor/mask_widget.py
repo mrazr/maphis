@@ -1,13 +1,12 @@
 import typing
 
-import cv2 as cv
 import numpy as np
 from PySide2.QtCore import QRectF
-from PySide2.QtGui import QPixmap, QImage, QPainter, QColor, Qt, QBitmap
-from PySide2.QtWidgets import QGraphicsPixmapItem, QGraphicsItem, QWidget, QStyleOptionGraphicsItem
+from PySide2.QtGui import QImage, QPainter, QColor, Qt
+from PySide2.QtWidgets import QGraphicsItem, QWidget, QStyleOptionGraphicsItem
 
-from model.colormap import Colormap
-from model.photo import LabelImg, LabelType
+from arthropod_describer.common.colormap import Colormap
+from arthropod_describer.common.photo import LabelImg
 
 
 class MaskWidget(QGraphicsItem):

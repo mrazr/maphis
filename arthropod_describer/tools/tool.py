@@ -2,13 +2,21 @@ import abc
 import enum
 import typing
 from abc import ABC
-from typing import Tuple
+from typing import Tuple, Dict, Tuple
 
 import numpy as np
 import skimage.morphology as M
 from PySide2.QtCore import QByteArray, QPoint, Slot
 from PySide2.QtGui import QBitmap, QPainter, QBrush, QImage, QColor
 from skimage import draw, io
+
+
+class EditContext:
+    def __init__(self, label_nd: np.ndarray, label: int, image: QImage, colormap: Dict[int, Tuple[int, int, int]]):
+        self.label_nd = label_nd
+        self.image = image
+        self.label = label
+        self.colormap = colormap
 
 
 class ParamType(enum.IntEnum):
@@ -59,7 +67,7 @@ class Tool(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def left_press(self, painter: QPainter, pos: QPoint, img: QImage, label: int) -> typing.List[np.ndarray]:
+    def left_press(self, painter: QPainter, pos: QPoint, context: EditContext) -> typing.List[np.ndarray]:
         pass
 
     @property
@@ -67,13 +75,13 @@ class Tool(abc.ABC):
     def active(self) -> bool:
         pass
 
-    def left_release(self, painter: QPainter, pos: QPoint, label: int) -> typing.Tuple[np.ndarray, int]:
+    def left_release(self, painter: QPainter, pos: QPoint, context: EditContext) -> typing.Tuple[np.ndarray, int]:
         pass
 
-    def right_press(self, painter: QPainter, pos: QPoint, img: QImage, label: int):
+    def right_press(self, painter: QPainter, pos: QPoint, context: EditContext) -> Tuple[np.ndarray, int]:
         pass
 
-    def right_release(self, painter: QPainter, pos: QPoint, label: int):
+    def right_release(self, painter: QPainter, pos: QPoint, context: EditContext) -> None:
         pass
 
     def middle_click(self, painter: QPainter, pos: QPoint, label: int):

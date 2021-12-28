@@ -1,18 +1,16 @@
 import typing
 
-import cv2 as cv
 from PySide2.QtCore import QPointF, Signal, QRectF, QPoint, Slot
-from PySide2.QtGui import QPixmap, QColor, QImage, QPainter, Qt, QCursor, QBrush, QBitmap, QRegion
-from PySide2.QtWidgets import QGraphicsItem, QGraphicsScene, QGraphicsPixmapItem, QGraphicsSceneMouseEvent, \
+from PySide2.QtGui import QPixmap, QImage, QPainter, Qt, QBrush, QBitmap, QRegion
+from PySide2.QtWidgets import QGraphicsItem, QGraphicsPixmapItem, QGraphicsSceneMouseEvent, \
     QStyleOptionGraphicsItem, QWidget, QGraphicsObject, QGraphicsSceneHoverEvent
 import numpy as np
-from skimage import draw, io
 
-from model.colormap import Colormap
-from state import State
-from tools.tool import Tool
-from mask_widget import MaskWidget
-from model.photo import Photo, LabelImg, LabelType
+from arthropod_describer.common.colormap import Colormap
+from arthropod_describer.common.state import State
+from arthropod_describer.tools.tool import Tool
+from arthropod_describer.label_editor.mask_widget import MaskWidget
+from arthropod_describer.common.photo import Photo, LabelImg, LabelType
 
 
 class EditableMask:

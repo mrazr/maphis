@@ -33,6 +33,8 @@ class ToolCursor(QGraphicsItem):
         self.setAcceptedMouseButtons(Qt.NoButton)
 
     def boundingRect(self) -> QRectF:
+        if self.cursor_image is None:
+            return QRectF()
         return self.cursor_image.rect()
 
     def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget:typing.Optional[QWidget]=...):
@@ -48,8 +50,10 @@ class ToolCursor(QGraphicsItem):
         self.setVisible(True)
         self.update()
 
-    def set_cursor(self, curs: QImage):
+    def set_cursor(self, curs: typing.Optional[QImage]):
         self.prepareGeometryChange()
+        if curs is None:
+            self.setVisible(False)
         self.cursor_image = curs
 
 
@@ -247,15 +251,21 @@ class CanvasWidget(QGraphicsObject):
         super().mouseReleaseEvent(event)
 
     def hoverEnterEvent(self, event: QGraphicsSceneHoverEvent):
+        if self._current_tool is None:
+            return
         self.cursor__.setVisible(True)
         self.update()
 
     def hoverMoveEvent(self, event: QGraphicsSceneHoverEvent):
+        if self._current_tool is None:
+            return
         self.cur_mouse_pos = event.pos().toPoint()
         self.cursor__.set_pos(self.cur_mouse_pos)
         self.update()
 
     def hoverLeaveEvent(self, event: QGraphicsSceneHoverEvent):
+        if self._current_tool is None:
+            return
         self.cursor__.setVisible(False)
         self.update()
 
@@ -265,7 +275,7 @@ class CanvasWidget(QGraphicsObject):
         self.cursor_image = self._current_tool.cursor_image #QImage(tool.cursor_image.data, sz[1], sz[0], sz[1], QImage.Format_Grayscale16)
         self.cursor_image.setColorTable(self.colormaps[LabelType.BUG])
         self.cursor__.set_cursor(self.cursor_image)
-        self.cursor__.setOpacity(0.5)
+        self.cursor__.setOpacity(0.25)
         self.update()
 
     def set_mask_shown(self, mask_type: LabelType, is_shown: bool):
@@ -278,9 +288,12 @@ class CanvasWidget(QGraphicsObject):
         if is_shown:
             print(f'setting cmap for {mask_type}')
             self.current_mask_shown = mask_type
-            self.cursor__.cursor_image.setColorTable(self.colormaps[mask_type])
+            #self.cursor__.cursor_image.setColorTable(self.colormaps[mask_type])
             #self._current_tool.color_map_changed(self.masks[mask_type].color_map)
-            self.cursor__.set_cursor(self._current_tool.cursor_image)
+            if self._current_tool is not None:
+                self.cursor__.set_cursor(self._current_tool.cursor_image)
+            else:
+                self.cursor__.set_cursor(None)
             #print(f'cmap for cursor is now {self.cursor__.cursor_image.colorTable()}')
             #if mask_type == LabelType.BUG:
             #    self.mask_widgets[LabelType.BUG]._mask_image.save(f'/home/radoslav/mask_bug.png')

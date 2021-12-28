@@ -1,10 +1,15 @@
+import os
 import sys
 import typing
+import importlib
+import inspect
+from pathlib import Path
 
 from PySide2.QtGui import QCloseEvent
 from PySide2.QtWidgets import QMainWindow, QApplication, QWidget, QHBoxLayout, QSizePolicy
 from PySide2.QtCore import QModelIndex, QPoint, Slot, QItemSelectionModel
 
+from tools.tool import Tool
 from state import State
 from model.photo import Photo
 from view.ui_arthropod_describer import Ui_ArhtropodDescriber
@@ -27,8 +32,13 @@ class ArthropodDescriber(QMainWindow):
 
         self.state = State()
 
+        self.tools: typing.List[Tool] = []
+        self._load_tools()
+
         self.mask_editor = MaskEditor(self.state)
         self._setup_label_editor()
+
+        self.mask_editor.register_tools(self.tools)
 
         hbox = QHBoxLayout()
         hbox.addWidget(self.mask_editor.widget)
@@ -45,6 +55,25 @@ class ArthropodDescriber(QMainWindow):
         self._setup_image_list()
 
         self.ui.actionOpen_folder.triggered.connect(self.handle_action_open_folder_triggered)
+
+    def _load_tools(self):
+        py_files = [inspect.getmodulename(file.path) for file in os.scandir(Path(__file__).parent / 'tools') if file.name.endswith('.py') and file.name != '__init__.py']
+        print(py_files)
+        modules = [importlib.import_module(f'.{module_name}', '.tools') for module_name in py_files]
+        tools = []
+        for module in modules:
+            members = inspect.getmembers(module)
+            for obj_name, obj in members:
+                if not obj_name.startswith('Tool_'):
+                    continue
+                if inspect.isclass(obj) and not inspect.isabstract(obj):
+                    tool = obj()
+                    tool.set_tool_id(len(tools))
+                    self.state.colormap_changed.connect(lambda cmap: tool.color_map_changed(cmap.colormap))
+                    tools.append(tool)
+
+        self.tools = tools
+        print(f'loaded {len(tools)} tools')
 
     def _setup_label_editor(self):
         self.mask_editor.signal_prev_photo.connect(self.handle_editor_prev_photo_request)

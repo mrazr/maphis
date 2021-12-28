@@ -15,7 +15,7 @@ from skimage import io
 import tools.tool
 from state import State
 from colormap_widget import ColormapWidget
-from tools.tool import Tool, Brush, ToolUserParam, ParamType
+from tools.tool import Tool, ToolUserParam, ParamType
 from custom_graphics_view import CustomGraphicsView
 from canvas_widget import CanvasWidget
 from view.ui_mask_edit_view import Ui_MaskEditor
@@ -71,9 +71,11 @@ class MaskEditor(QObject):
         self.ui.btnPrevious.clicked.connect(lambda: self.signal_prev_photo.emit())
 
         self.state = state
-        self.state.colormap_changed.connect(lambda cmap: self._current_tool.color_map_changed(cmap.colormap))
+        #self.state.colormap_changed.connect(lambda cmap: self._current_tool.color_map_changed(cmap.colormap))
 
         self._scene = QGraphicsScene()
+
+        self._tools: typing.List[Tool] = []
 
         self.photo_view = CustomGraphicsView()
         self.ui.center.addWidget(self.photo_view)
@@ -102,14 +104,15 @@ class MaskEditor(QObject):
         vbox.addWidget(self.colormap_widget)
 
         self.current_photo: Optional[Photo] = None
-        self._toolbox = QToolBox()
-        self._toolbox.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
-        self._tools: typing.List[Tool] = self._mock_load_tools()
+        self._tool_settings = QGroupBox('Tool settings')
+        self._tool_settings.setLayout(QVBoxLayout())
+        #self._tools: typing.List[Tool] = self._mock_load_tools()
         self._tool_param_widgets: typing.List[QWidget] = []
-        self._create_param_widgets()
+
         self._current_tool: typing.Optional[Tool] = None
 
-        vbox.addWidget(self._toolbox)
+        vbox.addWidget(self._tool_settings)
+        self._tool_settings.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Maximum)
         vbox.addStretch(2)
 
         side_widget = QWidget()
@@ -118,8 +121,8 @@ class MaskEditor(QObject):
 
         self.ui.center.addWidget(side_widget)
 
-        self._current_tool = self._tools[0]
-        self.canvas.set_current_tool(self._tools[0])
+        #self._current_tool = self._tools[0]
+        #self.canvas.set_current_tool(self._tools[0])
         self.ui.tbtnBugMask.animateClick()
         self.handle_reflection_mask_checked(False)
         self.handle_segments_mask_checked(False)
@@ -164,46 +167,39 @@ class MaskEditor(QObject):
         self.qtimer.timeout.connect(self._handle_view_changed)
         self.qtimer.stop()
 
-    def _build_label_pick_widget(self) -> QWidget:
-        self.mouse_img = QImage(':/images/mouse.png')
-        self.mouse_np = tools.tool.qimage2ndarray(self.mouse_img)
-        self.mouse_np = cv.resize(self.mouse_np, (0, 0), fx=0.25, fy=0.25, interpolation=cv.INTER_NEAREST)
+    def register_tools(self, tools: typing.List[Tool]):
+        for tool in tools:
+            self.register_tool(tool)
 
-        self.mouse_left_coords = np.nonzero(self.mouse_np == 127)
-        self.mouse_right_coords = np.nonzero(self.mouse_np == 255)
-
-        black = np.nonzero(self.mouse_np == 42)
-
-        self.mouse_np = np.dstack((self.mouse_np, self.mouse_np, self.mouse_np, 255 * np.zeros_like(self.mouse_np))).astype(np.uint8)
-
-        # BGRA, I guess
-        self.mouse_np[black] = [0, 0, 0, 255]
-        self.mouse_np[self.mouse_left_coords] = [0, 0, 125, 255]
-        self.mouse_np[self.mouse_right_coords] = [0, 125, 0, 255]
-
-        self.mouse_img = QImage(self.mouse_np.data, self.mouse_np.shape[1], self.mouse_np.shape[0],
-                                4 * self.mouse_np.shape[1], QImage.Format_ARGB32)
-
-        self.mouse_label.setPixmap(QPixmap.fromImage(self.mouse_img, Qt.AutoColor))
-
-    def _mock_load_tools(self) -> typing.List[Tool]:
-        return [self._mock_load_tool(i) for i in range(1)]
-
-    def _mock_load_tool(self, tool_id: int) -> Tool:
-        tool = Brush()
-        tool.set_id(tool_id)
+    def register_tool(self, tool: Tool):
         toolbutton = QToolButton()
         toolbutton.setCheckable(True)
         toolbutton.setAutoExclusive(True)
         toolbutton.setText(tool.tool_name)
-        toolbutton.toggled.connect(lambda checked: self.handle_tool_activated(checked, tool_id))
+        toolbutton.toggled.connect(lambda checked: self.handle_tool_activated(checked, tool.tool_id))
         self.ui.toolBox.layout().addWidget(toolbutton)
-        return tool
+        self._tools.append(tool)
+        param_widget = self._create_param_widget(tool)
+        #self._tool_settings.addItem(param_widget, tool.tool_name)
+        self._tool_param_widgets.append(param_widget)
+
+    #def _mock_load_tools(self) -> typing.List[Tool]:
+    #    return [self._mock_load_tool(i) for i in range(1)]
+
+    #def _mock_load_tool(self, tool_id: int) -> Tool:
+    #    tool = Brush()
+    #    tool.set_id(tool_id)
+    #    toolbutton = QToolButton()
+    #    toolbutton.setCheckable(True)
+    #    toolbutton.setAutoExclusive(True)
+    #    toolbutton.setText(tool.tool_name)
+    #    toolbutton.toggled.connect(lambda checked: self.handle_tool_activated(checked, tool_id))
+    #    self.ui.toolBox.layout().addWidget(toolbutton)
+    #    return tool
 
     def _create_param_widgets(self):
         for tool in self._tools:
             param_widget = self._create_param_widget(tool)
-            self._toolbox.addItem(param_widget, tool.tool_name)
             self._tool_param_widgets.append(param_widget)
 
     def _handle_param_changed(self, tool_id: int):
@@ -312,6 +308,10 @@ class MaskEditor(QObject):
 
     def handle_tool_activated(self, checked: bool, tool_id: int):
         self._current_tool = self._tools[tool_id]
+        self._current_tool.color_map_changed(self.state.colormap.colormap)
+        self._tool_settings.setTitle(f'{self._current_tool.tool_name} settings')
+        self._tool_settings.setVisible(True)
+        self._tool_settings.layout().addWidget(self._tool_param_widgets[tool_id])
         self._tool_param_widgets[tool_id].setVisible(checked)
         print(f'{"activated" if checked else "deactivated"} the tool {self._current_tool.tool_name}')
 
@@ -377,10 +377,14 @@ class MaskEditor(QObject):
                 self.canvas.update_clip_mask()
 
     def _handle_primary_label_changed(self, label: int):
+        if self._current_tool is None:
+            return
         self._current_tool.update_primary_label(label)
         self.canvas.cursor__.set_cursor(self._current_tool.cursor_image)
 
     def _handle_secondary_label_changed(self, label: int):
+        if self._current_tool is None:
+            return
         self._current_tool.update_secondary_label(label)
         self.canvas.update()
 

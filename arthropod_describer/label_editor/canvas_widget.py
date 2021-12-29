@@ -328,6 +328,7 @@ class CanvasWidget(QGraphicsObject):
     def set_current_tool(self, tool: Tool):
         self._current_tool = tool
         #self.cursor_image = QImage(bytess, crs.shape[1], crs.shape[0], QImage.)
+        self._current_tool.update_primary_label(self.state.primary_label)
         self.cursor_image = self._current_tool.cursor_image #QImage(tool.cursor_image.data, sz[1], sz[0], sz[1], QImage.Format_Grayscale16)
         #self.cursor_image.setColorTable(self.colormaps[LabelType.BUG])
         self.cursor__.set_cursor(self.cursor_image)

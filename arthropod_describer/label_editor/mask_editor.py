@@ -366,18 +366,18 @@ class MaskEditor(QObject):
                 self.canvas.update_clip_mask()
 
     def _handle_primary_label_changed(self, label: int):
+        self.state.primary_label = label
         if self._current_tool is None:
             return
         self._current_tool.update_primary_label(label)
         self.canvas.cursor__.set_cursor(self._current_tool.cursor_image)
-        self.state.primary_label = label
 
     def _handle_secondary_label_changed(self, label: int):
+        self.state.secondary_label = label
         if self._current_tool is None:
             return
         self._current_tool.update_secondary_label(label)
         self.canvas.update()
-        self.state.secondary_label = label
 
     def _handle_view_changed(self):
         rect = self.photo_view.viewport().rect()

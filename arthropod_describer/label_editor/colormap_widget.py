@@ -143,6 +143,9 @@ class ColormapWidget(QWidget):
         self.ui.leftComboBox.setCurrentIndex(1)
         self.ui.rightComboBox.setCurrentIndex(1)
 
+        self.primary_label_changed.emit(self.colormaps[current_idx].labels[1])
+        self.secondary_label_changed.emit(self.colormaps[current_idx].labels[1])
+
     def set_label_by_idx(self, idx: int, side: typing.Union[Literal['left'], Literal['right']]):
         if side == 'left':
             self.ui.leftComboBox.setCurrentIndex(idx)

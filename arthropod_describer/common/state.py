@@ -21,6 +21,8 @@ class State(QObject):
         self._current_photo: typing.Optional[Photo] = None
         self._current_photo_idx: int = -1
         self._current_label_img: typing.Optional[LabelImg] = None
+        self._primary_label: int = -1
+        self._secondary_label: int = -1
 
     @property
     def colormap(self) -> Colormap:
@@ -67,4 +69,20 @@ class State(QObject):
     def label_img(self, _label_img: LabelImg):
         self._current_label_img = _label_img
         self.label_img_changed.emit(self._current_label_img)
+
+    @property
+    def primary_label(self) -> int:
+        return self._primary_label
+
+    @primary_label.setter
+    def primary_label(self, label: int):
+        self._primary_label = label
+
+    @property
+    def secondary_label(self) -> int:
+        return self._secondary_label
+
+    @secondary_label.setter
+    def secondary_label(self, label: int):
+        self._secondary_label = label
 

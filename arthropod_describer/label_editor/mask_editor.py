@@ -2,15 +2,16 @@ import typing
 from typing import Optional
 
 from PySide2.QtCore import Signal, QObject, QPointF, QPoint, QTimer
-from PySide2.QtGui import Qt
+from PySide2.QtGui import Qt, QImage
 from PySide2.QtWidgets import QWidget, QGraphicsScene, QToolButton, QGroupBox, QVBoxLayout, QSpinBox, QLineEdit, \
     QCheckBox, QGridLayout, QLabel, QSizePolicy, QGraphicsProxyWidget, QGraphicsItem
 import numpy as np
+from skimage import io
 
 from arthropod_describer.common.label_change import LabelChange, DoType, CommandEntry
 from arthropod_describer.common.state import State
 from arthropod_describer.label_editor.colormap_widget import ColormapWidget
-from arthropod_describer.tools.tool import Tool, ToolUserParam, ParamType
+from arthropod_describer.common.tool import Tool, ToolUserParam, ParamType
 from arthropod_describer.custom_graphics_view import CustomGraphicsView
 from arthropod_describer.label_editor.canvas_widget import CanvasWidget
 from arthropod_describer.label_editor.ui_mask_edit_view import Ui_MaskEditor
@@ -64,7 +65,6 @@ class MaskEditor(QObject):
         self.canvas = CanvasWidget(self.state)
         self._scene.addItem(self.canvas)
         self.canvas.initialize()
-        self.canvas.left_press.connect(self.handle_left_press)
         self.canvas.label_changed.connect(self.handle_label_changed)
         self.photo_view.view_dragging.connect(self.canvas.handle_view_dragging)
 
@@ -155,6 +155,7 @@ class MaskEditor(QObject):
         #self._tool_settings.addItem(param_widget, tool.tool_name)
         self._tool_param_widgets.append(param_widget)
         self._tools_.append(ToolEntry(tool, toolbutton, param_widget))
+        tool.cursor_changed.connect(self._handle_tool_cursor_changed)
 
     #def _mock_load_tools(self) -> typing.List[Tool]:
     #    return [self._mock_load_tool(i) for i in range(1)]
@@ -188,7 +189,7 @@ class MaskEditor(QObject):
             else:
                 checkbox: QCheckBox = param_widget.findChild(QCheckBox, param_name)
                 tool.set_user_param(param_name, checkbox.isChecked())
-        self.canvas.set_current_tool(self._current_tool)
+        #self.canvas.set_current_tool(self._current_tool)
 
     def _create_param_widget(self, tool: Tool):
         params: typing.Dict[str, ToolUserParam] = tool.user_params
@@ -267,47 +268,62 @@ class MaskEditor(QObject):
         #self._glabel_list_view.setFlag(QGraphicsItem.ItemIgnoresTransformations, True)
         self._glabel_list_view.setZValue(100)
 
+        self.state.label_img = self.state.current_photo.label_dict[self.canvas.current_mask_shown]
+
     def handle_bug_mask_checked(self, checked: bool):
         print(f"bug {checked}")
         self.canvas.set_mask_shown(LabelType.BUG, checked)
+        if checked and self.state.label_img is not None:
+            self.state.label_img = self.current_photo.label_dict[LabelType.BUG]
 
     def handle_segments_mask_checked(self, checked: bool):
         print(f"segments {checked}")
         self.canvas.set_mask_shown(LabelType.REGIONS, checked)
+        if checked and self.state.label_img is not None:
+            self.state.label_img = self.current_photo.label_dict[LabelType.REGIONS]
 
     def handle_reflection_mask_checked(self, checked: bool):
         print(f"reflections {checked}")
         self.canvas.set_mask_shown(LabelType.REFLECTION, checked)
+        if checked and self.state.label_img is not None:
+            self.state.label_img = self.current_photo.label_dict[LabelType.REFLECTION]
 
     def handle_tool_activated(self, checked: bool, tool_id: int):
-        self._current_tool = self._tools_[tool_id].tool
-        self._current_tool.color_map_changed(self.state.colormap.colormap)
-        self._tool_settings.setTitle(f'{self._current_tool.tool_name} settings')
-        self._tool_settings.setVisible(True)
-        self._tool_settings.layout().addWidget(self._tool_param_widgets[tool_id])
+        if checked:
+            self._current_tool = self._tools_[tool_id].tool
+            self._current_tool.color_map_changed(self.state.colormap.colormap)
+            self.canvas.set_current_tool(self._current_tool)
+            self._tool_settings.setTitle(f'{self._current_tool.tool_name} settings')
+            self._tool_settings.setVisible(True)
+            self._tool_settings.layout().addWidget(self._tool_param_widgets[tool_id])
         self._tool_param_widgets[tool_id].setVisible(checked)
         print(f'{"activated" if checked else "deactivated"} the tool {self._current_tool.tool_name}')
 
-    def handle_left_press(self, pos: QPointF):
-        pos = pos.toPoint()
+    def handle_label_changed(self, lab_changes: typing.List[LabelChange]):
+        #label_img = self.state.current_photo.label_dict[self.canvas.current_mask_shown].label_img
+        ##self.current_photo.label_dict[self.canvas.current_mask_shown].label_img
 
-    def handle_label_changed(self, edit_img: np.ndarray):
-        label_img = self.state.current_photo.label_dict[self.canvas.current_mask_shown].label_img
-        #self.current_photo.label_dict[self.canvas.current_mask_shown].label_img
+        #new_labels = np.unique(edit_img)[1:] # filter out the -1 label which is the first on in the returned array
+        #command = CommandEntry()
 
-        new_labels = np.unique(edit_img)[1:] # filter out the -1 label which is the first on in the returned array
-        command = CommandEntry()
+        #for label in new_labels:
+        #    old_and_new = np.where(edit_img == label, label_img, -1)
+        #    old_labels = np.unique(old_and_new)[1:] # filter out -1
+        #    for old_label in old_labels:
+        #        coords = np.nonzero(old_and_new == old_label)
+        #        change = LabelChange(coords, label, old_label, self.canvas.current_mask_shown)
+        #        command.add_label_change(change)
+        #self.redo_stack.clear() # copying GIMP's behaviour: when the user paints something, the redo stack is cleared
+        #self.ui.tbtnRedo.setEnabled(False)
+        #self.do_command(command, update_canvas=False)
 
-        for label in new_labels:
-            old_and_new = np.where(edit_img == label, label_img, -1)
-            old_labels = np.unique(old_and_new)[1:] # filter out -1
-            for old_label in old_labels:
-                coords = np.nonzero(old_and_new == old_label)
-                change = LabelChange(coords, label, old_label, self.canvas.current_mask_shown)
-                command.add_label_change(change)
-        self.redo_stack.clear() # copying GIMP's behaviour: when the user paints something, the redo stack is cleared
+        if len(lab_changes) == 0:
+            return
+        command = CommandEntry(lab_changes)
+        self.redo_stack.clear()
         self.ui.tbtnRedo.setEnabled(False)
         self.do_command(command, update_canvas=False)
+        #io.imsave('/home/radoslav/knife_regions.tif', self.current_photo.label_dict[LabelType.REGIONS].label_img)
 
     def handle_undo_clicked(self):
         command = self.undo_stack.pop()
@@ -354,12 +370,14 @@ class MaskEditor(QObject):
             return
         self._current_tool.update_primary_label(label)
         self.canvas.cursor__.set_cursor(self._current_tool.cursor_image)
+        self.state.primary_label = label
 
     def _handle_secondary_label_changed(self, label: int):
         if self._current_tool is None:
             return
         self._current_tool.update_secondary_label(label)
         self.canvas.update()
+        self.state.secondary_label = label
 
     def _handle_view_changed(self):
         rect = self.photo_view.viewport().rect()
@@ -367,23 +385,13 @@ class MaskEditor(QObject):
                        rect.center().y() - self._glabel_line_edit.boundingRect().height() // 2)
         scene_point = self.photo_view.mapToScene(point)
         self._glabel_line_edit.setPos(scene_point)
-        #self._glabel_line_edit.setFlag(QGraphicsItem.ItemIgnoresTransformations, True)
         self._glabel_line_edit.setZValue(100)
 
-       # point2 = QPoint(rect.center().x() - self._glabel_list_view.boundingRect().width() // 2,
-       #                 point.y() + self._glabel_line_edit.boundingRect().height())
-       # #point.setY(point.y()) # + self._glabel_line_edit.boundingRect().height())
-       # scene_point = self.photo_view.mapToScene(point2)
         self._glabel_list_view.setPos(QPoint(0, self._glabel_line_edit.boundingRect().height()))
-        #self._glabel_list_view.setPos(scene_point)
-        #self._glabel_list_view.setFlag(QGraphicsItem.ItemIgnoresTransformations, True)
         self._glabel_list_view.setZValue(102)
 
         self._glabel_line_edit.update()
         self._glabel_list_view.update()
-        #self._glabel_list_view.widget().raise_()
-        #self._label_line_edit.setFocus()
-        #self._label_line_edit.raise_()
 
     def _show_label_search_bar(self):
         self._glabel_line_edit.setVisible(True)
@@ -394,3 +402,7 @@ class MaskEditor(QObject):
         self.qtimer.stop()
         self._glabel_line_edit.setVisible(False)
         self.photo_view.allow_zoom(True)
+
+    def _handle_tool_cursor_changed(self, tool_id: int, cursor_image: QImage):
+        if self.canvas._current_tool.tool_id == tool_id:
+            self.canvas.cursor__.set_cursor(cursor_image)

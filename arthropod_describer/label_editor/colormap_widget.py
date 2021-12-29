@@ -8,7 +8,7 @@ from PySide2.QtCore import Signal, Slot, QModelIndex
 from PySide2.QtGui import QImage, QPixmap, Qt
 from PySide2.QtWidgets import QWidget, QLabel, QCompleter, QLineEdit
 
-from arthropod_describer.tools.tool import qimage2ndarray
+from arthropod_describer.common.tool import qimage2ndarray
 from arthropod_describer.common.colormap import Colormap
 from arthropod_describer.label_editor.ui_colormap_widget import Ui_ColormapWidget
 

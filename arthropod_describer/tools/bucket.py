@@ -2,9 +2,11 @@ import typing
 
 import numpy as np
 from PySide2.QtCore import QPoint
-from PySide2.QtGui import QImage, QPainter
+from PySide2.QtGui import QImage, QPainter, QColor
+from skimage.segmentation import flood
 
-from arthropod_describer.tools.tool import Tool, qimage2ndarray, ToolUserParam
+from arthropod_describer.common.label_change import LabelChange, label_difference_to_label_changes
+from arthropod_describer.common.tool import Tool, ToolUserParam, EditContext
 
 TOOL_CLASS_NAME = 'Bucket'
 
@@ -33,9 +35,6 @@ class Tool_Bucket(Tool):
     def set_user_param(self, param_name: str, value: typing.Any):
         pass
 
-    def left_press(self, painter: QPainter, pos: QPoint, img: QImage, label: int):
-        pass
-
     @property
     def active(self) -> bool:
         return False
@@ -51,24 +50,14 @@ class Tool_Bucket(Tool):
             return
         self.cmap = cmap
 
-    def left_release(self, painter: QPainter, pos: QPoint, label: int) -> typing.Tuple[np.ndarray, int]:
-        pass
+    def left_release(self, painter: QPainter, pos: QPoint, ctx: EditContext) -> typing.List[LabelChange]:
+        picked_label = ctx.label_img.label_img[pos.y(), pos.x()]
+        # TODO should probably make distinction between connectivity for bg and fg, definitely
+        flood_mask = flood(ctx.label_img.label_img, pos.toTuple()[::-1], connectivity=1)
+        flood_coords = np.nonzero(flood_mask)
+        lab_change = LabelChange(np.nonzero(flood_mask), ctx.label, picked_label, ctx.label_img.label_type)
+        color = QColor(*ctx.colormap[ctx.label]).rgba()
+        for y, x in zip(*flood_coords):
+            ctx.label_viz.setPixel(x, y, color)
 
-    def right_press(self, painter: QPainter, pos: QPoint, img: QImage, label: int):
-        pass
-
-    def right_release(self, painter: QPainter, pos: QPoint, label: int):
-        pass
-
-    def middle_click(self, painter: QPainter, pos: QPoint, label: int):
-        pass
-
-    def mouse_move(self, painter: QPainter, new_pos: QPoint, old_pos: QPoint, label: int):
-        pass
-
-    #@property
-    #def tool_id(self) -> int:
-    #    return self._tool_id
-
-    #def set_tool_id(self, tool_id: int):
-    #    self._tool_id = tool_id
+        return [lab_change]

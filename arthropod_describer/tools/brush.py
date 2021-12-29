@@ -1,4 +1,5 @@
 import typing
+from typing import List
 
 import numpy as np
 from PySide2.QtCore import QPoint, Slot
@@ -6,7 +7,8 @@ from PySide2.QtGui import QImage, QPainter, QColor, QBrush
 from skimage import draw
 import skimage.morphology as M
 
-from arthropod_describer.tools.tool import Tool, qimage2ndarray, ToolUserParam, ParamType
+from arthropod_describer.common.tool import Tool, qimage2ndarray, ToolUserParam, ParamType, EditContext
+from arthropod_describer.common.label_change import LabelChange, label_difference_to_label_changes
 
 TOOL_CLASS_NAME = 'Brush'
 
@@ -63,19 +65,21 @@ class Tool_Brush(Tool):
         elif param.param_type == ParamType.BOOL:
             pass
         self._user_params[param_name].value = value
+        if param_name == 'radius':
+            self.cursor_changed.emit(self.tool_id, self.cursor_image)
         return value
 
-    def left_press(self, painter: QPainter, pos: QPoint, img: QImage, label: int) -> typing.List[np.ndarray]:
+    def left_press(self, painter: QPainter, pos: QPoint, ctx: EditContext) -> List[LabelChange]:
         self._active = True
-        self._current_img = img
-        if self.edit_mask.size() == img.size():
+        self._current_img = ctx.image
+        if self.edit_mask.size() == self._current_img.size():
             self.edit_mask.fill(QColor(0, 0, 0))
         else:
-            self.edit_mask = QImage(img.width(), img.height(), QImage.Format_Grayscale8)
+            self.edit_mask = QImage(self._current_img.width(), self._current_img.height(), QImage.Format_Grayscale8)
             self.edit_mask.fill(QColor(0, 0, 0))
-        return self.mouse_move(painter, pos, pos, label)
+        return self.mouse_move(painter, pos, pos, ctx)
 
-    def mouse_move(self, painter: QPainter, new_pos: QPoint, old_pos: QPoint, label: int) -> typing.List[np.ndarray]:
+    def mouse_move(self, painter: QPainter, new_pos: QPoint, old_pos: QPoint, ctx: EditContext) -> List[LabelChange]:
         if not self.active:
             return []
         painter.save()
@@ -101,18 +105,20 @@ class Tool_Brush(Tool):
         painter.restore()
         return []
 
-    def left_release(self, painter: QPainter, pos: QPoint, label: int) -> typing.Tuple[np.ndarray, int]:
+    def left_release(self, painter: QPainter, pos: QPoint, ctx: EditContext) -> List[LabelChange]:
         self._active = False
-        return np.where(qimage2ndarray(self.edit_mask) > 0, self._primary_label, -1), self._primary_label
+        #return np.where(qimage2ndarray(self.edit_mask) > 0, self._primary_label, -1), self._primary_label
+        lab_diff = np.where(qimage2ndarray(self.edit_mask) > 0, self._primary_label, -1)
+        return label_difference_to_label_changes(lab_diff, ctx.label_img)
 
-    def right_press(self, painter: QPainter, pos: QPoint, img: QImage, label: int) -> typing.Tuple[np.ndarray, int]:
-        return np.array([]), -1
+    #def right_press(self, painter: QPainter, pos: QPoint, ctx: EditContext) -> List[LabelChange]:
+    #    return np.array([]), -1
 
-    def right_release(self, painter: QPainter, pos: QPoint, label: int) -> typing.Tuple[np.ndarray, int]:
-        return np.array([]), -1
+    #def right_release(self, painter: QPainter, pos: QPoint, ctx: EditContext) -> List[LabelChange]:
+    #    return np.array([]), -1
 
-    def middle_click(self, painter: QPainter, pos: QPoint, label: int):
-        pass
+    #def middle_click(self, painter: QPainter, pos: QPoint, ctx: EditContext) -> List[LabelChange]:
+    #    pass
 
     @property
     def active(self) -> bool:

@@ -9,7 +9,7 @@ from PySide2.QtGui import QCloseEvent
 from PySide2.QtWidgets import QMainWindow, QApplication, QHBoxLayout, QSizePolicy
 from PySide2.QtCore import QModelIndex, QPoint, QItemSelectionModel
 
-from arthropod_describer.tools.tool import Tool
+from arthropod_describer.common.tool import Tool
 from arthropod_describer.common.state import State
 from arthropod_describer.common.photo import Photo
 from arthropod_describer.ui_arthropod_describer import Ui_ArhtropodDescriber

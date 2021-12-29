@@ -1,21 +1,25 @@
 import abc
 import enum
 import typing
-from typing import Dict, Tuple, List
+from typing import Dict, Tuple, List, Callable, Any
 
 import numpy as np
-from PySide2.QtCore import QPoint, Slot
-from PySide2.QtGui import QPainter, QImage
+from PySide2.QtCore import QPoint, Slot, QObject, Signal
+from PySide2.QtGui import QPainter, QImage, QPixmap
 
 from arthropod_describer.common.label_change import LabelChange
+from arthropod_describer.common.photo import LabelImg
 
 
 class EditContext:
-    def __init__(self, label_nd: np.ndarray, label: int, image: QImage, colormap: Dict[int, Tuple[int, int, int]]):
-        self.label_nd = label_nd
+    def __init__(self, label_img: LabelImg, label: int, image: QImage, colormap: Dict[int, Tuple[int, int, int]],
+                 label_viz: QImage):
+        self.label_img: LabelImg = label_img
         self.image = image
         self.label = label
         self.colormap = colormap
+        self.label_viz = label_viz
+        self.tool_viz_commands: List[Any] = []
 
 
 class ParamType(enum.IntEnum):
@@ -38,9 +42,11 @@ class ToolUserParam:
         self.value_step = step
 
 
-class Tool(abc.ABC):
-    @abc.abstractmethod
-    def __init__(self):
+class Tool(QObject):
+    cursor_changed = Signal([int, QImage])
+
+    def __init__(self, parent: QObject = None):
+        QObject.__init__(self, parent)
         self.tool_id = -42
 
     def set_tool_id(self, tool_id: int):
@@ -52,25 +58,20 @@ class Tool(abc.ABC):
         pass
 
     @property
-    @abc.abstractmethod
     def cursor_image(self) -> QImage:
-        pass
+        return QImage()
 
     @property
-    @abc.abstractmethod
     def user_params(self) -> typing.Dict[str, ToolUserParam]:
-        pass
+        return {}
 
-    @abc.abstractmethod
     def set_user_param(self, param_name: str, value: typing.Any):
         pass
 
     @property
-    @abc.abstractmethod
     def active(self) -> bool:
-        pass
+        return False
 
-    @abc.abstractmethod
     def left_press(self, painter: QPainter, pos: QPoint, context: EditContext) -> List[LabelChange]:
         return []
 
@@ -90,17 +91,14 @@ class Tool(abc.ABC):
         return []
 
     @Slot(int)
-    @abc.abstractmethod
     def update_primary_label(self, label: int):
         pass
 
     @Slot(int)
-    @abc.abstractmethod
     def update_secondary_label(self, label: int):
         pass
 
     @Slot(dict)
-    @abc.abstractmethod
     def color_map_changed(self, cmap: typing.Dict[int, typing.Tuple[int, int, int]]):
         pass
 

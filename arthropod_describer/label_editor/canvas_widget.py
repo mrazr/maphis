@@ -1,4 +1,5 @@
 import typing
+from typing import Tuple, Optional, Callable, List
 
 from PySide2.QtCore import QPointF, Signal, QRectF, QPoint, Slot
 from PySide2.QtGui import QPixmap, QImage, QPainter, Qt, QBrush, QBitmap, QRegion
@@ -7,20 +8,11 @@ from PySide2.QtWidgets import QGraphicsItem, QGraphicsPixmapItem, QGraphicsScene
 import numpy as np
 
 from arthropod_describer.common.colormap import Colormap
+from arthropod_describer.common.label_change import LabelChange
 from arthropod_describer.common.state import State
-from arthropod_describer.tools.tool import Tool
+from arthropod_describer.common.tool import Tool, EditContext
 from arthropod_describer.label_editor.mask_widget import MaskWidget
 from arthropod_describer.common.photo import Photo, LabelImg, LabelType
-
-
-class EditableMask:
-    def __init__(self):
-        self._mask: typing.Optional[LabelImg] = None
-        self._colormap = None
-
-    def set_mask(self, mask: LabelImg, colormap):
-        self._mask = mask
-        self._colormap = colormap
 
 
 class ToolCursor(QGraphicsItem):
@@ -36,6 +28,8 @@ class ToolCursor(QGraphicsItem):
         return self.cursor_image.rect()
 
     def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget:typing.Optional[QWidget]=...):
+        if self.cursor_image is None:
+            return
         painter.save()
         painter.drawImage(self.boundingRect().x() - self.cursor_image.width() // 2,
                           self.boundingRect().y() - self.cursor_image.height() // 2,
@@ -55,12 +49,34 @@ class ToolCursor(QGraphicsItem):
         self.cursor_image = curs
 
 
+class ToolVisLayer(QGraphicsItem):
+    def __init__(self, parent: QGraphicsItem = None):
+        QGraphicsItem.__init__(self, parent)
+        self._paint_rect: QRectF = QRectF()
+        self.vis_commands: List[Callable[[QPainter], None]] = []
+
+    def boundingRect(self) -> QRectF:
+        return self._paint_rect
+
+    def set_paint_rect(self, rect: QRectF):
+        self.prepareGeometryChange()
+        self._paint_rect = rect
+
+    def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget: Optional[QWidget]=...):
+        for command in self.vis_commands:
+            command(painter)
+
+    def set_vis_commands(self, cmds: List[Callable[[QPainter], None]]):
+        self.vis_commands = cmds
+        self.update(self.boundingRect())
+
+
 class CanvasWidget(QGraphicsObject):
     left_press = Signal(QPointF)
     right_press = Signal()
     wheel_press = Signal()
     wheel_move = Signal()
-    label_changed = Signal(np.ndarray)
+    label_changed = Signal(list)
 
     def __init__(self, state: State, parent=None):
         QGraphicsObject.__init__(self, parent)
@@ -104,6 +120,9 @@ class CanvasWidget(QGraphicsObject):
         self._clip_nd: np.ndarray = None
         self._clip_qimg = QImage()
         #self.setCursor(QCursor(Qt.CursorShape.BlankCursor))
+
+        self._tool_viz_layer: ToolVisLayer = ToolVisLayer()
+        self._tool_viz_commands: typing.List[typing.Callable[[QPainter], None]] = []
 
     def initialize(self):
         self._image_pixmap = QPixmap()
@@ -160,13 +179,18 @@ class CanvasWidget(QGraphicsObject):
         self.state.photo_changed.connect(self.set_photo)
         self.state.colormap_changed.connect(self._handle_colormap_changed)
 
+        self.scene().addItem(self._tool_viz_layer)
+        self._tool_viz_layer.setPos(0, 0)
+        self._tool_viz_layer.setZValue(50)
+
     def boundingRect(self) -> QRectF:
         if self.photo is not None:
             return self.canvas_rect
         return QRectF()
 
     def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget:typing.Optional[QWidget]=...):
-        pass
+        for viz_command in self._tool_viz_commands:
+            viz_command(painter)
 
     def set_photo(self, photo: Photo):
         self.photo = photo
@@ -174,6 +198,11 @@ class CanvasWidget(QGraphicsObject):
         self.masks = self.photo.label_dict
 
         self._set_pixmaps(photo.image, self._image_pixmap, self.image_gpixmap)
+
+        tool_layer_img = QImage(self.photo.image.size(), QImage.Format_ARGB32)
+        #self._tool_viz_layer.setPixmap(QPixmap.fromImage(tool_layer_img, Qt.AutoColor))
+        #self._tool_viz_layer.setZValue(45)
+        #self._tool_viz_layer.setPos(self.image_gpixmap.pos())
 
         for mask_type in self.masks.keys():
             self.mask_gpixmaps[mask_type].setVisible(False)
@@ -189,6 +218,7 @@ class CanvasWidget(QGraphicsObject):
             #self.colormaps[mask_type] = cmap
             #self.setVisible(True)
             #self.cursor__.update()
+        self._tool_viz_layer.set_paint_rect(self.image_gpixmap.boundingRect())
         self.update_clip_mask()
         self.set_mask_shown(self.current_mask_shown, True)
 
@@ -207,6 +237,7 @@ class CanvasWidget(QGraphicsObject):
 
     def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
         self.left_press.emit(event.scenePos())
+        self._tool_viz_layer.setVisible(True)
         if event.buttons() & Qt.MouseButton.MiddleButton == 0:
             if self._current_tool is not None:
                 painter = QPainter(self.mask_widgets[self.current_mask_shown]._mask_image)
@@ -214,8 +245,17 @@ class CanvasWidget(QGraphicsObject):
                     clip_region = QRegion(self.clip_mask)
                     painter.setClipRegion(clip_region, Qt.ClipOperation.ReplaceClip)
                 painter.setCompositionMode(QPainter.CompositionMode_Source)
-                self._current_tool.left_press(painter, event.pos().toPoint(),
-                                              self.mask_widgets[self.current_mask_shown]._mask_image, 1)
+                #lab_changes = self._current_tool.left_press(painter, event.pos().toPoint(),
+                #                              self.mask_widgets[self.current_mask_shown]._mask_image, 1)
+                lab_changes = []
+                if event.button() == Qt.MouseButton.LeftButton:
+                    lab_changes = self._current_tool.left_press(painter, event.pos().toPoint(),
+                                                                self._create_context())
+                elif event.button() == Qt.MouseButton.RightButton:
+                    lab_changes = self._current_tool.right_press(painter, event.pos().toPoint(),
+                                                                self._create_context())
+                if len(lab_changes) > 0:
+                    self.label_changed.emit(lab_changes)
         else:
             super().mousePressEvent(event)
 
@@ -230,7 +270,15 @@ class CanvasWidget(QGraphicsObject):
                 clip_region = QRegion(self.clip_mask)
                 painter.setClipRegion(clip_region, Qt.ClipOperation.ReplaceClip)
             painter.setCompositionMode(QPainter.CompositionMode_Source)
-            self._current_tool.mouse_move(painter, new_pos, old_pos, 1)
+            #lab_changes = self._current_tool.mouse_move(painter, new_pos, old_pos, 1)
+            ctx = self._create_context()
+            lab_changes = self._current_tool.mouse_move(painter, new_pos, old_pos,
+                                                        ctx)
+            #self._tool_viz_commands = ctx.tool_viz_commands
+            self._tool_viz_layer.set_vis_commands(ctx.tool_viz_commands)
+            self._tool_viz_layer.update()
+            if len(lab_changes) > 0:
+                self.label_changed.emit(lab_changes)
             self.cursor__.set_pos(event.scenePos())
             self.update()
 
@@ -243,9 +291,19 @@ class CanvasWidget(QGraphicsObject):
             painter.setCompositionMode(QPainter.CompositionMode_Source)
             # `edit_img` is an integer img, where non-zero elements denote pixels that were painted currently, and their integer value
             # denotes the label that was assigned to those pixels
-            edit_img, label = self._current_tool.left_release(painter, event.pos().toPoint().toTuple(), 1)
-            lab_img = self.photo.label_dict[self.current_mask_shown].label_img.astype(np.uint8)
-            self.label_changed.emit(edit_img)
+            ctx = self._create_context()
+            lab_changes = []
+            if event.button() == Qt.MouseButton.LeftButton:
+                lab_changes = self._current_tool.left_release(painter, event.pos().toPoint(),
+                                                            ctx)
+                print("left release")
+            elif event.button() == Qt.MouseButton.RightButton:
+                lab_changes = self._current_tool.right_release(painter, event.pos().toPoint(),
+                                                             ctx)
+                print('right release')
+            self._tool_viz_layer.set_vis_commands(ctx.tool_viz_commands)
+            if len(lab_changes) > 0:
+                self.label_changed.emit(lab_changes)
         super().mouseReleaseEvent(event)
 
     def hoverEnterEvent(self, event: QGraphicsSceneHoverEvent):
@@ -271,7 +329,7 @@ class CanvasWidget(QGraphicsObject):
         self._current_tool = tool
         #self.cursor_image = QImage(bytess, crs.shape[1], crs.shape[0], QImage.)
         self.cursor_image = self._current_tool.cursor_image #QImage(tool.cursor_image.data, sz[1], sz[0], sz[1], QImage.Format_Grayscale16)
-        self.cursor_image.setColorTable(self.colormaps[LabelType.BUG])
+        #self.cursor_image.setColorTable(self.colormaps[LabelType.BUG])
         self.cursor__.set_cursor(self.cursor_image)
         self.cursor__.setOpacity(0.25)
         self.update()
@@ -325,3 +383,10 @@ class CanvasWidget(QGraphicsObject):
     def _handle_colormap_changed(self, colormap: Colormap):
         for mask_widget in self.mask_widgets.values():
             mask_widget.set_color_map(colormap)
+
+    def _create_context(self) -> EditContext:
+        return EditContext(self.state.label_img,
+                           self.state.primary_label,
+                           self.state.current_photo.image,
+                           self.state.colormap.colormap,
+                           self.mask_widgets[self.current_mask_shown]._mask_image)

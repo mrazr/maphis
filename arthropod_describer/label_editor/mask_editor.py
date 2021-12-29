@@ -73,6 +73,7 @@ class MaskEditor(QObject):
         self.colormap_widget = ColormapWidget()
         self.colormap_widget.primary_label_changed.connect(self._handle_primary_label_changed)
         self.colormap_widget.secondary_label_changed.connect(self._handle_secondary_label_changed)
+        self.state.label_img_changed.connect(lambda lbl_img: self.colormap_widget.handle_label_type_changed(lbl_img.label_type))
         vbox.addWidget(self.colormap_widget)
 
         self.current_photo: Optional[Photo] = None

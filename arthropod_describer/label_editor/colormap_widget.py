@@ -4,10 +4,11 @@ from typing import Literal
 
 import cv2 as cv
 import numpy as np
-from PySide2.QtCore import Signal, Slot, QModelIndex
+from PySide2.QtCore import Signal, Slot, QModelIndex, QSortFilterProxyModel
 from PySide2.QtGui import QImage, QPixmap, Qt
 from PySide2.QtWidgets import QWidget, QLabel, QCompleter, QLineEdit
 
+from arthropod_describer.common.photo import LabelType
 from arthropod_describer.common.tool import qimage2ndarray
 from arthropod_describer.common.colormap import Colormap
 from arthropod_describer.label_editor.ui_colormap_widget import Ui_ColormapWidget
@@ -26,6 +27,9 @@ class ColormapWidget(QWidget):
 
         self.colormaps: typing.List[Colormap] = []
         self.current_colormap: typing.Optional[Colormap] = None
+
+        self.label_filter = QSortFilterProxyModel()
+        self.label_filter.setFilterRole(Qt.UserRole + 1)
 
         self.left_label: int = -1
         self.left_label_pixmap = QPixmap(48, 48)
@@ -119,16 +123,20 @@ class ColormapWidget(QWidget):
 
     def _handle_colormap_changed(self, current_idx: int):
         self.current_colormap = self.colormaps[current_idx]
+        self.label_filter.setSourceModel(self.current_colormap)
 
         self.left_label = self.current_colormap.labels[0]
         self.right_label = self.current_colormap.labels[0]
 
         #self.set_label_by_idx(random.randint(0, self.current_colormap.color_count), 'left')
 
-        self.ui.leftComboBox.setModel(self.current_colormap)
-        self.ui.rightComboBox.setModel(self.current_colormap)
+        #self.ui.leftComboBox.setModel(self.current_colormap)
+        #self.ui.rightComboBox.setModel(self.current_colormap)
 
-        self.completer.setModel(self.current_colormap)
+        self.ui.leftComboBox.setModel(self.label_filter)
+        self.ui.rightComboBox.setModel(self.label_filter)
+
+        self.completer.setModel(self.label_filter)
         self.completer.setCaseSensitivity(Qt.CaseInsensitive)
         self.completer.setFilterMode(Qt.MatchContains)
         #self.completer.highlighted.connect(lambda _: print("highlight"))
@@ -161,10 +169,12 @@ class ColormapWidget(QWidget):
         self.ui.colormapComboBox.setCurrentIndex(idx)
 
     def _handle_left_label_changed(self, idx: int):
-        self.change_primary_label(self.current_colormap.labels[idx])
+        index = self._correct_index(idx)
+        self.change_primary_label(self.current_colormap.labels[index.row()])
 
     def _handle_right_label_changed(self, idx: int):
-        self.change_secondary_label(self.current_colormap.labels[idx])
+        index = self._correct_index(idx)
+        self.change_secondary_label(self.current_colormap.labels[index.row()])
 
     def _handle_swap_labels_clicked(self):
         left_idx = self.ui.rightComboBox.currentIndex()
@@ -185,8 +195,22 @@ class ColormapWidget(QWidget):
 
     @Slot(QModelIndex)
     def _handle_label_search_confirmed(self, idx: QModelIndex):
+        #true_index = self._correct_index(idx)
         label = self.completer.completionModel().data(idx, Qt.UserRole)
         label_index = self.current_colormap.labels.index(label)
-        self.set_label_by_idx(label_index, 'left')
+        source_index = self.current_colormap.index(label_index, 0)
+        target_index = self.label_filter.mapFromSource(source_index)
+        self.set_label_by_idx(target_index.row(), 'left')
         self.label_search_bar.clearFocus()
         self.label_search_finished.emit()
+
+    def handle_label_type_changed(self, label_type: LabelType):
+        if label_type == LabelType.REGIONS:
+            self.label_filter.setFilterFixedString('regions')
+        else:
+            self.label_filter.setFilterFixedString('mask')
+
+    def _correct_index(self, index: typing.Union[QModelIndex, int]):
+        if isinstance(index, QModelIndex):
+            return self.label_filter.mapToSource(index)
+        return self.label_filter.mapToSource(self.label_filter.index(index, 0))

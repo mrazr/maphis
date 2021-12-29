@@ -77,5 +77,9 @@ class Colormap(QAbstractItemModel):
             return f'{name} {label}'
         elif role == Qt.UserRole:
             return label
+        elif role == Qt.UserRole + 1:
+            if label == 0 or label == 1000:
+                return 'mask'
+            return 'regions'
         else:
             return None

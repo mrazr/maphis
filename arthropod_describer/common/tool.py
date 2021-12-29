@@ -1,14 +1,13 @@
 import abc
 import enum
 import typing
-from abc import ABC
-from typing import Tuple, Dict, Tuple
+from typing import Dict, Tuple, List
 
 import numpy as np
-import skimage.morphology as M
-from PySide2.QtCore import QByteArray, QPoint, Slot
-from PySide2.QtGui import QBitmap, QPainter, QBrush, QImage, QColor
-from skimage import draw, io
+from PySide2.QtCore import QPoint, Slot
+from PySide2.QtGui import QPainter, QImage
+
+from arthropod_describer.common.label_change import LabelChange
 
 
 class EditContext:
@@ -66,29 +65,29 @@ class Tool(abc.ABC):
     def set_user_param(self, param_name: str, value: typing.Any):
         pass
 
-    @abc.abstractmethod
-    def left_press(self, painter: QPainter, pos: QPoint, context: EditContext) -> typing.List[np.ndarray]:
-        pass
-
     @property
     @abc.abstractmethod
     def active(self) -> bool:
         pass
 
-    def left_release(self, painter: QPainter, pos: QPoint, context: EditContext) -> typing.Tuple[np.ndarray, int]:
-        pass
+    @abc.abstractmethod
+    def left_press(self, painter: QPainter, pos: QPoint, context: EditContext) -> List[LabelChange]:
+        return []
 
-    def right_press(self, painter: QPainter, pos: QPoint, context: EditContext) -> Tuple[np.ndarray, int]:
-        pass
+    def left_release(self, painter: QPainter, pos: QPoint, context: EditContext) -> List[LabelChange]:
+        return []
 
-    def right_release(self, painter: QPainter, pos: QPoint, context: EditContext) -> None:
-        pass
+    def right_press(self, painter: QPainter, pos: QPoint, context: EditContext) -> List[LabelChange]:
+        return []
 
-    def middle_click(self, painter: QPainter, pos: QPoint, label: int):
-        pass
+    def right_release(self, painter: QPainter, pos: QPoint, context: EditContext) -> List[LabelChange]:
+        return []
 
-    def mouse_move(self, painter: QPainter, new_pos: QPoint, old_pos: QPoint, label: int):
-        pass
+    def middle_click(self, painter: QPainter, pos: QPoint, context: EditContext) -> List[LabelChange]:
+        return []
+
+    def mouse_move(self, painter: QPainter, new_pos: QPoint, old_pos: QPoint, context: EditContext) -> List[LabelChange]:
+        return []
 
     @Slot(int)
     @abc.abstractmethod

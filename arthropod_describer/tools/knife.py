@@ -33,16 +33,18 @@ class Tool_Knife(Tool):
         ctx.tool_viz_commands = []
         line_coords = skimage.draw.line(*self._first_endpoint, *(pos.toTuple()[::-1]))
 
-        label_profile = skimage.measure.profile_line(ctx.label_img.label_img,
-                                                     self._first_endpoint,
-                                                     pos.toTuple()[::-1],
-                                                     order=0,
-                                                     linewidth=1).astype(np.uint32)
+        #label_profile = skimage.measure.profile_line(ctx.label_img.label_img,
+        #                                             self._first_endpoint,
+        #                                             pos.toTuple()[::-1],
+        #                                             order=0,
+        #                                             linewidth=1).astype(np.uint32)
 
+        label_profile = ctx.label_img.label_img[line_coords]
         labels = np.unique(label_profile)
 
         if len(labels) < 2:
             return []
+        #labels = set()
 
         lab_coords: Dict[int, Tuple[List[int], List[int]]] = {label: ([], []) for label in labels}
 

@@ -1,5 +1,5 @@
 import typing
-from typing import Optional
+from typing import Optional, List
 
 from PySide2.QtCore import Signal, QObject, QPointF, QPoint, QTimer
 from PySide2.QtGui import Qt, QImage
@@ -8,7 +8,7 @@ from PySide2.QtWidgets import QWidget, QGraphicsScene, QToolButton, QGroupBox, Q
 import numpy as np
 from skimage import io
 
-from arthropod_describer.common.label_change import LabelChange, DoType, CommandEntry
+from arthropod_describer.common.label_change import LabelChange, DoType, CommandEntry, propagate_mask_changes_to
 from arthropod_describer.common.state import State
 from arthropod_describer.label_editor.colormap_widget import ColormapWidget
 from arthropod_describer.common.tool import Tool, ToolUserParam, ParamType
@@ -100,8 +100,8 @@ class MaskEditor(QObject):
         self.handle_reflection_mask_checked(False)
         self.handle_segments_mask_checked(False)
 
-        self.undo_stack: typing.List[CommandEntry] = []
-        self.redo_stack: typing.List[CommandEntry] = []
+        self.undo_stack: List[List[CommandEntry]] = []
+        self.redo_stack: List[List[CommandEntry]] = []
 
         self.ui.tbtnUndo.clicked.connect(self.handle_undo_clicked)
         self.ui.tbtnRedo.clicked.connect(self.handle_redo_clicked)
@@ -320,29 +320,38 @@ class MaskEditor(QObject):
 
         if len(lab_changes) == 0:
             return
-        command = CommandEntry(lab_changes)
+        photo = self.state.current_photo
+        command = CommandEntry(lab_changes, label_type=self.canvas.current_mask_shown, update_canvas=False)
+        commands = [command]
+
+        if command.label_type == LabelType.BUG:
+            if (cmd_for_regions := propagate_mask_changes_to(photo.segments_mask, command)) is not None:
+                commands.append(cmd_for_regions)
+            if (cmd_for_reflections := propagate_mask_changes_to(photo.reflection_mask, command)) is not None:
+                commands.append(cmd_for_reflections)
+
         self.redo_stack.clear()
         self.ui.tbtnRedo.setEnabled(False)
-        self.do_command(command, update_canvas=False)
+        self.do_commands(commands)
         #io.imsave('/home/radoslav/knife_regions.tif', self.current_photo.label_dict[LabelType.REGIONS].label_img)
 
     def handle_undo_clicked(self):
-        command = self.undo_stack.pop()
-        self.do_command(command)
+        commands = self.undo_stack.pop()
+        self.do_commands(commands)
         if len(self.undo_stack) == 0:
             self.ui.tbtnUndo.setEnabled(False)
 
     def handle_redo_clicked(self):
-        command = self.redo_stack.pop()
-        self.do_command(command)
+        commands = self.redo_stack.pop()
+        self.do_commands(commands)
         if len(self.redo_stack) == 0:
             self.ui.tbtnRedo.setEnabled(False)
 
     def change_labels(self, label_img: np.ndarray, change: LabelChange):
         label_img[change.coords[0], change.coords[1]] = change.new_label
 
-    def do_command(self, command: CommandEntry, update_canvas: bool=True):
-        reverse_command = CommandEntry()
+    def do_command(self, command: CommandEntry, update_canvas: bool=True) -> CommandEntry:
+        reverse_command = CommandEntry(label_type=command.label_type)
         labels_changed = set()
         for change in command.change_chain:
             label_img = self.current_photo.label_dict[change.label_type].label_img
@@ -351,20 +360,38 @@ class MaskEditor(QObject):
             reverse_command.add_label_change(change.swap_labels())
             labels_changed.add(change.label_type)
         reverse_command.do_type = DoType.Undo if command.do_type == DoType.Do else DoType.Do
-        if reverse_command.do_type == DoType.Undo:
-            self.undo_stack.append(reverse_command)
-            self.ui.tbtnUndo.setEnabled(True)
-        else:
-            self.redo_stack.append(reverse_command)
-            self.ui.tbtnRedo.setEnabled(True)
 
-        if update_canvas:
+        if command.update_canvas:
             for label_type in labels_changed:
                 self.canvas.update_label(label_type)
                 #io.imsave(f'/home/radoslav/change_{label_type}.png', 255 * self.current_photo.label_dict[label_type].label_img.astype(np.uint8))
         else:
             if LabelType.BUG in labels_changed:
                 self.canvas.update_clip_mask()
+
+        return reverse_command
+
+    def do_commands(self, commands: typing.List[CommandEntry], update_canvas: bool=True):
+        reverse_commands = [self.do_command(command) for command in commands]
+
+        labels_changed = set([command.label_type for command in commands])
+
+        do_type = reverse_commands[0].do_type
+
+        if do_type == DoType.Undo:
+            self.undo_stack.append(reverse_commands)
+            self.ui.tbtnUndo.setEnabled(True)
+        else:
+            self.redo_stack.append(reverse_commands)
+            self.ui.tbtnRedo.setEnabled(True)
+
+        #if update_canvas:
+        #    for label_type in labels_changed:
+        #        self.canvas.update_label(label_type)
+        #        #io.imsave(f'/home/radoslav/change_{label_type}.png', 255 * self.current_photo.label_dict[label_type].label_img.astype(np.uint8))
+        #else:
+        #    if LabelType.BUG in labels_changed:
+        #        self.canvas.update_clip_mask()
 
     def _handle_primary_label_changed(self, label: int):
         self.state.primary_label = label

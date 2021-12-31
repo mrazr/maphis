@@ -12,6 +12,7 @@ from PySide2.QtCore import QModelIndex, QPoint, QItemSelectionModel
 from arthropod_describer.common.tool import Tool
 from arthropod_describer.common.state import State
 from arthropod_describer.common.photo import Photo
+from arthropod_describer.plugin_manager import PluginManager
 from arthropod_describer.ui_arthropod_describer import Ui_ArhtropodDescriber
 from arthropod_describer.common.photo_loader import Storage, LocalStorage
 from arthropod_describer.common.utils import choose_folder
@@ -35,6 +36,9 @@ class ArthropodDescriber(QMainWindow):
 
         self.mask_editor = MaskEditor(self.state)
         self._setup_label_editor()
+
+        self.plugins_widget = PluginManager()
+        self.mask_editor.side_widget.layout().addWidget(self.plugins_widget)
 
         self.mask_editor.register_tools(self.tools)
 

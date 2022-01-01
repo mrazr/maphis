@@ -1,14 +1,14 @@
 import abc
-import enum
 import typing
-from typing import Dict, Tuple, List, Callable, Any
+from typing import Dict, Tuple, List, Any
 
 import numpy as np
 from PySide2.QtCore import QPoint, Slot, QObject, Signal
-from PySide2.QtGui import QPainter, QImage, QPixmap
+from PySide2.QtGui import QPainter, QImage
 
 from arthropod_describer.common.label_change import LabelChange
 from arthropod_describer.common.photo import LabelImg
+from arthropod_describer.common.user_params import ToolUserParam
 
 
 class EditContext:
@@ -20,26 +20,6 @@ class EditContext:
         self.colormap = colormap
         self.label_viz = label_viz
         self.tool_viz_commands: List[Any] = []
-
-
-class ParamType(enum.IntEnum):
-    INT = 0,
-    STR = 1,
-    BOOL = 2,
-
-
-class ToolUserParam:
-    def __init__(self, name: str, param_type: ParamType, default_value, min_val: int=-1, max_val: int=-1, step:int=1):
-        self.name = name
-        self.param_type = param_type
-        self.default_value = default_value
-        self.value = self.default_value
-        if self.param_type == ParamType.INT:
-            assert min_val >= 0
-            assert max_val >= 0
-        self.min_value = min_val
-        self.max_value = max_val
-        self.value_step = step
 
 
 class Tool(QObject):
@@ -87,7 +67,8 @@ class Tool(QObject):
     def middle_click(self, painter: QPainter, pos: QPoint, context: EditContext) -> List[LabelChange]:
         return []
 
-    def mouse_move(self, painter: QPainter, new_pos: QPoint, old_pos: QPoint, context: EditContext) -> List[LabelChange]:
+    def mouse_move(self, painter: QPainter, new_pos: QPoint, old_pos: QPoint, context: EditContext) -> List[
+        LabelChange]:
         return []
 
     @Slot(int)
@@ -106,7 +87,12 @@ class Tool(QObject):
 def qimage2ndarray(img: QImage) -> np.ndarray:
     img_ = img
     dtype = np.uint8
+    shape = img_.size().toTuple()[::-1]
     if img.format() == QImage.Format_ARGB32:
         img_ = img.convertToFormat(QImage.Format_RGB32)
         dtype = np.uint32
-    return np.reshape(np.frombuffer(img_.constBits(), dtype), img_.size().toTuple()[::-1]).astype(dtype)
+    elif img.format() == QImage.Format_RGB32:
+        img_ = QImage.convertToFormat(img_, QImage.Format_RGB888)
+        dtype = np.uint8
+        shape = shape + (3,)
+    return np.reshape(np.frombuffer(img_.constBits(), dtype), shape).astype(dtype)

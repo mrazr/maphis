@@ -61,7 +61,10 @@ class LabelImg:
 
     @label_image.setter
     def label_image(self, lbl_nd: np.ndarray):
-        self.label_img = lbl_nd
+        if self.label_img is None:
+            self.label_img = lbl_nd
+        else:
+            self.set_image(lbl_nd)
 
     @property
     def is_set(self) -> bool:
@@ -95,6 +98,20 @@ class LabelImg:
 
     def make_empty(self, size: typing.Tuple[int, int]):
         self.label_img = np.zeros(size[::-1], np.uint16)
+
+    def set_image(self, img: np.ndarray):
+        if self.label_img.shape != img.shape:
+            raise ValueError(f'The shape must be {self.label_img.shape}, got {img.shape}.')
+        elif self.label_img.dtype != img.dtype:
+            raise ValueError(f'The dtype must be {self.label_img.dtype}, got {img.dtype}.')
+        self.label_img = img
+
+    def clone(self) -> 'LabelImg':
+        lbl = LabelImg()
+        lbl._type = self._type
+        lbl._path = self._path
+        lbl.label_img = self.label_img.copy() if self.label_img is not None else None
+        return lbl
 
 
 class Photo(abc.ABC):
@@ -171,7 +188,7 @@ class LocalPhoto(Photo):
     REFLECTIONS = 'reflections'
 
     def __init__(self, folder: Path, img_name: str):
-        self._image: typing.Optional[QImage] = None #QImage(str(folder / 'images' / img_name))
+        self._image: typing.Optional[QImage] = None
         self._image_path = folder / 'images' / img_name
         self._bug_mask = LabelImg.load(folder / self.MASKS / f'maska - {img_name}', LabelType.BUG)
         self._segments_mask: typing.Optional[LabelImg] = LabelImg.load(folder / self.SECTIONS / f'maska - {img_name}', LabelType.REGIONS) #None

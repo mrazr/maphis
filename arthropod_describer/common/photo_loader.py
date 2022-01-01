@@ -85,6 +85,10 @@ class Storage(abc.ABC):
     def colormap(self) -> Colormap:
         pass
 
+    @abc.abstractmethod
+    def reset_photo(self, photo: Photo):
+        pass
+
 
 class LocalStorage(Storage):
     def __init__(self, folder: Path, image_regex: re.Pattern=TIF_REGEX):
@@ -111,7 +115,6 @@ class LocalStorage(Storage):
         cmap_path = self._location / 'colormap.json'
         if cmap_path.exists():
             self._colormap = Colormap(cmap_path=cmap_path)
-            print("hej")
 
     def _load_photo(self, img_name: str) -> LocalPhoto:
         return LocalPhoto(self._location, img_name) # TODO handle loading masks
@@ -165,6 +168,9 @@ class LocalStorage(Storage):
     @property
     def colormap(self) -> Colormap:
         return self._colormap
+
+    def reset_photo(self, photo: Photo):
+        pass
 
 
 class MockStorage(LocalStorage):

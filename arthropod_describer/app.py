@@ -9,11 +9,13 @@ import logging
 from PySide2.QtGui import QCloseEvent
 from PySide2.QtWidgets import QMainWindow, QApplication, QHBoxLayout, QSizePolicy
 from PySide2.QtCore import QModelIndex, QPoint, QItemSelectionModel
+import cv2 as cv
 
+from arthropod_describer.common.plugin import RegionComputation
 from arthropod_describer.common.tool import Tool
 from arthropod_describer.common.state import State
 from arthropod_describer.common.photo import Photo
-from arthropod_describer.plugin_manager import PluginManager
+from arthropod_describer.plugin_manager import PluginManager, ProcessType
 from arthropod_describer.ui_arthropod_describer import Ui_ArhtropodDescriber
 from arthropod_describer.common.photo_loader import Storage, LocalStorage
 from arthropod_describer.common.utils import choose_folder
@@ -44,6 +46,8 @@ class ArthropodDescriber(QMainWindow):
         self.plugins_widget = PluginManager()
         self.label_editor.side_widget.layout().addWidget(self.plugins_widget)
 
+        self.plugins_widget.apply_region_computation.connect(self.compute_regions)
+
         self.label_editor.register_tools(self.tools)
 
         hbox = QHBoxLayout()
@@ -61,6 +65,15 @@ class ArthropodDescriber(QMainWindow):
         self._setup_image_list()
 
         self.ui.actionOpen_folder.triggered.connect(self.handle_action_open_folder_triggered)
+
+    def compute_regions(self, reg_comp: RegionComputation, batch_mode: ProcessType):
+        print(f'performing {reg_comp.info.name} for {"single" if batch_mode == ProcessType.CURRENT_PHOTO else "all"}')
+        if batch_mode == ProcessType.CURRENT_PHOTO:
+            modified_labs = reg_comp(self.state.current_photo)
+            #for lab in modified_labs:
+                #cv.imwrite(f'/home/radoslav/fakulta/ad_stuff/{repr(lab)}.tif',
+                #           self.state.current_photo[lab].label_img)
+            self.label_editor.set_photo(self.state.current_photo)
 
     def _load_tools(self):
         py_files = [inspect.getmodulename(file.path) for file in os.scandir(Path(__file__).parent / 'tools') if file.name.endswith('.py') and file.name != '__init__.py']

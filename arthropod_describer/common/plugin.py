@@ -8,7 +8,8 @@ import inspect
 
 from arthropod_describer.common.label_change import CommandEntry
 from arthropod_describer.common.photo import LabelType, Photo
-from arthropod_describer.common.tool import Tool, ToolUserParam
+from arthropod_describer.common.tool import Tool
+from arthropod_describer.common.user_params import ToolUserParam
 
 
 @dataclass
@@ -44,7 +45,7 @@ class RegionComputation:
         pass
 
     @abc.abstractmethod
-    def __call__(self, photo: Photo, labels: Optional[Set[int]] = None) -> List[CommandEntry]:
+    def __call__(self, photo: Photo, labels: Optional[Set[int]] = None) -> Set[LabelType]:
         pass
 
     @property
@@ -97,29 +98,3 @@ class Plugin:
         desc = lines[1].split(':')[1].strip()
 
         return Info(name, desc)
-
-
-def load_modules(plugin_folder: Path, folder: Union[Literal['regions'], Literal['properties'], Literal['tools']]):
-    py_files = [inspect.getmodulename(file.path) for file in os.scandir(plugin_folder / folder)
-                if file.name.endswith('.py')]
-
-    print(py_files)
-
-    modules = [import_module(f'.{module_name}', f'.plugins.{folder}') for module_name in py_files]
-
-#def load_region_computations(folder: Path) -> List[RegionComputation]:
-#    py_files = [inspect.getmodulename(file.path) for file in os.scandir(folder) if file.name.endswith('.py')]
-#
-#    modules = [import_module(f'.{module_name}', '.tools') for module_name in py_files]
-#    reg
-#    for module in modules:
-#        members = inspect.getmembers(module)
-#        for obj_name, obj in members:
-#            if not obj_name.startswith('Tool_'):
-#                continue
-#            if inspect.isclass(obj) and not inspect.isabstract(obj):
-#                tool = obj()
-#                tool.set_tool_id(len(tools))
-#                self.state.colormap_changed.connect(lambda cmap: tool.color_map_changed(cmap.colormap))
-#                tools.append(tool)
-#

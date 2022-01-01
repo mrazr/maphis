@@ -1,14 +1,15 @@
 import inspect
 import os
+from enum import IntEnum
 from importlib import import_module
 from pathlib import Path
 from typing import Optional, List, Any
 
-from PySide2.QtCore import QAbstractItemModel, QObject, QModelIndex, Qt
+from PySide2.QtCore import QAbstractItemModel, QObject, QModelIndex, Qt, Signal
 from PySide2.QtWidgets import QWidget, QLayout, QGridLayout, QVBoxLayout
 
-from arthropod_describer.common.plugin import RegionComputation, load_modules, Plugin
-from arthropod_describer.common.user_params import create_param_widget, create_params_widget
+from arthropod_describer.common.plugin import RegionComputation, Plugin, PropertyComputation
+from arthropod_describer.common.user_params import create_params_widget, UserParamWidgetBinding
 from ui_plugins_widget import Ui_PluginsWidget
 
 
@@ -82,7 +83,15 @@ class RegionCompsListModel(QAbstractItemModel):
         return QModelIndex()
 
 
+class ProcessType(IntEnum):
+    CURRENT_PHOTO = 0,
+    ALL_PHOTOS = 1,
+
+
 class PluginManager(QWidget):
+    apply_region_computation = Signal([RegionComputation, ProcessType])
+    apply_property_computation = Signal([PropertyComputation, ProcessType])
+
     def __init__(self, parent: Optional[QWidget] = None):
         QWidget.__init__(self, parent)
         self.ui = Ui_PluginsWidget()
@@ -100,9 +109,21 @@ class PluginManager(QWidget):
         self.region_comps_list_model = RegionCompsListModel()
         self.ui.grpRegionSettings.setLayout(QVBoxLayout())
         self._reg_comp_param_widget: QWidget = QWidget()
+        self._current_reg_comp: Optional[RegionComputation] = None
+        self._param_binding: Optional[UserParamWidgetBinding] = UserParamWidgetBinding()
+
+        self.ui.btnApply.clicked.connect(self.handle_apply_clicked)
+        self.ui.btnApplyToAll.clicked.connect(self.handle_apply_all_clicked)
+        #self.ui.btnReset.clicked.connect(self.handle_reset_clicked)
 
     def set_show_region_computation(self, reg_comp: RegionComputation):
         self.ui.lblRegDesc.setText(reg_comp.info.description)
+
+    def handle_apply_clicked(self, chkd: bool):
+        self.apply_region_computation.emit(self._current_reg_comp, ProcessType.CURRENT_PHOTO)
+
+    def handle_apply_all_clicked(self, chkd: bool):
+        self.apply_region_computation.emit(self._current_reg_comp, ProcessType.ALL_PHOTOS)
 
     @property
     def current_plugin(self) -> Plugin:
@@ -122,14 +143,17 @@ class PluginManager(QWidget):
 
     def _handle_current_reg_comp_changed(self, index: int):
         print("REG COMP")
-        reg_comp = self.current_plugin.region_computations[index]
-        self.ui.lblRegDesc.setText(reg_comp.info.description)
+        self._current_reg_comp = self.current_plugin.region_computations[index]
+        self.ui.lblRegDesc.setText(self._current_reg_comp.info.description)
         #widg = create_params_widget(reg_comp.user_params)
         #self.ui.grpRegionSettings.setLayout(widg.layout())
         if self._reg_comp_param_widget is not None:
             self.ui.grpRegionSettings.layout().removeWidget(self._reg_comp_param_widget)
+            self._param_binding.param_widget = None
+            self._param_binding.user_params = dict()
             self._reg_comp_param_widget.deleteLater()
-        self._reg_comp_param_widget = create_params_widget(reg_comp.user_params)
+        self._reg_comp_param_widget = create_params_widget(self._current_reg_comp.user_params)
+        self._param_binding.bind(self._current_reg_comp.user_params, self._reg_comp_param_widget)
         self.ui.grpRegionSettings.layout().addWidget(self._reg_comp_param_widget)
         self.ui.grpRegionSettings.update()
 

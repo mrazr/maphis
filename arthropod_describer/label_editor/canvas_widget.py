@@ -203,6 +203,7 @@ class CanvasWidget(QGraphicsObject):
         for mw in self.mask_widgets.values():
             mw.setOpacity(self.label_opacity)
             mw.update()
+        self.cursor__.setOpacity(self.label_opacity)
 
     def set_photo_(self, photo: Photo):
         logging.info('CW - Setting new photo')
@@ -360,7 +361,7 @@ class CanvasWidget(QGraphicsObject):
         self.cursor_image = self._current_tool.cursor_image #QImage(tool.cursor_image.data, sz[1], sz[0], sz[1], QImage.Format_Grayscale16)
         #self.cursor_image.setColorTable(self.colormaps[LabelType.BUG])
         self.cursor__.set_cursor(self.cursor_image)
-        self.cursor__.setOpacity(0.25)
+        self.cursor__.setOpacity(self.label_opacity)
         self.update()
 
     def set_mask_shown(self, mask_type: LabelType, is_shown: bool):

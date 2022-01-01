@@ -85,6 +85,8 @@ class Tool_Brush(Tool):
             return []
         painter.save()
         brush_color = QColor.fromRgb(*self.cmap[self._primary_label])
+        if self._primary_label == 0:
+            brush_color.setAlpha(0)
         painter.setPen(brush_color)
         painter.setBrush(QBrush(brush_color))
         rr, cc = draw.line(old_pos.y(), old_pos.x(),

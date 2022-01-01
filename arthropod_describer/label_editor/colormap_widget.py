@@ -18,6 +18,7 @@ class ColormapWidget(QWidget):
     primary_label_changed = Signal(int)
     secondary_label_changed = Signal(int)
     label_search_finished = Signal()
+    label_opacity_changed = Signal(int)
 
     def __init__(self, parent: typing.Optional[QWidget] = None):
         QWidget.__init__(self, parent=parent)
@@ -41,6 +42,7 @@ class ColormapWidget(QWidget):
         self.ui.leftComboBox.currentIndexChanged.connect(self._handle_left_label_changed)
         self.ui.rightComboBox.currentIndexChanged.connect(self._handle_right_label_changed)
         self.ui.btnSwapLabels.clicked.connect(self._handle_swap_labels_clicked)
+        self.ui.opacitySlider.valueChanged.connect(self.label_opacity_changed.emit)
 
        # self.colormap_chooser = QWidget()
        # self.colormap_chooser_layout: QHBoxLayout = QHBoxLayout()
@@ -86,7 +88,7 @@ class ColormapWidget(QWidget):
     def _build_label_pick_widget(self):
         self.mouse_img = QImage(':/images/mouse.png')
         self.mouse_np = qimage2ndarray(self.mouse_img)
-        self.mouse_np = cv.resize(self.mouse_np, (0, 0), fx=0.25, fy=0.25, interpolation=cv.INTER_NEAREST)
+        self.mouse_np = cv.resize(self.mouse_np, (0, 0), fx=0.15, fy=0.15, interpolation=cv.INTER_NEAREST)
 
         self.mouse_left_coords = np.nonzero(self.mouse_np == 127)
         self.mouse_right_coords = np.nonzero(self.mouse_np == 255)

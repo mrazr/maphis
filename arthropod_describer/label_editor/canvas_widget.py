@@ -12,7 +12,7 @@ from arthropod_describer.common.colormap import Colormap
 from arthropod_describer.common.label_change import LabelChange
 from arthropod_describer.common.state import State
 from arthropod_describer.common.tool import Tool, EditContext
-from arthropod_describer.label_editor.mask_widget import MaskWidget
+from arthropod_describer.label_editor.label_view_widget import LabelView
 from arthropod_describer.common.photo import Photo, LabelImg, LabelType
 
 
@@ -90,6 +90,8 @@ class CanvasWidget(QGraphicsObject):
                           LabelType.REGIONS: [],
                           LabelType.REFLECTION: []}
 
+        self.label_opacity = 0.25
+
         self._image_pixmap = None
         self.image_gpixmap = None
 
@@ -106,7 +108,7 @@ class CanvasWidget(QGraphicsObject):
 
         self.mask_gpixmaps: typing.Dict[LabelType, QGraphicsPixmapItem] = {}
 
-        self.mask_widgets: typing.Dict[LabelType, MaskWidget] = {}
+        self.mask_widgets: typing.Dict[LabelType, LabelView] = {}
 
         self.canvas_rect = QRectF()
 
@@ -154,30 +156,30 @@ class CanvasWidget(QGraphicsObject):
         #    LabelType.REFLECTION: self._reflection_gpixmap
         #}
 
-        mask_w = MaskWidget()
+        mask_w = LabelView()
         self.scene().addItem(mask_w)
         self.mask_widgets[LabelType.BUG] = mask_w
         mask_w.setPos(0, 0)
         mask_w.setZValue(1)
 
-        mask_w = MaskWidget()
+        mask_w = LabelView()
         self.scene().addItem(mask_w)
         self.mask_widgets[LabelType.REGIONS] = mask_w
         mask_w.setPos(0, 0)
         mask_w.setZValue(2)
 
-        mask_w = MaskWidget()
+        mask_w = LabelView()
         self.scene().addItem(mask_w)
         self.mask_widgets[LabelType.REFLECTION] = mask_w
         mask_w.setPos(0, 0)
         mask_w.setZValue(3)
-        mask_w.setOpacity(0.25)
+        mask_w.setOpacity(self.label_opacity)
 
         self.cursor__ = ToolCursor(None)
         self.scene().addItem(self.cursor__)
         self.cursor__.setPos(0, 0)
         self.cursor__.setZValue(10)
-        mask_w.setOpacity(0.25)
+        mask_w.setOpacity(self.label_opacity)
 
         #self.state.photo_changed.connect(self.set_photo_)
         self.state.colormap_changed.connect(self._handle_colormap_changed)
@@ -185,7 +187,7 @@ class CanvasWidget(QGraphicsObject):
         self.scene().addItem(self._tool_viz_layer)
         self._tool_viz_layer.setPos(0, 0)
         self._tool_viz_layer.setZValue(50)
-        mask_w.setOpacity(0.25)
+        mask_w.setOpacity(self.label_opacity)
 
     def boundingRect(self) -> QRectF:
         if self.state.current_photo is not None:
@@ -196,6 +198,12 @@ class CanvasWidget(QGraphicsObject):
         for viz_command in self._tool_viz_commands:
             viz_command(painter)
 
+    def set_label_opacity(self, opac: int):
+        self.label_opacity = opac / 100.0
+        for mw in self.mask_widgets.values():
+            mw.setOpacity(self.label_opacity)
+            mw.update()
+
     def set_photo_(self, photo: Photo):
         logging.info('CW - Setting new photo')
         self.prepareGeometryChange()
@@ -204,7 +212,7 @@ class CanvasWidget(QGraphicsObject):
                           self.image_gpixmap)
 
         for lbl_type in LabelType:
-            self.mask_widgets[lbl_type].set_mask_image(self.state.current_photo[lbl_type])
+            self.mask_widgets[lbl_type].set_label_image(self.state.current_photo[lbl_type])
 
         self._tool_viz_layer.set_paint_rect(self.image_gpixmap.boundingRect())
         self.update_clip_mask()
@@ -260,7 +268,7 @@ class CanvasWidget(QGraphicsObject):
         self._tool_viz_layer.setVisible(True)
         if event.buttons() & Qt.MouseButton.MiddleButton == 0:
             if self._current_tool is not None:
-                painter = QPainter(self.mask_widgets[self.current_mask_shown]._mask_image)
+                painter = QPainter(self.mask_widgets[self.current_mask_shown]._label_qimage)
                 if self.current_mask_shown != LabelType.BUG:
                     clip_region = QRegion(self.clip_mask)
                     painter.setClipRegion(clip_region, Qt.ClipOperation.ReplaceClip)
@@ -280,9 +288,9 @@ class CanvasWidget(QGraphicsObject):
             super().mousePressEvent(event)
 
     def mouseMoveEvent(self, event: QGraphicsSceneMouseEvent):
-        img = self.mask_widgets[LabelType.BUG]._mask_image
+        img = self.mask_widgets[LabelType.BUG]._label_qimage
         if self._current_tool is not None:
-            painter = QPainter(self.mask_widgets[self.current_mask_shown]._mask_image)
+            painter = QPainter(self.mask_widgets[self.current_mask_shown]._label_qimage)
             painter.setBrush(QBrush(img.color(1)))
             old_pos = event.lastPos().toPoint()
             new_pos = event.pos().toPoint()
@@ -304,7 +312,7 @@ class CanvasWidget(QGraphicsObject):
 
     def mouseReleaseEvent(self, event: QGraphicsSceneMouseEvent):
         if self._current_tool is not None:
-            img = self.mask_widgets[self.current_mask_shown]._mask_image
+            img = self.mask_widgets[self.current_mask_shown]._label_qimage
             painter = QPainter(img)
             if self.current_mask_shown != LabelType.BUG:
                 pass
@@ -359,7 +367,7 @@ class CanvasWidget(QGraphicsObject):
         logging.info(f'CW - Setting a label {"shown" if is_shown else "hidden"} to {mask_type}')
         #self.mask_gpixmaps[mask_type].setVisible(is_shown)
         self.mask_widgets[mask_type].setVisible(is_shown)
-        self.mask_widgets[mask_type].setOpacity(0.25)
+        self.mask_widgets[mask_type].setOpacity(self.label_opacity)
         #if self.masks is None:
         #    print("away")
         #    return
@@ -389,7 +397,7 @@ class CanvasWidget(QGraphicsObject):
         self.update()
     
     def update_label(self, label_type: LabelType):
-        self.mask_widgets[label_type].set_mask_image(self.state.current_photo[label_type])
+        self.mask_widgets[label_type].set_label_image(self.state.current_photo[label_type])
         if label_type == LabelType.BUG:
             self.update_clip_mask()
 
@@ -412,4 +420,4 @@ class CanvasWidget(QGraphicsObject):
                            self.state.primary_label,
                            self.state.current_photo.image,
                            self.state.colormap.colormap,
-                           self.mask_widgets[self.current_mask_shown]._mask_image)
+                           self.mask_widgets[self.current_mask_shown]._label_qimage)

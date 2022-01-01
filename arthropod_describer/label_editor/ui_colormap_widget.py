@@ -20,7 +20,7 @@ class Ui_ColormapWidget(object):
     def setupUi(self, ColormapWidget):
         if not ColormapWidget.objectName():
             ColormapWidget.setObjectName(u"ColormapWidget")
-        ColormapWidget.resize(475, 216)
+        ColormapWidget.resize(475, 220)
         self.verticalLayout_2 = QVBoxLayout(ColormapWidget)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.groupBox = QGroupBox(ColormapWidget)
@@ -97,6 +97,19 @@ class Ui_ColormapWidget(object):
 
         self.verticalLayout.addWidget(self.btnSwapLabels)
 
+        self.label_4 = QLabel(self.groupBox)
+        self.label_4.setObjectName(u"label_4")
+
+        self.verticalLayout.addWidget(self.label_4)
+
+        self.opacitySlider = QSlider(self.groupBox)
+        self.opacitySlider.setObjectName(u"opacitySlider")
+        self.opacitySlider.setMaximum(100)
+        self.opacitySlider.setValue(20)
+        self.opacitySlider.setOrientation(Qt.Horizontal)
+
+        self.verticalLayout.addWidget(self.opacitySlider)
+
 
         self.verticalLayout_2.addWidget(self.groupBox)
 
@@ -115,5 +128,6 @@ class Ui_ColormapWidget(object):
         self.label_2.setText(QCoreApplication.translate("ColormapWidget", u"Right", None))
         self.lblRightLabelName.setText("")
         self.btnSwapLabels.setText(QCoreApplication.translate("ColormapWidget", u"Swap labels", None))
+        self.label_4.setText(QCoreApplication.translate("ColormapWidget", u"Label opacity", None))
     # retranslateUi
 

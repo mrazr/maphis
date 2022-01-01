@@ -75,6 +75,10 @@ class LabelEditor(QObject):
         self.colormap_widget = ColormapWidget()
         self.colormap_widget.primary_label_changed.connect(self._handle_primary_label_changed)
         self.colormap_widget.secondary_label_changed.connect(self._handle_secondary_label_changed)
+        #self.colormap_widget.label_opacity_changed.connect(self.change_label_opacity)
+
+        self.colormap_widget.label_opacity_changed.connect(self.canvas.set_label_opacity)
+
         self.state.label_img_changed.connect(lambda lbl_img: self.colormap_widget.handle_label_type_changed(lbl_img.label_type))
         vbox.addWidget(self.colormap_widget)
 

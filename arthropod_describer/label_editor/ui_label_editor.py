@@ -42,6 +42,16 @@ class Ui_LabelEditor(object):
 
         self.toolBar.addWidget(self.tbtnRedo)
 
+        self.btnResetZoom = QPushButton(LabelEditor)
+        self.btnResetZoom.setObjectName(u"btnResetZoom")
+
+        self.toolBar.addWidget(self.btnResetZoom)
+
+        self.btnZoomBug = QPushButton(LabelEditor)
+        self.btnZoomBug.setObjectName(u"btnZoomBug")
+
+        self.toolBar.addWidget(self.btnZoomBug)
+
         self.toolBox = QGroupBox(LabelEditor)
         self.toolBox.setObjectName(u"toolBox")
         self.toolBox.setFlat(False)
@@ -85,6 +95,7 @@ class Ui_LabelEditor(object):
 
         self.btnResetLabel = QPushButton(self.MaskGroup)
         self.btnResetLabel.setObjectName(u"btnResetLabel")
+        self.btnResetLabel.setEnabled(False)
 
         self.horizontalLayout_2.addWidget(self.btnResetLabel)
 
@@ -141,6 +152,8 @@ class Ui_LabelEditor(object):
         LabelEditor.setWindowTitle(QCoreApplication.translate("LabelEditor", u"Form", None))
         self.tbtnUndo.setText(QCoreApplication.translate("LabelEditor", u"Undo", None))
         self.tbtnRedo.setText(QCoreApplication.translate("LabelEditor", u"Redo", None))
+        self.btnResetZoom.setText(QCoreApplication.translate("LabelEditor", u"Reset zoom", None))
+        self.btnZoomBug.setText(QCoreApplication.translate("LabelEditor", u"Zoom on bug", None))
         self.toolBox.setTitle(QCoreApplication.translate("LabelEditor", u"Mask tools", None))
         self.MaskGroup.setTitle(QCoreApplication.translate("LabelEditor", u"Active mask", None))
         self.tbtnBugMask.setText(QCoreApplication.translate("LabelEditor", u"Bug", None))

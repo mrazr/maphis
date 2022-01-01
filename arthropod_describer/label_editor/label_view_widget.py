@@ -47,6 +47,8 @@ class LabelView(QGraphicsItem):
         self._nd_img = np.zeros(self._label_img.label_img.shape + (1,), np.uint32)
         used_labels = np.unique(self._label_img.label_img)
         cmap = {label: QColor.fromRgb(*self._colormap.colormap[label]).rgba() for label in used_labels}
+        if 0 in used_labels:
+            cmap[0] = QColor(0, 0, 0, 0).rgba()
         for label in used_labels:
             #self._nd_img = np.where(self._label_img.label_img == label, cmap[label], self._nd_img)
             coords = np.nonzero(self._label_img.label_img == label)

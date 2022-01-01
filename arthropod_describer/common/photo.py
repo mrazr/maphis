@@ -2,6 +2,7 @@ import abc
 from enum import IntEnum, Enum
 import typing
 from pathlib import Path
+from typing import Union
 import time
 import logging
 
@@ -26,6 +27,7 @@ class LabelImg:
         self._path: typing.Optional[Path] = None
         #self.color_map: typing.Dict[int, typing.Tuple[int, int, int]] = {}
         self._type = None
+        self._bbox: typing.Optional[typing.Tuple[int, int, int, int]]
 
     @classmethod
     def create(cls, size: typing.Tuple[int, int], mask_type) -> 'LabelImg':
@@ -113,6 +115,14 @@ class LabelImg:
         lbl.label_img = self.label_img.copy() if self.label_img is not None else None
         return lbl
 
+    def _compute_bbox(self):
+        if self._type == LabelType.REGIONS:
+            coords = np.nonzero(self.label_img)
+            top, left = np.min(coords[0]), np.min(coords[1])
+            bottom, right = np.max(coords[0]), np.max(coords[1])
+            self._bug_bbox = [left, top, right, bottom]
+
+
 
 class Photo(abc.ABC):
     @property
@@ -137,7 +147,7 @@ class Photo(abc.ABC):
 
     @bug_mask.setter
     @abc.abstractmethod
-    def bug_mask(self, mask):
+    def bug_mask(self, mask: Union[LabelImg, np.ndarray]):
         pass
 
     @property
@@ -146,7 +156,7 @@ class Photo(abc.ABC):
         pass
 
     @segments_mask.setter
-    def segments_mask(self, mask):
+    def segments_mask(self, mask: Union[LabelImg, np.ndarray]):
         pass
 
     @property
@@ -156,7 +166,7 @@ class Photo(abc.ABC):
 
     @reflection_mask.setter
     @abc.abstractmethod
-    def reflection_mask(self, mask):
+    def reflection_mask(self, mask: Union[LabelImg, np.ndarray]):
         pass
 
     def assign_mask(self, mask: LabelImg):
@@ -181,6 +191,13 @@ class Photo(abc.ABC):
     def __getitem__(self, item: LabelType) -> LabelImg:
         pass
 
+    @property
+    def bug_bbox(self) -> typing.Optional[typing.Tuple[int, int, int, int]]:
+        return None
+
+    def recompute_bbox(self):
+        pass
+
 
 class LocalPhoto(Photo):
     MASKS = 'masks'
@@ -193,6 +210,7 @@ class LocalPhoto(Photo):
         self._bug_mask = LabelImg.load(folder / self.MASKS / f'maska - {img_name}', LabelType.BUG)
         self._segments_mask: typing.Optional[LabelImg] = LabelImg.load(folder / self.SECTIONS / f'maska - {img_name}', LabelType.REGIONS) #None
         self._reflection_mask: typing.Optional[LabelImg] = LabelImg.load(folder / self.REFLECTIONS / f'maska - {img_name}', LabelType.REFLECTION) #None
+        self._bug_bbox: typing.Optional[typing.Tuple[int, int, int, int]] = None
 
     @property
     def image(self) -> QImage:
@@ -215,7 +233,10 @@ class LocalPhoto(Photo):
 
     @bug_mask.setter
     def bug_mask(self, mask: LabelImg):
-        self._bug_mask = mask
+        if isinstance(mask, LabelImg):
+            self._bug_mask = mask
+        else:
+            self._bug_mask.label_img = mask
 
     @property
     def segments_mask(self) -> typing.Optional[LabelImg]:
@@ -225,9 +246,13 @@ class LocalPhoto(Photo):
         return self._get_label_img(LabelType.REGIONS)
 
     @segments_mask.setter
-    def segments_mask(self, mask: LabelImg):
+    def segments_mask(self, mask: Union[LabelImg, np.ndarray]):
         # TODO make sure `mask` is subset of self._bug_mask
-        self._segments_mask = mask
+        if isinstance(mask, LabelImg):
+            self._segments_mask = mask
+        else:
+            self._segments_mask.label_img = mask
+        self.recompute_bbox()
 
     @property
     def reflection_mask(self) -> typing.Optional[LabelImg]:
@@ -246,7 +271,10 @@ class LocalPhoto(Photo):
     @reflection_mask.setter
     def reflection_mask(self, mask: LabelImg):
         # TODO make sure `mask` is subset of self._bug_mask
-        self._reflection_mask = mask
+        if isinstance(mask, LabelImg):
+            self._reflection_mask = mask
+        else:
+            self._reflection_mask.label_img = mask
 
     def reset_label_image(self, label_type: LabelType):
         lbl_img = self[label_type]
@@ -260,3 +288,13 @@ class LocalPhoto(Photo):
             return self._segments_mask
         else:
             return self._reflection_mask
+
+    @property
+    def bug_bbox(self) -> typing.Optional[typing.Tuple[int, int, int, int]]:
+        return self._bug_bbox
+
+    def recompute_bbox(self):
+        coords = np.nonzero(self._segments_mask.label_img)
+        top, left = np.min(coords[0]), np.min(coords[1])
+        bottom, right = np.max(coords[0]), np.max(coords[1])
+        self._bug_bbox = [left, top, right, bottom]

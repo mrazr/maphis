@@ -73,7 +73,7 @@ class ArthropodDescriber(QMainWindow):
             #for lab in modified_labs:
                 #cv.imwrite(f'/home/radoslav/fakulta/ad_stuff/{repr(lab)}.tif',
                 #           self.state.current_photo[lab].label_img)
-            self.label_editor.set_photo(self.state.current_photo)
+            self.label_editor.set_photo(self.state.current_photo, reset_zoom=False)
 
     def _load_tools(self):
         py_files = [inspect.getmodulename(file.path) for file in os.scandir(Path(__file__).parent / 'tools') if file.name.endswith('.py') and file.name != '__init__.py']

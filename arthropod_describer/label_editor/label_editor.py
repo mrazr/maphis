@@ -42,6 +42,8 @@ class LabelEditor(QObject):
         self.ui.tbtnReflectionMask.toggled.connect(self.handle_reflection_mask_checked)
         self.ui.btnNext.clicked.connect(lambda: self.signal_next_photo.emit())
         self.ui.btnPrevious.clicked.connect(lambda: self.signal_prev_photo.emit())
+        self.ui.btnResetZoom.clicked.connect(self.show_whole_image)
+        self.ui.btnZoomBug.clicked.connect(self.zoom_on_bug)
 
         self.state = state
         #self.state.colormap_changed.connect(lambda cmap: self._current_tool.color_map_changed(cmap.colormap))
@@ -239,12 +241,15 @@ class LabelEditor(QObject):
         tool = self._tools_[tool_id].tool
         tool.set_user_param(param_name, checked == Qt.CheckState.Checked)
 
-    def set_photo(self, photo: Photo):
+    def set_photo(self, photo: Photo, reset_zoom: bool = True):
         logging.info(f'LE - Setting a new photo to {photo.image_name}')
         #self.current_photo = photo
         self.canvas.set_photo_(self.state.current_photo)
 
-        self.show_whole_image()
+        if reset_zoom:
+            self.show_whole_image()
+
+        self.ui.btnZoomBug.setEnabled(photo.bug_bbox is not None)
 
         rect = self.photo_view.viewport().rect()
         point = QPoint(rect.center().x() - self._glabel_line_edit.boundingRect().width() // 2,
@@ -268,6 +273,13 @@ class LabelEditor(QObject):
         logging.info(f'LE - fitting image into view, canvas rect is {self.canvas.boundingRect()}')
         logging.info(f'LE - photo size is {self.state.current_photo.image.size().toTuple()}')
         self.photo_view.fitInView(self.canvas, Qt.KeepAspectRatio)
+
+    def zoom_on_bug(self):
+        print(f'rect is {self.state.current_photo.bug_bbox}')
+        l, t, r, b = self.state.current_photo.bug_bbox
+        w = r - l
+        h = b - t
+        self.photo_view.fitInView(l, t, w, h, Qt.KeepAspectRatio)
 
     def handle_bug_mask_checked(self, checked: bool):
         if checked:
@@ -372,6 +384,7 @@ class LabelEditor(QObject):
         self.redo_stack.clear()
         self.ui.tbtnRedo.setEnabled(False)
         self.do_commands(commands)
+        self.state.current_photo.recompute_bbox()
         #io.imsave('/home/radoslav/knife_regions.tif', self.current_photo.label_dict[LabelType.REGIONS].label_img)
 
     def handle_undo_clicked(self):
@@ -379,12 +392,14 @@ class LabelEditor(QObject):
         self.do_commands(commands)
         if len(self.undo_stack) == 0:
             self.ui.tbtnUndo.setEnabled(False)
+        self.state.current_photo.recompute_bbox()
 
     def handle_redo_clicked(self):
         commands = self.redo_stack.pop()
         self.do_commands(commands)
         if len(self.redo_stack) == 0:
             self.ui.tbtnRedo.setEnabled(False)
+        self.state.current_photo.recompute_bbox()
 
     def change_labels(self, label_img: np.ndarray, change: LabelChange):
         label_img[change.coords[0], change.coords[1]] = change.new_label

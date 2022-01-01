@@ -16,7 +16,7 @@ from arthropod_describer.common.tool import Tool
 from arthropod_describer.common.user_params import ToolUserParam, ParamType
 from arthropod_describer.custom_graphics_view import CustomGraphicsView
 from arthropod_describer.label_editor.canvas_widget import CanvasWidget
-from arthropod_describer.label_editor.ui_mask_edit_view import Ui_MaskEditor
+from arthropod_describer.label_editor.ui_label_editor import Ui_LabelEditor
 from arthropod_describer.common.photo import Photo, LabelType, LabelImg
 
 
@@ -27,14 +27,14 @@ class ToolEntry:
         self.param_widget = param_widget
 
 
-class MaskEditor(QObject):
+class LabelEditor(QObject):
     signal_next_photo = Signal()
     signal_prev_photo = Signal()
 
     def __init__(self, state: State):
         QObject.__init__(self)
         self.widget = QWidget()
-        self.ui = Ui_MaskEditor()
+        self.ui = Ui_LabelEditor()
         self.ui.setupUi(self.widget)
 
         self.ui.tbtnBugMask.toggled.connect(self.handle_bug_mask_checked)

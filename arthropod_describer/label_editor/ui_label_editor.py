@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'mask_edit_view.ui'
+## Form generated from reading UI file 'label_editor.ui'
 ##
 ## Created by: Qt User Interface Compiler version 5.14.2
 ##
@@ -16,33 +16,33 @@ from PySide2.QtGui import (QBrush, QColor, QConicalGradient, QCursor, QFont,
 from PySide2.QtWidgets import *
 
 
-class Ui_MaskEditor(object):
-    def setupUi(self, MaskEditor):
-        if not MaskEditor.objectName():
-            MaskEditor.setObjectName(u"MaskEditor")
-        MaskEditor.resize(1059, 699)
+class Ui_LabelEditor(object):
+    def setupUi(self, LabelEditor):
+        if not LabelEditor.objectName():
+            LabelEditor.setObjectName(u"LabelEditor")
+        LabelEditor.resize(1059, 699)
         sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(MaskEditor.sizePolicy().hasHeightForWidth())
-        MaskEditor.setSizePolicy(sizePolicy)
-        self.verticalLayout = QVBoxLayout(MaskEditor)
+        sizePolicy.setHeightForWidth(LabelEditor.sizePolicy().hasHeightForWidth())
+        LabelEditor.setSizePolicy(sizePolicy)
+        self.verticalLayout = QVBoxLayout(LabelEditor)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.toolBar = QHBoxLayout()
         self.toolBar.setObjectName(u"toolBar")
-        self.tbtnUndo = QToolButton(MaskEditor)
+        self.tbtnUndo = QToolButton(LabelEditor)
         self.tbtnUndo.setObjectName(u"tbtnUndo")
         self.tbtnUndo.setEnabled(False)
 
         self.toolBar.addWidget(self.tbtnUndo)
 
-        self.tbtnRedo = QToolButton(MaskEditor)
+        self.tbtnRedo = QToolButton(LabelEditor)
         self.tbtnRedo.setObjectName(u"tbtnRedo")
         self.tbtnRedo.setEnabled(False)
 
         self.toolBar.addWidget(self.tbtnRedo)
 
-        self.toolBox = QGroupBox(MaskEditor)
+        self.toolBox = QGroupBox(LabelEditor)
         self.toolBox.setObjectName(u"toolBox")
         self.toolBox.setFlat(False)
         self.toolBox.setCheckable(False)
@@ -51,7 +51,7 @@ class Ui_MaskEditor(object):
 
         self.toolBar.addWidget(self.toolBox)
 
-        self.MaskGroup = QGroupBox(MaskEditor)
+        self.MaskGroup = QGroupBox(LabelEditor)
         self.MaskGroup.setObjectName(u"MaskGroup")
         self.horizontalLayout_2 = QHBoxLayout(self.MaskGroup)
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
@@ -105,7 +105,7 @@ class Ui_MaskEditor(object):
 
         self.controls = QHBoxLayout()
         self.controls.setObjectName(u"controls")
-        self.btnPrevious = QPushButton(MaskEditor)
+        self.btnPrevious = QPushButton(LabelEditor)
         self.btnPrevious.setObjectName(u"btnPrevious")
         sizePolicy1 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
         sizePolicy1.setHorizontalStretch(0)
@@ -123,7 +123,7 @@ class Ui_MaskEditor(object):
 
         self.controls.addItem(self.horizontalSpacer)
 
-        self.btnNext = QPushButton(MaskEditor)
+        self.btnNext = QPushButton(LabelEditor)
         self.btnNext.setObjectName(u"btnNext")
 
         self.controls.addWidget(self.btnNext)
@@ -132,22 +132,22 @@ class Ui_MaskEditor(object):
         self.verticalLayout.addLayout(self.controls)
 
 
-        self.retranslateUi(MaskEditor)
+        self.retranslateUi(LabelEditor)
 
-        QMetaObject.connectSlotsByName(MaskEditor)
+        QMetaObject.connectSlotsByName(LabelEditor)
     # setupUi
 
-    def retranslateUi(self, MaskEditor):
-        MaskEditor.setWindowTitle(QCoreApplication.translate("MaskEditor", u"Form", None))
-        self.tbtnUndo.setText(QCoreApplication.translate("MaskEditor", u"Undo", None))
-        self.tbtnRedo.setText(QCoreApplication.translate("MaskEditor", u"Redo", None))
-        self.toolBox.setTitle(QCoreApplication.translate("MaskEditor", u"Mask tools", None))
-        self.MaskGroup.setTitle(QCoreApplication.translate("MaskEditor", u"Active mask", None))
-        self.tbtnBugMask.setText(QCoreApplication.translate("MaskEditor", u"Bug", None))
-        self.tbtnSegmentsMask.setText(QCoreApplication.translate("MaskEditor", u"Segments", None))
-        self.tbtnReflectionMask.setText(QCoreApplication.translate("MaskEditor", u"Reflections", None))
-        self.btnResetLabel.setText(QCoreApplication.translate("MaskEditor", u"Reset", None))
-        self.btnPrevious.setText(QCoreApplication.translate("MaskEditor", u"<", None))
-        self.btnNext.setText(QCoreApplication.translate("MaskEditor", u">", None))
+    def retranslateUi(self, LabelEditor):
+        LabelEditor.setWindowTitle(QCoreApplication.translate("LabelEditor", u"Form", None))
+        self.tbtnUndo.setText(QCoreApplication.translate("LabelEditor", u"Undo", None))
+        self.tbtnRedo.setText(QCoreApplication.translate("LabelEditor", u"Redo", None))
+        self.toolBox.setTitle(QCoreApplication.translate("LabelEditor", u"Mask tools", None))
+        self.MaskGroup.setTitle(QCoreApplication.translate("LabelEditor", u"Active mask", None))
+        self.tbtnBugMask.setText(QCoreApplication.translate("LabelEditor", u"Bug", None))
+        self.tbtnSegmentsMask.setText(QCoreApplication.translate("LabelEditor", u"Segments", None))
+        self.tbtnReflectionMask.setText(QCoreApplication.translate("LabelEditor", u"Reflections", None))
+        self.btnResetLabel.setText(QCoreApplication.translate("LabelEditor", u"Reset", None))
+        self.btnPrevious.setText(QCoreApplication.translate("LabelEditor", u"<", None))
+        self.btnNext.setText(QCoreApplication.translate("LabelEditor", u">", None))
     # retranslateUi
 

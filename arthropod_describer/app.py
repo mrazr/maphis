@@ -19,7 +19,7 @@ from arthropod_describer.common.photo_loader import Storage, LocalStorage
 from arthropod_describer.common.utils import choose_folder
 from arthropod_describer.image_list_model import ImageListModel
 from arthropod_describer.thumbnail_storage import ThumbnailStorage, ThumbnailDelegate
-from arthropod_describer.label_editor.mask_editor import MaskEditor
+from arthropod_describer.label_editor.label_editor import LabelEditor
 import arthropod_describer.resources
 
 
@@ -38,16 +38,16 @@ class ArthropodDescriber(QMainWindow):
         self.tools: typing.List[Tool] = []
         self._load_tools()
 
-        self.mask_editor = MaskEditor(self.state)
+        self.label_editor = LabelEditor(self.state)
         self._setup_label_editor()
 
         self.plugins_widget = PluginManager()
-        self.mask_editor.side_widget.layout().addWidget(self.plugins_widget)
+        self.label_editor.side_widget.layout().addWidget(self.plugins_widget)
 
-        self.mask_editor.register_tools(self.tools)
+        self.label_editor.register_tools(self.tools)
 
         hbox = QHBoxLayout()
-        hbox.addWidget(self.mask_editor.widget)
+        hbox.addWidget(self.label_editor.widget)
 
         self.ui.pgEditor.setLayout(hbox)
 
@@ -82,10 +82,10 @@ class ArthropodDescriber(QMainWindow):
         print(f'loaded {len(tools)} tools')
 
     def _setup_label_editor(self):
-        self.mask_editor.signal_prev_photo.connect(self.handle_editor_prev_photo_request)
-        self.mask_editor.signal_next_photo.connect(self.handle_editor_next_photo_request)
+        self.label_editor.signal_prev_photo.connect(self.handle_editor_prev_photo_request)
+        self.label_editor.signal_next_photo.connect(self.handle_editor_next_photo_request)
 
-        self.state.photo_changed.connect(self.mask_editor.set_photo)
+        self.state.photo_changed.connect(self.label_editor.set_photo)
 
     def _setup_image_list(self):
         self.ui.imageListView.setModel(self.image_list_model)
@@ -111,8 +111,8 @@ class ArthropodDescriber(QMainWindow):
         self.image_list_model.initialize(self.storage.image_paths, self.thumbnail_storage, 0)
         self.current_idx = self.image_list_model.index(0, 0)
         self.ui.imageListView.selectionModel().setCurrentIndex(self.current_idx, QItemSelectionModel.Select)
-        self.mask_editor.colormap_widget.register_colormap(self.storage.colormap)
-        self.mask_editor.colormap_widget.set_colormap(0)
+        self.label_editor.colormap_widget.register_colormap(self.storage.colormap)
+        self.label_editor.colormap_widget.set_colormap(0)
 
     def handle_action_open_folder_triggered(self, checked: bool):
         maybe_path = choose_folder(self)

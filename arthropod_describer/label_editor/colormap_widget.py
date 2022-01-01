@@ -208,7 +208,7 @@ class ColormapWidget(QWidget):
 
     def handle_label_type_changed(self, label_type: LabelType):
         if label_type == LabelType.REGIONS:
-            self.label_filter.setFilterFixedString('regions')
+            self.label_filter.setFilterFixedString('')
         else:
             self.label_filter.setFilterFixedString('mask')
 

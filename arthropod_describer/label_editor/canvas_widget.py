@@ -1,3 +1,4 @@
+import logging
 import typing
 from typing import Tuple, Optional, Callable, List
 
@@ -129,29 +130,29 @@ class CanvasWidget(QGraphicsObject):
         self.image_gpixmap = self.scene().addPixmap(self._image_pixmap)
         self.image_gpixmap.setZValue(0)
 
-        self._mask_pixmap = QPixmap()
-        self._mask_gpixmap = self.scene().addPixmap(self._mask_pixmap)
-        self._mask_gpixmap.setZValue(1)
+        #self._mask_pixmap = QPixmap()
+        #self._mask_gpixmap = self.scene().addPixmap(self._mask_pixmap)
+        #self._mask_gpixmap.setZValue(1)
 
-        self._segments_pixmap = QPixmap()
-        self._segments_gpixmap = self.scene().addPixmap(self._segments_pixmap)
-        self._segments_gpixmap.setZValue(2)
+        #self._segments_pixmap = QPixmap()
+        #self._segments_gpixmap = self.scene().addPixmap(self._segments_pixmap)
+        #self._segments_gpixmap.setZValue(2)
 
-        self._reflection_pixmap = QPixmap()
-        self._reflection_gpixmap = self.scene().addPixmap(self._reflection_pixmap)
-        self._reflection_gpixmap.setZValue(3)
+        #self._reflection_pixmap = QPixmap()
+        #self._reflection_gpixmap = self.scene().addPixmap(self._reflection_pixmap)
+        #self._reflection_gpixmap.setZValue(3)
 
-        self.mask_pixmaps: typing.Dict[LabelType, QPixmap] = {
-            LabelType.BUG: self._mask_pixmap,
-            LabelType.REGIONS: self._segments_pixmap,
-            LabelType.REFLECTION: self._reflection_pixmap
-        }
+        #self.mask_pixmaps: typing.Dict[LabelType, QPixmap] = {
+        #    LabelType.BUG: self._mask_pixmap,
+        #    LabelType.REGIONS: self._segments_pixmap,
+        #    LabelType.REFLECTION: self._reflection_pixmap
+        #}
 
-        self.mask_gpixmaps: typing.Dict[LabelType, QGraphicsPixmapItem] = {
-            LabelType.BUG: self._mask_gpixmap,
-            LabelType.REGIONS: self._segments_gpixmap,
-            LabelType.REFLECTION: self._reflection_gpixmap
-        }
+        #self.mask_gpixmaps: typing.Dict[LabelType, QGraphicsPixmapItem] = {
+        #    LabelType.BUG: self._mask_gpixmap,
+        #    LabelType.REGIONS: self._segments_gpixmap,
+        #    LabelType.REFLECTION: self._reflection_gpixmap
+        #}
 
         mask_w = MaskWidget()
         self.scene().addItem(mask_w)
@@ -170,21 +171,24 @@ class CanvasWidget(QGraphicsObject):
         self.mask_widgets[LabelType.REFLECTION] = mask_w
         mask_w.setPos(0, 0)
         mask_w.setZValue(3)
+        mask_w.setOpacity(0.25)
 
         self.cursor__ = ToolCursor(None)
         self.scene().addItem(self.cursor__)
         self.cursor__.setPos(0, 0)
         self.cursor__.setZValue(10)
+        mask_w.setOpacity(0.25)
 
-        self.state.photo_changed.connect(self.set_photo)
+        #self.state.photo_changed.connect(self.set_photo_)
         self.state.colormap_changed.connect(self._handle_colormap_changed)
 
         self.scene().addItem(self._tool_viz_layer)
         self._tool_viz_layer.setPos(0, 0)
         self._tool_viz_layer.setZValue(50)
+        mask_w.setOpacity(0.25)
 
     def boundingRect(self) -> QRectF:
-        if self.photo is not None:
+        if self.state.current_photo is not None:
             return self.canvas_rect
         return QRectF()
 
@@ -192,35 +196,51 @@ class CanvasWidget(QGraphicsObject):
         for viz_command in self._tool_viz_commands:
             viz_command(painter)
 
-    def set_photo(self, photo: Photo):
-        self.photo = photo
+    def set_photo_(self, photo: Photo):
+        logging.info('CW - Setting new photo')
+        self.prepareGeometryChange()
+        self._set_pixmaps(self.state.current_photo.image,
+                          self._image_pixmap,
+                          self.image_gpixmap)
 
-        self.masks = self.photo.label_dict
+        for lbl_type in LabelType:
+            self.mask_widgets[lbl_type].set_mask_image(self.state.current_photo[lbl_type])
 
-        self._set_pixmaps(photo.image, self._image_pixmap, self.image_gpixmap)
-
-        tool_layer_img = QImage(self.photo.image.size(), QImage.Format_ARGB32)
-        #self._tool_viz_layer.setPixmap(QPixmap.fromImage(tool_layer_img, Qt.AutoColor))
-        #self._tool_viz_layer.setZValue(45)
-        #self._tool_viz_layer.setPos(self.image_gpixmap.pos())
-
-        for mask_type in self.masks.keys():
-            self.mask_gpixmaps[mask_type].setVisible(False)
-            self.mask_widgets[mask_type].set_mask_image(self.masks[mask_type])
-            #mw = self.mask_widgets[mask_type]._mask_image
-
-            #cmap = [QColor.fromRgb(*np.random.randint(0, 255, (3,)), 150).rgba() for _ in range(256)] #for _ in range(self.mask_widgets[mask_type]._mask_image.colorCount())]
-            #self.mask_widgets[mask_type].set_color_map(cmap)
-            #self.cursor__.cursor_image.setColorTable(cmap)
-            #print(mw.format())
-            #print(mw.colorCount())
-            #print(mw.colorTable())
-            #self.colormaps[mask_type] = cmap
-            #self.setVisible(True)
-            #self.cursor__.update()
         self._tool_viz_layer.set_paint_rect(self.image_gpixmap.boundingRect())
         self.update_clip_mask()
         self.set_mask_shown(self.current_mask_shown, True)
+
+    #def set_photo(self, photo: Photo):
+    #    self.photo = photo
+
+    #    self.masks = self.photo.label_dict
+
+    #    self._set_pixmaps(photo.image, self._image_pixmap, self.image_gpixmap)
+
+    #    tool_layer_img = QImage(self.photo.image.size(), QImage.Format_ARGB32)
+    #    #self._tool_viz_layer.setPixmap(QPixmap.fromImage(tool_layer_img, Qt.AutoColor))
+    #    #self._tool_viz_layer.setZValue(45)
+    #    #self._tool_viz_layer.setPos(self.image_gpixmap.pos())
+    #    if not self.masks[self.current_mask_shown].is_set:
+    #        self.masks[self.current_mask_shown].make_empty(self.photo.image.size().toTuple())
+
+    #    for mask_type in self.masks.keys():
+    #        #self.mask_gpixmaps[mask_type].setVisible(False)
+    #        self.mask_widgets[mask_type].set_mask_image(self.masks[mask_type])
+    #        #mw = self.mask_widgets[mask_type]._mask_image
+
+    #        #cmap = [QColor.fromRgb(*np.random.randint(0, 255, (3,)), 150).rgba() for _ in range(256)] #for _ in range(self.mask_widgets[mask_type]._mask_image.colorCount())]
+    #        #self.mask_widgets[mask_type].set_color_map(cmap)
+    #        #self.cursor__.cursor_image.setColorTable(cmap)
+    #        #print(mw.format())
+    #        #print(mw.colorCount())
+    #        #print(mw.colorTable())
+    #        #self.colormaps[mask_type] = cmap
+    #        #self.setVisible(True)
+    #        #self.cursor__.update()
+    #    self._tool_viz_layer.set_paint_rect(self.image_gpixmap.boundingRect())
+    #    self.update_clip_mask()
+    #    self.set_mask_shown(self.current_mask_shown, True)
 
     def _set_pixmaps(self, image: QImage, pixmap: QPixmap, gpixmap: QGraphicsPixmapItem):
         pixmap.convertFromImage(image, Qt.MonoOnly)
@@ -336,14 +356,15 @@ class CanvasWidget(QGraphicsObject):
         self.update()
 
     def set_mask_shown(self, mask_type: LabelType, is_shown: bool):
+        logging.info(f'CW - Setting a label {"shown" if is_shown else "hidden"} to {mask_type}')
         #self.mask_gpixmaps[mask_type].setVisible(is_shown)
         self.mask_widgets[mask_type].setVisible(is_shown)
         self.mask_widgets[mask_type].setOpacity(0.25)
-        if self.masks is None:
-            print("away")
-            return
+        #if self.masks is None:
+        #    print("away")
+        #    return
         if is_shown:
-            print(f'setting cmap for {mask_type}')
+            #print(f'setting cmap for {mask_type}')
             self.current_mask_shown = mask_type
             #self.cursor__.cursor_image.setColorTable(self.colormaps[mask_type])
             #self._current_tool.color_map_changed(self.masks[mask_type].color_map)
@@ -358,7 +379,7 @@ class CanvasWidget(QGraphicsObject):
             #    self.mask_widgets[LabelType.REGIONS]._mask_image.save(f'/home/radoslav/mask_reg.png')
             #else:
             #    self.mask_widgets[LabelType.REFLECTION]._mask_image.save(f'/home/radoslav/mask_reflection.png')
-            print(f'cmap is {self.masks[mask_type].color_map}')
+            #print(f'cmap is {self.masks[mask_type].color_map}')
 
     @Slot(bool, QPoint)
     def handle_view_dragging(self, dragging: bool, mouse_pos: QPoint):
@@ -368,18 +389,19 @@ class CanvasWidget(QGraphicsObject):
         self.update()
     
     def update_label(self, label_type: LabelType):
-        self.mask_widgets[label_type].set_mask_image(self.masks[label_type])
+        self.mask_widgets[label_type].set_mask_image(self.state.current_photo[label_type])
         if label_type == LabelType.BUG:
             self.update_clip_mask()
 
     def update_clip_mask(self):
-        clip_mask = 255 * (self.photo.bug_mask.label_image > 0).astype(np.uint8)
-        self._clip_nd = np.require(clip_mask, np.uint8, 'C')
-        #io.imsave('/home/radoslav/clip_np.png', self._clip_nd)
-        self._clip_qimg = QImage(self._clip_nd.data, self._clip_nd.shape[1], self._clip_nd.shape[0], self._clip_nd.strides[0], QImage.Format_Grayscale8)
-        self._clip_qimg.invertPixels()
-        #self._clip_qimg.save('/home/radoslav/clip_mask.png')
-        self.clip_mask = QBitmap.fromImage(self._clip_qimg, Qt.AutoColor)
+        if self.state.current_photo.bug_mask.is_set:
+            clip_mask = 255 * (self.state.current_photo.bug_mask.label_image > 0).astype(np.uint8)
+            self._clip_nd = np.require(clip_mask, np.uint8, 'C')
+            #io.imsave('/home/radoslav/clip_np.png', self._clip_nd)
+            self._clip_qimg = QImage(self._clip_nd.data, self._clip_nd.shape[1], self._clip_nd.shape[0], self._clip_nd.strides[0], QImage.Format_Grayscale8)
+            self._clip_qimg.invertPixels()
+            #self._clip_qimg.save('/home/radoslav/clip_mask.png')
+            self.clip_mask = QBitmap.fromImage(self._clip_qimg, Qt.AutoColor)
 
     def _handle_colormap_changed(self, colormap: Colormap):
         for mask_widget in self.mask_widgets.values():

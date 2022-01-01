@@ -4,6 +4,7 @@ import typing
 import importlib
 import inspect
 from pathlib import Path
+import logging
 
 from PySide2.QtGui import QCloseEvent
 from PySide2.QtWidgets import QMainWindow, QApplication, QHBoxLayout, QSizePolicy
@@ -20,6 +21,9 @@ from arthropod_describer.image_list_model import ImageListModel
 from arthropod_describer.thumbnail_storage import ThumbnailStorage, ThumbnailDelegate
 from arthropod_describer.label_editor.mask_editor import MaskEditor
 import arthropod_describer.resources
+
+
+logging.basicConfig(filename='arthropod_logger.log', level=logging.INFO)
 
 
 class ArthropodDescriber(QMainWindow):
@@ -48,7 +52,7 @@ class ArthropodDescriber(QMainWindow):
         self.ui.pgEditor.setLayout(hbox)
 
         self.storage: typing.Optional[Storage] = None
-        self.current_photo: typing.Optional[Photo] = None
+        #self.current_photo: typing.Optional[Photo] = None
         self.current_idx: typing.Optional[QModelIndex] = None
 
         self.thumbnail_storage: typing.Optional[ThumbnailStorage] = ThumbnailStorage()
@@ -118,8 +122,12 @@ class ArthropodDescriber(QMainWindow):
 
     def handle_current_changed(self, current: QModelIndex, previous: QModelIndex):
         row = current.row()
+        if self.state.current_photo is not None:
+            self.state.current_photo.bug_mask.unload()
+            self.state.current_photo.segments_mask.unload()
+            self.state.current_photo.reflection_mask.unload()
         photo = self.storage.get_photo_by_idx(row)
-        self.current_photo = photo
+        #self.current_photo = photo
         #self.mask_editor.set_photo(photo)
         self.state.current_photo = photo
         self.current_idx = current

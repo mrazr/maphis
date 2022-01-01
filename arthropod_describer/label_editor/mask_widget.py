@@ -40,7 +40,9 @@ class MaskWidget(QGraphicsItem):
         self.update()
 
     def _recolor_image(self):
-        if self._label_img is None:
+        if self._label_img is None or not self._label_img.is_set:
+            self._mask_image = None
+            #self.setVisible(False)
             return
         self._nd_img = np.zeros(self._label_img.label_img.shape + (1,), np.uint32)
         used_labels = np.unique(self._label_img.label_img)
@@ -60,4 +62,5 @@ class MaskWidget(QGraphicsItem):
         return self._mask_image.rect()
 
     def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget: typing.Optional[QWidget]=...):
-        painter.drawImage(option.rect, self._mask_image)
+        if self._mask_image is not None:
+            painter.drawImage(option.rect, self._mask_image)

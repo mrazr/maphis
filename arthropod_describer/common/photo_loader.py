@@ -16,9 +16,9 @@ logger = logging.getLogger("model.photo_loader")
 
 TIF_REGEX = re.compile(".*\.tif")
 
-BUG_MASK_DIR = 'bug_masks'
-SEGMENTS_MASK_DIR = 'segments_masks'
-REFLECTION_MASK_DIR = 'reflection_masks'
+BUG_MASK_DIR = 'masks'
+SEGMENTS_MASK_DIR = 'sections'
+REFLECTION_MASK_DIR = 'reflections'
 
 
 # restructure the folder to the proposed directory structure

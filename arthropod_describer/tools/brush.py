@@ -7,7 +7,8 @@ from PySide2.QtGui import QImage, QPainter, QColor, QBrush
 from skimage import draw
 import skimage.morphology as M
 
-from arthropod_describer.common.tool import Tool, qimage2ndarray, ToolUserParam, ParamType, EditContext
+from arthropod_describer.common.tool import Tool, qimage2ndarray, EditContext
+from arthropod_describer.common.user_params import ToolUserParam, ParamType
 from arthropod_describer.common.label_change import LabelChange, label_difference_to_label_changes
 
 TOOL_CLASS_NAME = 'Brush'

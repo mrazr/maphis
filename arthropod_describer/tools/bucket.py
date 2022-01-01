@@ -6,7 +6,8 @@ from PySide2.QtGui import QImage, QPainter, QColor
 from skimage.segmentation import flood
 
 from arthropod_describer.common.label_change import LabelChange, label_difference_to_label_changes
-from arthropod_describer.common.tool import Tool, ToolUserParam, EditContext
+from arthropod_describer.common.tool import Tool, EditContext
+from arthropod_describer.common.user_params import ToolUserParam
 
 TOOL_CLASS_NAME = 'Bucket'
 

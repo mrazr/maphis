@@ -1,5 +1,6 @@
 import typing
 from typing import Optional, List
+import logging
 
 from PySide2.QtCore import Signal, QObject, QPointF, QPoint, QTimer
 from PySide2.QtGui import Qt, QImage
@@ -11,11 +12,12 @@ from skimage import io
 from arthropod_describer.common.label_change import LabelChange, DoType, CommandEntry, propagate_mask_changes_to
 from arthropod_describer.common.state import State
 from arthropod_describer.label_editor.colormap_widget import ColormapWidget
-from arthropod_describer.common.tool import Tool, ToolUserParam, ParamType
+from arthropod_describer.common.tool import Tool
+from arthropod_describer.common.user_params import ToolUserParam, ParamType
 from arthropod_describer.custom_graphics_view import CustomGraphicsView
 from arthropod_describer.label_editor.canvas_widget import CanvasWidget
 from arthropod_describer.label_editor.ui_mask_edit_view import Ui_MaskEditor
-from arthropod_describer.common.photo import Photo, LabelType
+from arthropod_describer.common.photo import Photo, LabelType, LabelImg
 
 
 class ToolEntry:
@@ -76,7 +78,6 @@ class MaskEditor(QObject):
         self.state.label_img_changed.connect(lambda lbl_img: self.colormap_widget.handle_label_type_changed(lbl_img.label_type))
         vbox.addWidget(self.colormap_widget)
 
-        self.current_photo: Optional[Photo] = None
         self._tool_settings = QGroupBox('Tool settings')
         self._tool_settings.setLayout(QVBoxLayout())
         #self._tools: typing.List[Tool] = self._mock_load_tools()
@@ -86,13 +87,13 @@ class MaskEditor(QObject):
 
         vbox.addWidget(self._tool_settings)
         self._tool_settings.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Maximum)
-        vbox.addStretch(2)
+        #vbox.addStretch(2)
 
-        side_widget = QWidget()
-        side_widget.setLayout(vbox)
-        side_widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
+        self.side_widget = QWidget()
+        self.side_widget.setLayout(vbox)
+        self.side_widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
 
-        self.ui.center.addWidget(side_widget)
+        self.ui.center.addWidget(self.side_widget)
 
         #self._current_tool = self._tools[0]
         #self.canvas.set_current_tool(self._tools[0])
@@ -157,20 +158,6 @@ class MaskEditor(QObject):
         self._tool_param_widgets.append(param_widget)
         self._tools_.append(ToolEntry(tool, toolbutton, param_widget))
         tool.cursor_changed.connect(self._handle_tool_cursor_changed)
-
-    #def _mock_load_tools(self) -> typing.List[Tool]:
-    #    return [self._mock_load_tool(i) for i in range(1)]
-
-    #def _mock_load_tool(self, tool_id: int) -> Tool:
-    #    tool = Brush()
-    #    tool.set_id(tool_id)
-    #    toolbutton = QToolButton()
-    #    toolbutton.setCheckable(True)
-    #    toolbutton.setAutoExclusive(True)
-    #    toolbutton.setText(tool.tool_name)
-    #    toolbutton.toggled.connect(lambda checked: self.handle_tool_activated(checked, tool_id))
-    #    self.ui.toolBox.layout().addWidget(toolbutton)
-    #    return tool
 
     def _create_param_widgets(self):
         for tool in self._tools:
@@ -249,11 +236,11 @@ class MaskEditor(QObject):
         tool.set_user_param(param_name, checked == Qt.CheckState.Checked)
 
     def set_photo(self, photo: Photo):
-        self.current_photo = photo
-        self.canvas.set_photo(self.current_photo)
-        self._scene.setSceneRect(self.canvas.sceneBoundingRect())
-        self._scene.update()
-        self.photo_view.fitInView(self.canvas, Qt.KeepAspectRatio)
+        logging.info(f'LE - Setting a new photo to {photo.image_name}')
+        #self.current_photo = photo
+        self.canvas.set_photo_(self.state.current_photo)
+
+        self.show_whole_image()
 
         rect = self.photo_view.viewport().rect()
         point = QPoint(rect.center().x() - self._glabel_line_edit.boundingRect().width() // 2,
@@ -269,30 +256,76 @@ class MaskEditor(QObject):
         #self._glabel_list_view.setFlag(QGraphicsItem.ItemIgnoresTransformations, True)
         self._glabel_list_view.setZValue(100)
 
-        self.state.label_img = self.state.current_photo.label_dict[self.canvas.current_mask_shown]
+        self.state.label_img = self.state.current_photo[self.canvas.current_mask_shown]
+
+    def show_whole_image(self):
+        self._scene.setSceneRect(self.canvas.sceneBoundingRect())
+        self._scene.update()
+        logging.info(f'LE - fitting image into view, canvas rect is {self.canvas.boundingRect()}')
+        logging.info(f'LE - photo size is {self.state.current_photo.image.size().toTuple()}')
+        self.photo_view.fitInView(self.canvas, Qt.KeepAspectRatio)
 
     def handle_bug_mask_checked(self, checked: bool):
-        print(f"bug {checked}")
-        self.canvas.set_mask_shown(LabelType.BUG, checked)
-        if checked and self.state.label_img is not None:
-            self.state.label_img = self.current_photo.label_dict[LabelType.BUG]
+        if checked:
+            self.switch_label_image(LabelType.BUG)
+        #if self.state.current_photo is None:
+        #    return
+        #print(f"bug {checked}")
+        #if not self.state.current_photo.bug_mask.is_set:
+        #    #LabelImg.assign_to_photo(self.current_photo, LabelType.BUG)
+        #    self.state.current_photo.bug_mask.make_empty(self.state.current_photo.image.size().toTuple())
+        #    self.canvas.mask_widgets[LabelType.BUG].set_mask_image(self.state.current_photo.bug_mask)
+        #self.canvas.set_mask_shown(LabelType.BUG, checked)
+        #if checked and self.state.label_img is not None:
+        #    self.state.label_img = self.state.current_photo[LabelType.BUG]
 
     def handle_segments_mask_checked(self, checked: bool):
-        print(f"segments {checked}")
-        self.canvas.set_mask_shown(LabelType.REGIONS, checked)
-        if checked and self.state.label_img is not None:
-            self.state.label_img = self.current_photo.label_dict[LabelType.REGIONS]
+        if checked:
+            self.switch_label_image(LabelType.REGIONS)
+        #if self.state.current_photo is None:
+        #    return
+        #print(f"segments {checked}")
+        #if not self.state.current_photo.segments_mask.is_set:
+        #    #LabelImg.assign_to_photo(self.current_photo, LabelType.REGIONS)
+        #    self.state.current_photo.segments_mask.make_empty(self.state.current_photo.image.size().toTuple())
+        #    self.canvas.mask_widgets[LabelType.REGIONS].set_mask_image(self.state.current_photo.segments_mask)
+        #self.canvas.set_mask_shown(LabelType.REGIONS, checked)
+        #if checked and self.state.label_img is not None:
+        #    self.state.label_img = self.state.current_photo[LabelType.REGIONS]
 
     def handle_reflection_mask_checked(self, checked: bool):
-        print(f"reflections {checked}")
-        self.canvas.set_mask_shown(LabelType.REFLECTION, checked)
-        if checked and self.state.label_img is not None:
-            self.state.label_img = self.current_photo.label_dict[LabelType.REFLECTION]
+        if checked:
+            self.switch_label_image(LabelType.REFLECTION)
+       # print(f"reflections {checked}")
+       # if self.state.current_photo is None:
+       #     return
+       # if not self.state.current_photo.reflection_mask.is_set:
+       #     #LabelImg.assign_to_photo(self.current_photo, LabelType.REFLECTION)
+       #     self.current_photo.reflection_mask.make_empty(self.current_photo.image.size().toTuple())
+       #     self.canvas.mask_widgets[LabelType.REFLECTION].set_mask_image(self.current_photo.reflection_mask)
+       # self.canvas.set_mask_shown(LabelType.REFLECTION, checked)
+       # if checked and self.state.label_img is not None:
+       #     self.state.label_img = self.current_photo[LabelType.REFLECTION]
+
+    def switch_label_image(self, label_type: LabelType):
+        logging.info(f'LE - Retrieving {repr(label_type)}')
+        hide = set(list(LabelType))
+        hide.remove(label_type)
+        for hide_label in hide:
+            logging.info(f'Hiding label {repr(hide_label)}')
+            self.canvas.set_mask_shown(hide_label, False)
+        if self.state.current_photo is None:
+            logging.info(f'LE - state.current_photo is None, returning')
+            return
+        lbl_img = self.state.current_photo[label_type]
+        self.state.label_img = lbl_img
+        self.canvas.set_mask_shown(label_type, True)
 
     def handle_tool_activated(self, checked: bool, tool_id: int):
         if checked:
             self._current_tool = self._tools_[tool_id].tool
-            self._current_tool.color_map_changed(self.state.colormap.colormap)
+            if self.state.colormap is not None:
+                self._current_tool.color_map_changed(self.state.colormap.colormap)
             self.canvas.set_current_tool(self._current_tool)
             self._tool_settings.setTitle(f'{self._current_tool.tool_name} settings')
             self._tool_settings.setVisible(True)
@@ -325,10 +358,12 @@ class MaskEditor(QObject):
         commands = [command]
 
         if command.label_type == LabelType.BUG:
-            if (cmd_for_regions := propagate_mask_changes_to(photo.segments_mask, command)) is not None:
-                commands.append(cmd_for_regions)
-            if (cmd_for_reflections := propagate_mask_changes_to(photo.reflection_mask, command)) is not None:
-                commands.append(cmd_for_reflections)
+            if photo.segments_mask.is_set:
+                if (cmd_for_regions := propagate_mask_changes_to(photo.segments_mask, command)) is not None:
+                    commands.append(cmd_for_regions)
+            if photo.reflection_mask.is_set:
+                if (cmd_for_reflections := propagate_mask_changes_to(photo.reflection_mask, command)) is not None:
+                    commands.append(cmd_for_reflections)
 
         self.redo_stack.clear()
         self.ui.tbtnRedo.setEnabled(False)
@@ -354,7 +389,7 @@ class MaskEditor(QObject):
         reverse_command = CommandEntry(label_type=command.label_type)
         labels_changed = set()
         for change in command.change_chain:
-            label_img = self.current_photo.label_dict[change.label_type].label_img
+            label_img = self.state.current_photo[change.label_type].label_img
             #io.imsave('/home/radoslav/pre_change.png', 255 * label_img.astype(np.uint8))
             self.change_labels(label_img, change)
             reverse_command.add_label_change(change.swap_labels())

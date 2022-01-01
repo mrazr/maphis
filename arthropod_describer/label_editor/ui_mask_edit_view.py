@@ -76,6 +76,18 @@ class Ui_MaskEditor(object):
 
         self.horizontalLayout_2.addWidget(self.tbtnReflectionMask)
 
+        self.line = QFrame(self.MaskGroup)
+        self.line.setObjectName(u"line")
+        self.line.setFrameShape(QFrame.VLine)
+        self.line.setFrameShadow(QFrame.Sunken)
+
+        self.horizontalLayout_2.addWidget(self.line)
+
+        self.btnResetLabel = QPushButton(self.MaskGroup)
+        self.btnResetLabel.setObjectName(u"btnResetLabel")
+
+        self.horizontalLayout_2.addWidget(self.btnResetLabel)
+
 
         self.toolBar.addWidget(self.MaskGroup)
 
@@ -134,6 +146,7 @@ class Ui_MaskEditor(object):
         self.tbtnBugMask.setText(QCoreApplication.translate("MaskEditor", u"Bug", None))
         self.tbtnSegmentsMask.setText(QCoreApplication.translate("MaskEditor", u"Segments", None))
         self.tbtnReflectionMask.setText(QCoreApplication.translate("MaskEditor", u"Reflections", None))
+        self.btnResetLabel.setText(QCoreApplication.translate("MaskEditor", u"Reset", None))
         self.btnPrevious.setText(QCoreApplication.translate("MaskEditor", u"<", None))
         self.btnNext.setText(QCoreApplication.translate("MaskEditor", u">", None))
     # retranslateUi

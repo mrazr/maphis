@@ -20,7 +20,7 @@ class Ui_ColormapWidget(object):
     def setupUi(self, ColormapWidget):
         if not ColormapWidget.objectName():
             ColormapWidget.setObjectName(u"ColormapWidget")
-        ColormapWidget.resize(475, 220)
+        ColormapWidget.resize(475, 264)
         self.verticalLayout_2 = QVBoxLayout(ColormapWidget)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.groupBox = QGroupBox(ColormapWidget)
@@ -41,10 +41,20 @@ class Ui_ColormapWidget(object):
         self.LabelChooser.setObjectName(u"LabelChooser")
         self.leftLabel = QVBoxLayout()
         self.leftLabel.setObjectName(u"leftLabel")
-        self.label = QLabel(self.groupBox)
-        self.label.setObjectName(u"label")
+        self.currentLabelLeft = QLabel(self.groupBox)
+        self.currentLabelLeft.setObjectName(u"currentLabelLeft")
 
-        self.leftLabel.addWidget(self.label, 0, Qt.AlignHCenter|Qt.AlignTop)
+        self.leftLabel.addWidget(self.currentLabelLeft, 0, Qt.AlignHCenter|Qt.AlignTop)
+
+        self.horizontalLayout = QHBoxLayout()
+        self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.horizontalLayout.setContentsMargins(-1, 0, -1, -1)
+        self.labelIndicator = QLabel(self.groupBox)
+        self.labelIndicator.setObjectName(u"labelIndicator")
+        self.labelIndicator.setStyleSheet(u"border-color: rgb(0, 0, 0);\n"
+"border-size: 1px;")
+
+        self.horizontalLayout.addWidget(self.labelIndicator)
 
         self.leftComboBox = QComboBox(self.groupBox)
         self.leftComboBox.setObjectName(u"leftComboBox")
@@ -56,7 +66,10 @@ class Ui_ColormapWidget(object):
         self.leftComboBox.setInsertPolicy(QComboBox.InsertAtBottom)
         self.leftComboBox.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-        self.leftLabel.addWidget(self.leftComboBox)
+        self.horizontalLayout.addWidget(self.leftComboBox)
+
+
+        self.leftLabel.addLayout(self.horizontalLayout)
 
         self.lblLeftLabelName = QLabel(self.groupBox)
         self.lblLeftLabelName.setObjectName(u"lblLeftLabelName")
@@ -66,36 +79,8 @@ class Ui_ColormapWidget(object):
 
         self.LabelChooser.addLayout(self.leftLabel)
 
-        self.rightLabel = QVBoxLayout()
-        self.rightLabel.setObjectName(u"rightLabel")
-        self.label_2 = QLabel(self.groupBox)
-        self.label_2.setObjectName(u"label_2")
-
-        self.rightLabel.addWidget(self.label_2, 0, Qt.AlignHCenter|Qt.AlignTop)
-
-        self.rightComboBox = QComboBox(self.groupBox)
-        self.rightComboBox.setObjectName(u"rightComboBox")
-        sizePolicy.setHeightForWidth(self.rightComboBox.sizePolicy().hasHeightForWidth())
-        self.rightComboBox.setSizePolicy(sizePolicy)
-        self.rightComboBox.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-
-        self.rightLabel.addWidget(self.rightComboBox)
-
-        self.lblRightLabelName = QLabel(self.groupBox)
-        self.lblRightLabelName.setObjectName(u"lblRightLabelName")
-
-        self.rightLabel.addWidget(self.lblRightLabelName, 0, Qt.AlignHCenter|Qt.AlignTop)
-
-
-        self.LabelChooser.addLayout(self.rightLabel)
-
 
         self.verticalLayout.addLayout(self.LabelChooser)
-
-        self.btnSwapLabels = QPushButton(self.groupBox)
-        self.btnSwapLabels.setObjectName(u"btnSwapLabels")
-
-        self.verticalLayout.addWidget(self.btnSwapLabels)
 
         self.label_4 = QLabel(self.groupBox)
         self.label_4.setObjectName(u"label_4")
@@ -123,11 +108,9 @@ class Ui_ColormapWidget(object):
         ColormapWidget.setWindowTitle(QCoreApplication.translate("ColormapWidget", u"LabelWidget", None))
         self.groupBox.setTitle(QCoreApplication.translate("ColormapWidget", u"Colormap and labels", None))
         self.label_3.setText(QCoreApplication.translate("ColormapWidget", u"Active colormap", None))
-        self.label.setText(QCoreApplication.translate("ColormapWidget", u"Left", None))
+        self.currentLabelLeft.setText(QCoreApplication.translate("ColormapWidget", u"Current label", None))
+        self.labelIndicator.setText("")
         self.lblLeftLabelName.setText("")
-        self.label_2.setText(QCoreApplication.translate("ColormapWidget", u"Right", None))
-        self.lblRightLabelName.setText("")
-        self.btnSwapLabels.setText(QCoreApplication.translate("ColormapWidget", u"Swap labels", None))
         self.label_4.setText(QCoreApplication.translate("ColormapWidget", u"Label opacity", None))
     # retranslateUi
 

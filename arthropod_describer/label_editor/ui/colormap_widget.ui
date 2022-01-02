@@ -35,27 +35,45 @@
         <item>
          <layout class="QVBoxLayout" name="leftLabel">
           <item alignment="Qt::AlignHCenter|Qt::AlignTop">
-           <widget class="QLabel" name="label">
+           <widget class="QLabel" name="currentLabelLeft">
             <property name="text">
-             <string>Left</string>
+             <string>Current label</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QComboBox" name="leftComboBox">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
+           <layout class="QHBoxLayout" name="horizontalLayout">
+            <property name="topMargin">
+             <number>0</number>
             </property>
-            <property name="insertPolicy">
-             <enum>QComboBox::InsertAtBottom</enum>
-            </property>
-            <property name="sizeAdjustPolicy">
-             <enum>QComboBox::AdjustToContents</enum>
-            </property>
-           </widget>
+            <item>
+             <widget class="QLabel" name="labelIndicator">
+              <property name="styleSheet">
+               <string notr="true">border-color: rgb(0, 0, 0);
+border-size: 1px;</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="leftComboBox">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="insertPolicy">
+               <enum>QComboBox::InsertAtBottom</enum>
+              </property>
+              <property name="sizeAdjustPolicy">
+               <enum>QComboBox::AdjustToContents</enum>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
           <item alignment="Qt::AlignHCenter|Qt::AlignTop">
            <widget class="QLabel" name="lblLeftLabelName">
@@ -66,45 +84,7 @@
           </item>
          </layout>
         </item>
-        <item>
-         <layout class="QVBoxLayout" name="rightLabel">
-          <item alignment="Qt::AlignHCenter|Qt::AlignTop">
-           <widget class="QLabel" name="label_2">
-            <property name="text">
-             <string>Right</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QComboBox" name="rightComboBox">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="sizeAdjustPolicy">
-             <enum>QComboBox::AdjustToContents</enum>
-            </property>
-           </widget>
-          </item>
-          <item alignment="Qt::AlignHCenter|Qt::AlignTop">
-           <widget class="QLabel" name="lblRightLabelName">
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
        </layout>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btnSwapLabels">
-        <property name="text">
-         <string>Swap labels</string>
-        </property>
-       </widget>
       </item>
       <item>
        <widget class="QLabel" name="label_4">

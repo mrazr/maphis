@@ -5,7 +5,7 @@ from typing import Literal
 import cv2 as cv
 import numpy as np
 from PySide2.QtCore import Signal, Slot, QModelIndex, QSortFilterProxyModel
-from PySide2.QtGui import QImage, QPixmap, Qt
+from PySide2.QtGui import QImage, QPixmap, Qt, QColor
 from PySide2.QtWidgets import QWidget, QLabel, QCompleter, QLineEdit
 
 from arthropod_describer.common.photo import LabelType, LabelImg
@@ -43,8 +43,6 @@ class ColormapWidget(QWidget):
 
         self.ui.colormapComboBox.currentIndexChanged.connect(self._handle_colormap_changed)
         self.ui.leftComboBox.currentIndexChanged.connect(self._handle_left_label_changed)
-        self.ui.rightComboBox.currentIndexChanged.connect(self._handle_right_label_changed)
-        self.ui.btnSwapLabels.clicked.connect(self._handle_swap_labels_clicked)
         self.ui.opacitySlider.valueChanged.connect(self.label_opacity_changed.emit)
 
        # self.colormap_chooser = QWidget()
@@ -64,9 +62,12 @@ class ColormapWidget(QWidget):
 
         self.mouse_label.setAlignment(Qt.AlignHCenter)
 
+        self.colorPixmap = QPixmap(32, 32)
+        self.ui.labelIndicator.setPixmap(self.colorPixmap)
+
         self._build_label_pick_widget()
 
-        self.layout().addWidget(self.mouse_label)
+        #self.layout().addWidget(self.mouse_label)
 
        # self.colormap_chooser.setLayout(self.colormap_chooser_layout)
 
@@ -128,6 +129,10 @@ class ColormapWidget(QWidget):
 
         self.mouse_label.setPixmap(QPixmap.fromImage(self.mouse_img, Qt.AutoColor))
 
+        self.colorPixmap.fill(QColor.fromRgb(*color))
+        self.ui.labelIndicator.setPixmap(self.colorPixmap)
+        self.ui.labelIndicator.setStyleSheet("border: 1px solid black;")
+
     def _handle_colormap_changed(self, current_idx: int):
         self.current_colormap = self.colormaps[current_idx]
         self.label_filter.setSourceModel(self.current_colormap)
@@ -141,7 +146,6 @@ class ColormapWidget(QWidget):
         #self.ui.rightComboBox.setModel(self.current_colormap)
 
         self.ui.leftComboBox.setModel(self.label_filter)
-        self.ui.rightComboBox.setModel(self.label_filter)
 
         self.completer.setModel(self.label_filter)
         self.completer.setCaseSensitivity(Qt.CaseInsensitive)
@@ -156,7 +160,6 @@ class ColormapWidget(QWidget):
         self.set_label_by_idx(random.randint(0, self.current_colormap.color_count), 'right')
 
         self.ui.leftComboBox.setCurrentIndex(1)
-        self.ui.rightComboBox.setCurrentIndex(1)
 
         self.primary_label_changed.emit(self.colormaps[current_idx].labels[1])
         self.secondary_label_changed.emit(self.colormaps[current_idx].labels[1])
@@ -164,8 +167,6 @@ class ColormapWidget(QWidget):
     def set_label_by_idx(self, idx: int, side: typing.Union[Literal['left'], Literal['right']]):
         if side == 'left':
             self.ui.leftComboBox.setCurrentIndex(idx)
-        else:
-            self.ui.rightComboBox.setCurrentIndex(idx)
 
     def register_colormap(self, colormap: Colormap):
         # TODO handle not inserting duplicates
@@ -184,11 +185,12 @@ class ColormapWidget(QWidget):
         self.change_secondary_label(self.current_colormap.labels[index.row()])
 
     def _handle_swap_labels_clicked(self):
-        left_idx = self.ui.rightComboBox.currentIndex()
-        right_idx = self.ui.leftComboBox.currentIndex()
+        pass
+        #left_idx = self.ui.rightComboBox.currentIndex()
+        #right_idx = self.ui.leftComboBox.currentIndex()
 
-        self.set_label_by_idx(left_idx, 'left')
-        self.set_label_by_idx(right_idx, 'right')
+        #self.set_label_by_idx(left_idx, 'left')
+        #self.set_label_by_idx(right_idx, 'right')
 
     def change_primary_label(self, label: int):
         self.left_label = label

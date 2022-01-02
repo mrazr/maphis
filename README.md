@@ -34,7 +34,6 @@
 
 1. In the repo's root directory activate the venv: `source venv/bin/activate`
 2. Run: `python3 arthropod_describer/app.py`
-3. When done, `deactivate` the venv, if you want.
 
 ## User guide
 

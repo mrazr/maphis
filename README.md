@@ -1,6 +1,6 @@
-#Arthropod Describer
+# Arthropod Describer
 
-##Outline
+## Outline
 1. [Features](#features)
 2. [Running](#running)
 3. [Installation](#installation)

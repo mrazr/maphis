@@ -111,20 +111,9 @@ class Ui_LabelEditor(object):
 
         self.center = QHBoxLayout()
         self.center.setObjectName(u"center")
-        self.tabSidebar = QTabWidget(LabelEditor)
-        self.tabSidebar.setObjectName(u"tabSidebar")
-        self.tabEditing = QWidget()
-        self.tabEditing.setObjectName(u"tabEditing")
-        self.tabSidebar.addTab(self.tabEditing, "")
-        self.tabPlugins = QWidget()
-        self.tabPlugins.setObjectName(u"tabPlugins")
-        self.tabSidebar.addTab(self.tabPlugins, "")
-
-        self.center.addWidget(self.tabSidebar)
-
-
-        self.verticalLayout.addLayout(self.center)
-
+        self.photo_view = QVBoxLayout()
+        self.photo_view.setObjectName(u"photo_view")
+        self.photo_view.setContentsMargins(0, -1, -1, 0)
         self.controls = QHBoxLayout()
         self.controls.setObjectName(u"controls")
         self.btnPrevious = QPushButton(LabelEditor)
@@ -151,7 +140,24 @@ class Ui_LabelEditor(object):
         self.controls.addWidget(self.btnNext)
 
 
-        self.verticalLayout.addLayout(self.controls)
+        self.photo_view.addLayout(self.controls)
+
+
+        self.center.addLayout(self.photo_view)
+
+        self.tabSidebar = QTabWidget(LabelEditor)
+        self.tabSidebar.setObjectName(u"tabSidebar")
+        self.tabEditing = QWidget()
+        self.tabEditing.setObjectName(u"tabEditing")
+        self.tabSidebar.addTab(self.tabEditing, "")
+        self.tabPlugins = QWidget()
+        self.tabPlugins.setObjectName(u"tabPlugins")
+        self.tabSidebar.addTab(self.tabPlugins, "")
+
+        self.center.addWidget(self.tabSidebar)
+
+
+        self.verticalLayout.addLayout(self.center)
 
 
         self.retranslateUi(LabelEditor)
@@ -174,9 +180,9 @@ class Ui_LabelEditor(object):
         self.tbtnSegmentsMask.setText(QCoreApplication.translate("LabelEditor", u"Segments", None))
         self.tbtnReflectionMask.setText(QCoreApplication.translate("LabelEditor", u"Reflections", None))
         self.btnResetLabel.setText(QCoreApplication.translate("LabelEditor", u"Reset", None))
-        self.tabSidebar.setTabText(self.tabSidebar.indexOf(self.tabEditing), QCoreApplication.translate("LabelEditor", u"Editing", None))
-        self.tabSidebar.setTabText(self.tabSidebar.indexOf(self.tabPlugins), QCoreApplication.translate("LabelEditor", u"Plugins", None))
         self.btnPrevious.setText(QCoreApplication.translate("LabelEditor", u"<", None))
         self.btnNext.setText(QCoreApplication.translate("LabelEditor", u">", None))
+        self.tabSidebar.setTabText(self.tabSidebar.indexOf(self.tabEditing), QCoreApplication.translate("LabelEditor", u"Editing", None))
+        self.tabSidebar.setTabText(self.tabSidebar.indexOf(self.tabPlugins), QCoreApplication.translate("LabelEditor", u"Plugins", None))
     # retranslateUi
 

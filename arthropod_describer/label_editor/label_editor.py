@@ -6,7 +6,7 @@ import logging
 from PySide2.QtCore import Signal, QObject, QPointF, QPoint, QTimer
 from PySide2.QtGui import Qt, QImage
 from PySide2.QtWidgets import QWidget, QGraphicsScene, QToolButton, QGroupBox, QVBoxLayout, QSpinBox, QLineEdit, \
-    QCheckBox, QGridLayout, QLabel, QSizePolicy, QGraphicsProxyWidget, QGraphicsItem, QToolBox
+    QCheckBox, QGridLayout, QLabel, QSizePolicy, QGraphicsProxyWidget, QGraphicsItem, QToolBox, QPushButton
 import numpy as np
 from skimage import io
 
@@ -15,7 +15,7 @@ from arthropod_describer.common.label_change import LabelChange, DoType, Command
 from arthropod_describer.common.state import State
 from arthropod_describer.label_editor.colormap_widget import ColormapWidget
 from arthropod_describer.common.tool import Tool
-from arthropod_describer.common.user_params import ToolUserParam, ParamType
+from arthropod_describer.common.user_params import ToolUserParam, ParamType, UserParamWidgetBinding
 from arthropod_describer.custom_graphics_view import CustomGraphicsView
 from arthropod_describer.label_editor.canvas_widget import CanvasWidget
 from arthropod_describer.label_editor.ui_label_editor import Ui_LabelEditor
@@ -47,6 +47,8 @@ class LabelEditor(QObject):
         self.ui.btnResetZoom.clicked.connect(self.show_whole_image)
         self.ui.btnZoomBug.clicked.connect(self.zoom_on_bug)
 
+        self.ui.toolBox.setVisible(False)
+
         self.state = state
         #self.state.colormap_changed.connect(lambda cmap: self._current_tool.color_map_changed(cmap.colormap))
 
@@ -56,9 +58,12 @@ class LabelEditor(QObject):
 
         self._tools_: typing.List[ToolEntry] = []
 
+        self.tool_param_binding: UserParamWidgetBinding = UserParamWidgetBinding()
+
         self.photo_view = CustomGraphicsView()
         #self.ui.center.addWidget(self.photo_view)
-        self.ui.center.insertWidget(0, self.photo_view)
+        #self.ui.center.insertWidget(0, self.photo_view)
+        self.ui.photo_view.insertWidget(0, self.photo_view)
         self.photo_view.setScene(self._scene)
 
         self.photo_view.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -97,16 +102,30 @@ class LabelEditor(QObject):
         self.state.label_img_changed.connect(lambda lbl_img: self.colormap_widget.handle_label_type_changed(lbl_img.label_type))
         vbox.addWidget(self.colormap_widget)
 
-        self._tool_settings = QGroupBox('Tool settings')
-        self._tool_settings.setLayout(QVBoxLayout())
-        #self._tools: typing.List[Tool] = self._mock_load_tools()
-        self._tool_param_widgets: typing.List[QWidget] = []
+        self.col_count = 3
+        #self.tool_box_layout = QVBoxLayout()
 
+        #self._tools_layout = QGridLayout()
+        #self.col_count = 3
 
-        vbox.addWidget(self._tool_settings)
-        self._tool_settings.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Maximum)
+        #self.tool_box = QGroupBox('Tools')
+        ##self._tool_settings.setLayout(self._tools_layout)
+        #self.tool_box_layout.addItem(self._tools_layout)
 
+        #self._tool_settings = QGroupBox('Settings')
+        #self.tool_box_layout.addWidget(self._tool_settings)
+
+        ##self._tools: typing.List[Tool] = self._mock_load_tools()
+
+        ##vbox.addWidget(self._tool_settings)
+        #vbox.addItem(self.tool_box_layout)
+        #self._tool_settings.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Maximum)
+
+        self._setup_toolbox()
+        vbox.addWidget(self.tool_box)
         vbox.addStretch(2)
+
+        self._tool_param_widgets: typing.List[QWidget] = []
 
         #self.side_widget = QWidget()
         #self.side_widget.setLayout(vbox)
@@ -180,11 +199,18 @@ class LabelEditor(QObject):
         toolbutton.setAutoExclusive(True)
         toolbutton.setText(tool.tool_name)
         toolbutton.toggled.connect(lambda checked: self.handle_tool_activated(checked, tool.tool_id))
-        self.ui.toolBox.layout().addWidget(toolbutton)
+        #self.ui.toolBox.layout().addWidget(toolbutton)
+        row, col = len(self._tools) // self.col_count, len(self._tools) % self.col_count
+
         self._tools.append(tool)
         param_widget = self._create_param_widget(tool)
+        #self._tools_layout.addWidget(toolbutton, row, col)
+        self.tool_buttons_layout.addWidget(toolbutton, row, col)
+        #self.tool_settings_layout.addWidget(param_widget)
         #self._tool_settings.addItem(param_widget, tool.tool_name)
         self._tool_param_widgets.append(param_widget)
+        self.tool_settings.layout().addWidget(self._tool_param_widgets[tool.tool_id])
+        param_widget.setVisible(False)
         self._tools_.append(ToolEntry(tool, toolbutton, param_widget))
         tool.cursor_changed.connect(self._handle_tool_cursor_changed)
 
@@ -192,6 +218,28 @@ class LabelEditor(QObject):
         for tool in self._tools:
             param_widget = self._create_param_widget(tool)
             self._tool_param_widgets.append(param_widget)
+
+    def _setup_toolbox(self):
+        self.tool_box = QGroupBox('Tools')
+
+        self.tool_box_layout = QVBoxLayout()
+
+        self.tool_box.setLayout(self.tool_box_layout)
+
+        self.tool_box.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Preferred)
+
+        self.tool_buttons_widg = QWidget()
+        self.tool_buttons_layout = QGridLayout()
+        self.tool_buttons_widg.setLayout(self.tool_buttons_layout)
+        #self.tool_box_layout.addItem(self.tool_buttons_layout)
+        self.tool_box_layout.addWidget(self.tool_buttons_widg)
+
+        self.tool_settings = QGroupBox('Settings')
+        self.tool_settings_layout = QVBoxLayout()
+        self.tool_settings.setLayout(self.tool_settings_layout)
+        self.tool_settings.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Preferred)
+
+        self.tool_box_layout.addWidget(self.tool_settings)
 
     def _handle_param_changed(self, tool_id: int):
         tool = self._tools_[tool_id].tool
@@ -211,9 +259,9 @@ class LabelEditor(QObject):
     def _create_param_widget(self, tool: Tool):
         params: typing.Dict[str, ToolUserParam] = tool.user_params
 
-        param_widget = QGroupBox()
+        param_widget = QWidget()
         param_widget.setSizePolicy(QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum))
-        param_widget.setTitle(tool.tool_name)
+        #param_widget.setTitle(tool.tool_name)
 
         lay = QGridLayout()
 
@@ -231,22 +279,25 @@ class LabelEditor(QObject):
                 entry.setMaximum(param.max_value)
                 entry.setSingleStep(param.value_step)
                 entry.setValue(param.default_value)
-                entry.setObjectName(param_name)
-                entry.valueChanged.connect(lambda: self._handle_param_changed(tool.tool_id))
+                #entry.setObjectName(param_name)
+                entry.setObjectName(param.key)
+                #entry.valueChanged.connect(lambda: self._handle_param_changed(tool.tool_id))
                 lay.addWidget(entry, row, 1)
                 entry = None
             elif param.param_type == ParamType.STR:
                 entry = QLineEdit()
                 entry.setText(param.default_value)
-                entry.setObjectName(param_name)
-                entry.textChanged.connect(lambda: self._handle_param_changed(tool.tool_id))
+                #entry.setObjectName(param_name)
+                entry.setObjectName(param.key)
+                #entry.textChanged.connect(lambda: self._handle_param_changed(tool.tool_id))
                 lay.addWidget(entry, row, 1)
                 entry = None
             elif param.param_type == ParamType.BOOL:
                 entry = QCheckBox()
                 entry.setChecked(param.default_value)
-                entry.setObjectName(param_name)
-                entry.stateChanged.connect(lambda: self._handle_param_changed(tool.tool_id))
+                #entry.setObjectName(param_name)
+                entry.setObjectName(param.key)
+                #entry.stateChanged.connect(lambda: self._handle_param_changed(tool.tool_id))
                 lay.addWidget(entry, row, 1)
                 entry = None
         return param_widget
@@ -366,10 +417,15 @@ class LabelEditor(QObject):
             if self.state.colormap is not None:
                 self._current_tool.color_map_changed(self.state.colormap.colormap)
             self.canvas.set_current_tool(self._current_tool)
-            self._tool_settings.setTitle(f'{self._current_tool.tool_name} settings')
-            self._tool_settings.setVisible(True)
-            self._tool_settings.layout().addWidget(self._tool_param_widgets[tool_id])
+            #self._tool_settings.setTitle(f'{self._current_tool.tool_name} settings')
+            if len(self._current_tool.user_params.keys()) > 0:
+                self.tool_settings.setVisible(True)
+                self.tool_param_binding.bind(list(self._current_tool.user_params.values()),
+                                             self._tool_param_widgets[self._current_tool.tool_id])
+            else:
+                self.tool_settings.setVisible(False)
         self._tool_param_widgets[tool_id].setVisible(checked)
+        self.tool_settings.update()
         print(f'{"activated" if checked else "deactivated"} the tool {self._current_tool.tool_name}')
 
     def handle_label_changed(self, lab_changes: typing.List[LabelChange]):

@@ -27,7 +27,8 @@
 2. Go to the root directory of the cloned repository
 3. Create a new python virtual environment by running `python3 -m venv venv`
 4. Activate the virtual environment: `source venv/bin/activate`
-5. Install the requirements: `python3 -m pip install -e .`
+5. Install the requirements: `python3 -m pip install -r requirements.txt`
+6. Install the app: `python3 -m pip install -e .`
 
 ## Running
 

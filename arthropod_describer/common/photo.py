@@ -32,14 +32,14 @@ class LabelImg:
     @classmethod
     def create(cls, size: typing.Tuple[int, int], mask_type) -> 'LabelImg':
         mask = LabelImg()
-        mask.label_img = np.zeros(size[::-1], np.uint16)
+        mask.label_img = np.zeros(size, np.uint16)
         mask._type = mask_type
         mask.color_map = {0: (0, 0, 0)}
         return mask
 
     @classmethod
     def assign_to_photo(cls, photo: 'Photo', label_type: LabelType) -> 'LabelImg':
-        lbl_img = LabelImg.create(photo.image.size().toTuple(), label_type)
+        lbl_img = LabelImg.create(photo.image.shape[:2], label_type)
         photo.assign_mask(lbl_img)
         return lbl_img
 
@@ -99,13 +99,14 @@ class LabelImg:
         return lbl
 
     def make_empty(self, size: typing.Tuple[int, int]):
-        self.label_img = np.zeros(size[::-1], np.uint16)
+        self.label_img = np.zeros(size, np.uint16)
 
     def set_image(self, img: np.ndarray):
-        if self.label_img.shape != img.shape:
-            raise ValueError(f'The shape must be {self.label_img.shape}, got {img.shape}.')
-        elif self.label_img.dtype != img.dtype:
-            raise ValueError(f'The dtype must be {self.label_img.dtype}, got {img.dtype}.')
+        if self.label_img is not None and img is not None:
+            if self.label_img.shape != img.shape:
+                raise ValueError(f'The shape must be {self.label_img.shape}, got {img.shape}.')
+            elif self.label_img.dtype != img.dtype:
+                raise ValueError(f'The dtype must be {self.label_img.dtype}, got {img.dtype}.')
         self.label_img = img
 
     def clone(self) -> 'LabelImg':
@@ -123,7 +124,6 @@ class LabelImg:
             self._bug_bbox = [left, top, right, bottom]
 
 
-
 class Photo(abc.ABC):
     @property
     @abc.abstractmethod
@@ -137,7 +137,7 @@ class Photo(abc.ABC):
 
     @property
     @abc.abstractmethod
-    def image(self) -> QImage:
+    def image(self) -> np.ndarray:
         pass
 
     @property
@@ -205,7 +205,7 @@ class LocalPhoto(Photo):
     REFLECTIONS = 'reflections'
 
     def __init__(self, folder: Path, img_name: str):
-        self._image: typing.Optional[QImage] = None
+        self._image: typing.Optional[np.ndarray] = None
         self._image_path = folder / 'images' / img_name
         self._bug_mask = LabelImg.load(folder / self.MASKS / f'maska - {img_name}', LabelType.BUG)
         self._segments_mask: typing.Optional[LabelImg] = LabelImg.load(folder / self.SECTIONS / f'maska - {img_name}', LabelType.REGIONS) #None
@@ -213,7 +213,7 @@ class LocalPhoto(Photo):
         self._bug_bbox: typing.Optional[typing.Tuple[int, int, int, int]] = None
 
     @property
-    def image(self) -> QImage:
+    def image(self) -> np.ndarray:
         return self._image
 
     @property
@@ -279,7 +279,7 @@ class LocalPhoto(Photo):
     def reset_label_image(self, label_type: LabelType):
         lbl_img = self[label_type]
         if self.image is not None:
-            lbl_img.make_empty(self.image.size().toTuple())
+            lbl_img.make_empty(self.image.shape[:2])
 
     def __getitem__(self, item: LabelType):
         if item == LabelType.BUG:
@@ -295,6 +295,17 @@ class LocalPhoto(Photo):
 
     def recompute_bbox(self):
         coords = np.nonzero(self._segments_mask.label_img)
-        top, left = np.min(coords[0]), np.min(coords[1])
-        bottom, right = np.max(coords[0]), np.max(coords[1])
+        if len(coords[0]) == 0:
+            top, left = 0, 0
+            bottom, right = self.segments_mask.label_img.shape
+        else:
+            top, left = np.min(coords[0]), np.min(coords[1])
+            bottom, right = np.max(coords[0]), np.max(coords[1])
         self._bug_bbox = [left, top, right, bottom]
+
+
+def nd2qimage(nd: np.ndarray) -> QImage:
+    if nd.ndim == 3:
+        # assume RGB888
+        return QImage(nd.data, nd.shape[1], nd.shape[0], nd.strides[0], QImage.Format_RGB888)
+    return QImage()

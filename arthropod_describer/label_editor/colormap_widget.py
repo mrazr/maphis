@@ -8,7 +8,8 @@ from PySide2.QtCore import Signal, Slot, QModelIndex, QSortFilterProxyModel
 from PySide2.QtGui import QImage, QPixmap, Qt
 from PySide2.QtWidgets import QWidget, QLabel, QCompleter, QLineEdit
 
-from arthropod_describer.common.photo import LabelType
+from arthropod_describer.common.photo import LabelType, LabelImg
+from arthropod_describer.common.state import State
 from arthropod_describer.common.tool import qimage2ndarray
 from arthropod_describer.common.colormap import Colormap
 from arthropod_describer.label_editor.ui_colormap_widget import Ui_ColormapWidget
@@ -20,11 +21,13 @@ class ColormapWidget(QWidget):
     label_search_finished = Signal()
     label_opacity_changed = Signal(int)
 
-    def __init__(self, parent: typing.Optional[QWidget] = None):
+    def __init__(self, state: State, parent: typing.Optional[QWidget] = None):
         QWidget.__init__(self, parent=parent)
 
         self.ui = Ui_ColormapWidget()
         self.ui.setupUi(self)
+
+        self.state = state
 
         self.colormaps: typing.List[Colormap] = []
         self.current_colormap: typing.Optional[Colormap] = None
@@ -84,6 +87,8 @@ class ColormapWidget(QWidget):
         #self.completer2 = QCompleter()
 
         self.label_search_bar.setCompleter(self.completer)
+
+        self.state.label_img_changed.connect(self._handle_label_image_changed)
 
     def _build_label_pick_widget(self):
         self.mouse_img = QImage(':/images/mouse.png')
@@ -216,3 +221,7 @@ class ColormapWidget(QWidget):
         if isinstance(index, QModelIndex):
             return self.label_filter.mapToSource(index)
         return self.label_filter.mapToSource(self.label_filter.index(index, 0))
+
+    def _handle_label_image_changed(self, lbl_img: LabelImg):
+        ulabels = set(list(np.unique(self.state.current_photo.segments_mask.label_img)))
+        self.state.colormap.set_used_labels(ulabels)

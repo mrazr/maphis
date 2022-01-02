@@ -5,10 +5,11 @@ import importlib
 import inspect
 from pathlib import Path
 import logging
+import multiprocessing as mp
 
 from PySide2.QtGui import QCloseEvent
-from PySide2.QtWidgets import QMainWindow, QApplication, QHBoxLayout, QSizePolicy
-from PySide2.QtCore import QModelIndex, QPoint, QItemSelectionModel
+from PySide2.QtWidgets import QMainWindow, QApplication, QHBoxLayout, QSizePolicy, QStatusBar, QProgressBar
+from PySide2.QtCore import QModelIndex, QPoint, QItemSelectionModel, QTimer
 import cv2 as cv
 
 from arthropod_describer.common.plugin import RegionComputation
@@ -28,6 +29,16 @@ import arthropod_describer.resources
 logging.basicConfig(filename='arthropod_logger.log', level=logging.INFO)
 
 
+def run_reg_comp_on_storage(reg_comp: RegionComputation, storage: Storage, progress_queue: mp.Queue, send_photo: bool=False):
+    for i in range(storage.image_count):
+        photo = storage.get_photo_by_idx(i)
+        _ = reg_comp(photo)
+        if send_photo:
+            progress_queue.put_nowait((i+1, storage.image_count, photo))
+        else:
+            progress_queue.put_nowait((i+1, storage.image_count))
+
+
 class ArthropodDescriber(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
@@ -40,11 +51,21 @@ class ArthropodDescriber(QMainWindow):
         self.tools: typing.List[Tool] = []
         self._load_tools()
 
+        self.progress_bar = QProgressBar()
+        self.progress_bar.setVisible(False)
+        self._status_bar = QStatusBar()
+        self._status_bar.addWidget(self.progress_bar)
+        self.setStatusBar(self._status_bar)
+
         self.label_editor = LabelEditor(self.state)
         self._setup_label_editor()
 
-        self.plugins_widget = PluginManager()
-        self.label_editor.side_widget.layout().addWidget(self.plugins_widget)
+        self.plugins_widget = PluginManager(self.state)
+        #self.label_editor.side_widget.layout().addWidget(self.plugins_widget)
+        self.label_editor.ui.tabPlugins.layout().addWidget(self.plugins_widget)
+        self.label_editor.ui.tabPlugins.layout().addStretch(2)
+        #self.label_editor.toolbox.addItem(self.plugins_widget, 'Plugins')
+        #self.plugins_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
 
         self.plugins_widget.apply_region_computation.connect(self.compute_regions)
 
@@ -66,14 +87,44 @@ class ArthropodDescriber(QMainWindow):
 
         self.ui.actionOpen_folder.triggered.connect(self.handle_action_open_folder_triggered)
 
+        self.progress_queue = mp.Queue()
+        self.check_progress_timer = QTimer()
+        self.check_progress_timer.setInterval(200)
+        self.check_progress_timer.timeout.connect(self.update_progress)
+        self.reg_comp_process: typing.Optional[mp.Process] = None
+
     def compute_regions(self, reg_comp: RegionComputation, batch_mode: ProcessType):
         print(f'performing {reg_comp.info.name} for {"single" if batch_mode == ProcessType.CURRENT_PHOTO else "all"}')
         if batch_mode == ProcessType.CURRENT_PHOTO:
-            modified_labs = reg_comp(self.state.current_photo)
+            restrictions = self.plugins_widget.selected_regions if reg_comp.region_restricted else []
+            modified_labs = reg_comp(self.state.current_photo, set(restrictions))
             #for lab in modified_labs:
                 #cv.imwrite(f'/home/radoslav/fakulta/ad_stuff/{repr(lab)}.tif',
                 #           self.state.current_photo[lab].label_img)
             self.label_editor.set_photo(self.state.current_photo, reset_zoom=False)
+        else:
+            self.progress_bar.setRange(0, self.storage.image_count)
+            self.progress_bar.setVisible(True)
+            self.check_progress_timer.start()
+            self.reg_comp_process = mp.Process(target=run_reg_comp_on_storage,
+                                               args=(reg_comp, self.storage, self.progress_queue, True))
+            self.reg_comp_process.start()
+
+    def update_progress(self):
+        while not self.progress_queue.empty():
+            done, out_of, photo = self.progress_queue.get()
+            self.progress_bar.setValue(done)
+            if photo.image_path == self.state.current_photo.image_path:
+                self.state.current_photo.bug_mask = photo.bug_mask
+                self.state.current_photo.segments_mask = photo.segments_mask
+                self.state.current_photo.reflection_mask = photo.reflection_mask
+                self.state.label_img_changed.emit(self.state.current_photo.segments_mask)
+                self.label_editor.set_photo(self.state.current_photo, False)
+                print('setting the current photo')
+            if done == out_of:
+                self.check_progress_timer.stop()
+                self.progress_bar.setVisible(False)
+                self.reg_comp_process = None
 
     def _load_tools(self):
         py_files = [inspect.getmodulename(file.path) for file in os.scandir(Path(__file__).parent / 'tools') if file.name.endswith('.py') and file.name != '__init__.py']
@@ -86,7 +137,7 @@ class ArthropodDescriber(QMainWindow):
                 if not obj_name.startswith('Tool_'):
                     continue
                 if inspect.isclass(obj) and not inspect.isabstract(obj):
-                    tool = obj()
+                    tool = obj(self.state)
                     tool.set_tool_id(len(tools))
                     self.state.colormap_changed.connect(lambda cmap: tool.color_map_changed(cmap.colormap))
                     tools.append(tool)

@@ -7,12 +7,13 @@ import skimage.draw
 import skimage.measure
 
 from arthropod_describer.common.label_change import LabelChange
+from arthropod_describer.common.state import State
 from arthropod_describer.common.tool import Tool, EditContext
 
 
 class Tool_Knife(Tool):
-    def __init__(self):
-        Tool.__init__(self)
+    def __init__(self, state: State):
+        Tool.__init__(self, state)
         self._tool_name = "Knife"
         self._active = False
         self._first_endpoint: Tuple[int, int] = (-1, -1)

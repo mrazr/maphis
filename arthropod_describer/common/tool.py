@@ -8,6 +8,7 @@ from PySide2.QtGui import QPainter, QImage
 
 from arthropod_describer.common.label_change import LabelChange
 from arthropod_describer.common.photo import LabelImg
+from arthropod_describer.common.state import State
 from arthropod_describer.common.user_params import ToolUserParam
 
 
@@ -25,7 +26,7 @@ class EditContext:
 class Tool(QObject):
     cursor_changed = Signal([int, QImage])
 
-    def __init__(self, parent: QObject = None):
+    def __init__(self, state: State, parent: QObject = None):
         QObject.__init__(self, parent)
         self.tool_id = -42
 

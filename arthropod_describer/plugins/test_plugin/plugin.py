@@ -4,6 +4,7 @@ import sys
 from arthropod_describer.common.plugin import Plugin, PropertyComputation, RegionComputation, Info
 from arthropod_describer.common.tool import Tool
 from arthropod_describer.plugins.test_plugin.regions.body import BodyComp
+from arthropod_describer.plugins.test_plugin.regions.eraser import RegionEraser
 from arthropod_describer.plugins.test_plugin.regions.legs import LegsRegion
 
 
@@ -14,7 +15,7 @@ class TestPlugin(Plugin):
     """
     def __init__(self, info: Optional[Info] = None):
         super().__init__(info)
-        self._region_computations = [LegsRegion(), BodyComp()]
+        self._region_computations = [LegsRegion(), BodyComp(), RegionEraser()]
 
     @property
     def plugin_id(self) -> int:

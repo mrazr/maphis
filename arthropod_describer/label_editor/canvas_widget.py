@@ -13,7 +13,7 @@ from arthropod_describer.common.label_change import LabelChange
 from arthropod_describer.common.state import State
 from arthropod_describer.common.tool import Tool, EditContext
 from arthropod_describer.label_editor.label_view_widget import LabelView
-from arthropod_describer.common.photo import Photo, LabelImg, LabelType
+from arthropod_describer.common.photo import Photo, LabelImg, LabelType, nd2qimage
 
 
 class ToolCursor(QGraphicsItem):
@@ -127,6 +127,8 @@ class CanvasWidget(QGraphicsObject):
         self._tool_viz_layer: ToolVisLayer = ToolVisLayer()
         self._tool_viz_commands: typing.List[typing.Callable[[QPainter], None]] = []
 
+        self.current_image: QImage = QImage()
+
     def initialize(self):
         self._image_pixmap = QPixmap()
         self.image_gpixmap = self.scene().addPixmap(self._image_pixmap)
@@ -207,8 +209,9 @@ class CanvasWidget(QGraphicsObject):
 
     def set_photo_(self, photo: Photo):
         logging.info('CW - Setting new photo')
+        self.current_image = nd2qimage(photo.image)
         self.prepareGeometryChange()
-        self._set_pixmaps(self.state.current_photo.image,
+        self._set_pixmaps(nd2qimage(self.state.current_photo.image),
                           self._image_pixmap,
                           self.image_gpixmap)
 
@@ -419,6 +422,6 @@ class CanvasWidget(QGraphicsObject):
     def _create_context(self) -> EditContext:
         return EditContext(self.state.label_img,
                            self.state.primary_label,
-                           self.state.current_photo.image,
+                           self.current_image,
                            self.state.colormap.colormap,
                            self.mask_widgets[self.current_mask_shown]._label_qimage)

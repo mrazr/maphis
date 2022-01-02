@@ -8,6 +8,7 @@ import logging
 import cv2 as cv
 import numpy as np
 from PySide2.QtGui import QImage
+from skimage import io
 
 from arthropod_describer.common.photo import LocalPhoto, Photo
 from arthropod_describer.common.colormap import Colormap
@@ -132,14 +133,17 @@ class LocalStorage(Storage):
     def get_photo_by_idx(self, idx: int) -> Photo:
         assert 0 <= idx < len(self._image_names)
         photo = self._images[idx]
-
+        print(f'loading {photo.image_name}')
         if self._loaded_photo is not None:
             self._loaded_photo._image = None
-            self._loaded_photo.bug_mask.label_image = None
-            self._loaded_photo.segments_mask.label_image = None
-            self._loaded_photo.reflection_mask.label_image = None
+            #self._loaded_photo.bug_mask.label_image = None
+            #self._loaded_photo.segments_mask.label_image = None
+            #self._loaded_photo.reflection_mask.label_image = None
+            self._loaded_photo.bug_mask.unload()
+            self._loaded_photo.segments_mask.unload()
+            self._loaded_photo.reflection_mask.unload()
 
-        photo._image = QImage(str(photo.image_path))
+        photo._image = io.imread(str(photo.image_path)) #QImage(str(photo.image_path))
         photo.bug_mask.reload()
         photo.segments_mask.reload()
         photo.reflection_mask.reload()

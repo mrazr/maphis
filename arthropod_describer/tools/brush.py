@@ -7,6 +7,7 @@ from PySide2.QtGui import QImage, QPainter, QColor, QBrush
 from skimage import draw
 import skimage.morphology as M
 
+from arthropod_describer.common.state import State
 from arthropod_describer.common.tool import Tool, qimage2ndarray, EditContext
 from arthropod_describer.common.user_params import ToolUserParam, ParamType
 from arthropod_describer.common.label_change import LabelChange, label_difference_to_label_changes
@@ -15,14 +16,16 @@ TOOL_CLASS_NAME = 'Brush'
 
 
 class Tool_Brush(Tool):
-    def __init__(self):
-        Tool.__init__(self)
+    def __init__(self, state: State):
+        Tool.__init__(self, state)
         self._tool_name = "Brush"
         self._user_params = {'radius': ToolUserParam('radius', ParamType.INT, 9, min_val=1, max_val=75, step=2)}
         self._current_img = None
         self.edit_mask = QImage()
         self.edit_painter = QPainter(self.edit_mask)
         radius = self._user_params['radius'].value
+
+        self.state = state
 
         self._primary_label: int = 1000
         self._secondary_label: int = 0
@@ -84,7 +87,7 @@ class Tool_Brush(Tool):
         if not self.active:
             return []
         painter.save()
-        brush_color = QColor.fromRgb(*self.cmap[self._primary_label])
+        brush_color = QColor.fromRgb(*self.cmap[ctx.label])
         if self._primary_label == 0:
             brush_color.setAlpha(0)
         painter.setPen(brush_color)
@@ -111,7 +114,7 @@ class Tool_Brush(Tool):
     def left_release(self, painter: QPainter, pos: QPoint, ctx: EditContext) -> List[LabelChange]:
         self._active = False
         #return np.where(qimage2ndarray(self.edit_mask) > 0, self._primary_label, -1), self._primary_label
-        lab_diff = np.where(qimage2ndarray(self.edit_mask) > 0, self._primary_label, -1)
+        lab_diff = np.where(qimage2ndarray(self.edit_mask) > 0, ctx.label, -1)
         return label_difference_to_label_changes(lab_diff, ctx.label_img)
 
     #def right_press(self, painter: QPainter, pos: QPoint, ctx: EditContext) -> List[LabelChange]:
@@ -139,10 +142,10 @@ class Tool_Brush(Tool):
     def _update_icon(self):
         if len(self.cmap.keys()) > 0:
             sz = self._brush_mask.shape
-            self._brush_mask = self._primary_label * self._brush_mask
+            self._brush_mask = self.state.primary_label * self._brush_mask #self._primary_label * self._brush_mask
             self._brush_icon = QImage(sz[1], sz[0], QImage.Format_ARGB32)
             self._brush_icon.fill(QColor(0, 0, 0, 0))
-            brush_color = QColor.fromRgb(*self.cmap[self._primary_label])
+            brush_color = QColor.fromRgb(*self.cmap[self.state.primary_label])
             painter = QPainter(self._brush_icon)
             painter.setPen(brush_color)
             radius = self.user_params['radius'].value

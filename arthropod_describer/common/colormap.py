@@ -39,6 +39,8 @@ class Colormap(QAbstractItemModel):
         self.colormap: Dict[int, Tuple[int, int, int]] = {int(label): (v[c][r], v[c][g], v[c][b]) for label, v in self.cmap[COLORMAP].items()}
         self.label_names: Dict[int, str] = {int(label): v['name'] for label, v in self.cmap[COLORMAP].items()}
 
+        self._used_labels: typing.Set[int] = set()
+
     @property
     def name(self) -> str:
         return self.cmap[NAME]
@@ -81,5 +83,12 @@ class Colormap(QAbstractItemModel):
             if label == 0 or label == 1000:
                 return 'mask'
             return 'regions'
+        elif role == Qt.UserRole + 3:
+            return 'used' if label in self._used_labels else 'not'
         else:
             return None
+
+    def set_used_labels(self, labs: typing.Set[int]):
+        self._used_labels = labs
+        self.dataChanged.emit(self.createIndex(0, 0),
+                              self.createIndex(self.rowCount() - 1, 0))

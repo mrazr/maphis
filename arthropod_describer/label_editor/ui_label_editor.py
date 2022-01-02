@@ -20,7 +20,7 @@ class Ui_LabelEditor(object):
     def setupUi(self, LabelEditor):
         if not LabelEditor.objectName():
             LabelEditor.setObjectName(u"LabelEditor")
-        LabelEditor.resize(1059, 699)
+        LabelEditor.resize(1059, 704)
         sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -111,6 +111,17 @@ class Ui_LabelEditor(object):
 
         self.center = QHBoxLayout()
         self.center.setObjectName(u"center")
+        self.tabSidebar = QTabWidget(LabelEditor)
+        self.tabSidebar.setObjectName(u"tabSidebar")
+        self.tabEditing = QWidget()
+        self.tabEditing.setObjectName(u"tabEditing")
+        self.tabSidebar.addTab(self.tabEditing, "")
+        self.tabPlugins = QWidget()
+        self.tabPlugins.setObjectName(u"tabPlugins")
+        self.tabSidebar.addTab(self.tabPlugins, "")
+
+        self.center.addWidget(self.tabSidebar)
+
 
         self.verticalLayout.addLayout(self.center)
 
@@ -126,13 +137,13 @@ class Ui_LabelEditor(object):
 
         self.controls.addWidget(self.btnPrevious)
 
-        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.hspcLeft = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
-        self.controls.addItem(self.horizontalSpacer_2)
+        self.controls.addItem(self.hspcLeft)
 
-        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.hspcRight = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
-        self.controls.addItem(self.horizontalSpacer)
+        self.controls.addItem(self.hspcRight)
 
         self.btnNext = QPushButton(LabelEditor)
         self.btnNext.setObjectName(u"btnNext")
@@ -144,6 +155,9 @@ class Ui_LabelEditor(object):
 
 
         self.retranslateUi(LabelEditor)
+
+        self.tabSidebar.setCurrentIndex(0)
+
 
         QMetaObject.connectSlotsByName(LabelEditor)
     # setupUi
@@ -160,6 +174,8 @@ class Ui_LabelEditor(object):
         self.tbtnSegmentsMask.setText(QCoreApplication.translate("LabelEditor", u"Segments", None))
         self.tbtnReflectionMask.setText(QCoreApplication.translate("LabelEditor", u"Reflections", None))
         self.btnResetLabel.setText(QCoreApplication.translate("LabelEditor", u"Reset", None))
+        self.tabSidebar.setTabText(self.tabSidebar.indexOf(self.tabEditing), QCoreApplication.translate("LabelEditor", u"Editing", None))
+        self.tabSidebar.setTabText(self.tabSidebar.indexOf(self.tabPlugins), QCoreApplication.translate("LabelEditor", u"Plugins", None))
         self.btnPrevious.setText(QCoreApplication.translate("LabelEditor", u"<", None))
         self.btnNext.setText(QCoreApplication.translate("LabelEditor", u">", None))
     # retranslateUi

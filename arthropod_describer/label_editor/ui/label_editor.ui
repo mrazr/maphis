@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1059</width>
-    <height>699</height>
+    <height>704</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -151,7 +151,25 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="center"/>
+    <layout class="QHBoxLayout" name="center">
+     <item>
+      <widget class="QTabWidget" name="tabSidebar">
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <widget class="QWidget" name="tabEditing">
+        <attribute name="title">
+         <string>Editing</string>
+        </attribute>
+       </widget>
+       <widget class="QWidget" name="tabPlugins">
+        <attribute name="title">
+         <string>Plugins</string>
+        </attribute>
+       </widget>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <layout class="QHBoxLayout" name="controls">
@@ -169,7 +187,7 @@
       </widget>
      </item>
      <item>
-      <spacer name="horizontalSpacer_2">
+      <spacer name="hspcLeft">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
@@ -182,7 +200,7 @@
       </spacer>
      </item>
      <item>
-      <spacer name="horizontalSpacer">
+      <spacer name="hspcRight">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>

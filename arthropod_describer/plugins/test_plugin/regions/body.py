@@ -22,6 +22,14 @@ class BodyComp(RegionComputation):
         DEFAULT_VALUE: 200
         MIN_VALUE: 0
         MAX_VALUE: 255
+
+        NAME: Filter size for small components
+        KEY: filter_size
+        PARAM_TYPE: INT
+        VALUE: 25
+        DEFAULT_VALUE: 25
+        MIN_VALUE: 1
+        MAX_VALUE: 55
     """
     def __init__(self):
         RegionComputation.__init__(self, None)
@@ -40,10 +48,15 @@ class BodyComp(RegionComputation):
         return list(self._user_params.values())
 
     def __call__(self, photo: Photo, labels: Optional[Set[int]] = None) -> Set[LabelType]:
-        blue_chan = qimage2ndarray(photo.image)[:, :, 2]
+        #blue_chan = qimage2ndarray(photo.image)[:, :, 2]
+        print(f'obtained {labels} restrictions')
+        blue_chan = photo.image[:, :, 2]
         bug = (blue_chan < self._user_params['threshold'].value).astype(np.uint16)
         bug = cv2.morphologyEx(bug, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE,
                                                                                (15, 15)))
-        photo.bug_mask.label_img = 1000 * bug
-        photo.segments_mask.label_img = 1000 * bug
+        sz = self._user_params['filter_size'].value
+        bug = cv2.morphologyEx(bug, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE,
+                                                                              (sz, sz)))
+        photo.bug_mask = 1000 * bug
+        photo.segments_mask = 1000 * bug
         return {LabelType.REGIONS, LabelType.BUG}

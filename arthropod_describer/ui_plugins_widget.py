@@ -20,8 +20,8 @@ class Ui_PluginsWidget(object):
     def setupUi(self, PluginsWidget):
         if not PluginsWidget.objectName():
             PluginsWidget.setObjectName(u"PluginsWidget")
-        PluginsWidget.resize(650, 409)
-        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        PluginsWidget.resize(650, 430)
+        sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(PluginsWidget.sizePolicy().hasHeightForWidth())
@@ -59,11 +59,12 @@ class Ui_PluginsWidget(object):
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
         self.lblRegDesc = QLabel(self.grpRegDesc)
         self.lblRegDesc.setObjectName(u"lblRegDesc")
-        sizePolicy2 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sizePolicy2 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
         sizePolicy2.setHorizontalStretch(0)
         sizePolicy2.setVerticalStretch(0)
         sizePolicy2.setHeightForWidth(self.lblRegDesc.sizePolicy().hasHeightForWidth())
         self.lblRegDesc.setSizePolicy(sizePolicy2)
+        self.lblRegDesc.setWordWrap(True)
 
         self.horizontalLayout_3.addWidget(self.lblRegDesc)
 
@@ -72,8 +73,24 @@ class Ui_PluginsWidget(object):
 
         self.grpRegionSettings = QGroupBox(self.tabRegionComps)
         self.grpRegionSettings.setObjectName(u"grpRegionSettings")
+        sizePolicy1.setHeightForWidth(self.grpRegionSettings.sizePolicy().hasHeightForWidth())
+        self.grpRegionSettings.setSizePolicy(sizePolicy1)
 
         self.verticalLayout_2.addWidget(self.grpRegionSettings)
+
+        self.grpRegRestrict = QGroupBox(self.tabRegionComps)
+        self.grpRegRestrict.setObjectName(u"grpRegRestrict")
+        self.verticalLayout_4 = QVBoxLayout(self.grpRegRestrict)
+        self.verticalLayout_4.setObjectName(u"verticalLayout_4")
+        self.regRestrictView = QListView(self.grpRegRestrict)
+        self.regRestrictView.setObjectName(u"regRestrictView")
+        self.regRestrictView.setSelectionMode(QAbstractItemView.MultiSelection)
+        self.regRestrictView.setSelectionBehavior(QAbstractItemView.SelectRows)
+
+        self.verticalLayout_4.addWidget(self.regRestrictView)
+
+
+        self.verticalLayout_2.addWidget(self.grpRegRestrict)
 
         self.horizontalLayout_2 = QHBoxLayout()
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
@@ -120,6 +137,7 @@ class Ui_PluginsWidget(object):
         self.grpRegDesc.setTitle(QCoreApplication.translate("PluginsWidget", u"Description", None))
         self.lblRegDesc.setText("")
         self.grpRegionSettings.setTitle(QCoreApplication.translate("PluginsWidget", u"Settings", None))
+        self.grpRegRestrict.setTitle(QCoreApplication.translate("PluginsWidget", u"Apply to regions", None))
         self.btnApply.setText(QCoreApplication.translate("PluginsWidget", u"Apply", None))
         self.btnApplyToAll.setText(QCoreApplication.translate("PluginsWidget", u"Apply to all", None))
         self.btnReset.setText(QCoreApplication.translate("PluginsWidget", u"Reset", None))

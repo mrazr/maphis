@@ -5,10 +5,12 @@ from importlib import import_module
 from pathlib import Path
 from typing import Optional, List, Any
 
-from PySide2.QtCore import QAbstractItemModel, QObject, QModelIndex, Qt, Signal
+import numpy as np
+from PySide2.QtCore import QAbstractItemModel, QObject, QModelIndex, Qt, Signal, QSortFilterProxyModel, QItemSelection
 from PySide2.QtWidgets import QWidget, QLayout, QGridLayout, QVBoxLayout
 
 from arthropod_describer.common.plugin import RegionComputation, Plugin, PropertyComputation
+from arthropod_describer.common.state import State
 from arthropod_describer.common.user_params import create_params_widget, UserParamWidgetBinding
 from ui_plugins_widget import Ui_PluginsWidget
 
@@ -59,7 +61,7 @@ class RegionCompsListModel(QAbstractItemModel):
     def comps_list(self, comps: List[RegionComputation]):
         self._region_comps = comps
         self.dataChanged.emit(self.createIndex(0, 0),
-                              self.createIndex(0, len(self._region_comps) - 1))
+                              self.createIndex(len(self._region_comps) - 1, 0))
 
     def rowCount(self, parent: QModelIndex = ...) -> int:
         return len(self._region_comps)
@@ -92,11 +94,13 @@ class PluginManager(QWidget):
     apply_region_computation = Signal([RegionComputation, ProcessType])
     apply_property_computation = Signal([PropertyComputation, ProcessType])
 
-    def __init__(self, parent: Optional[QWidget] = None):
+    def __init__(self, state: State, parent: Optional[QWidget] = None):
         QWidget.__init__(self, parent)
         self.ui = Ui_PluginsWidget()
         self.ui.setupUi(self)
         self.plugins: List[Plugin] = self._load_plugins()
+
+        self.state = state
 
         self._current_plugin: Optional[Plugin] = None
 
@@ -114,7 +118,18 @@ class PluginManager(QWidget):
 
         self.ui.btnApply.clicked.connect(self.handle_apply_clicked)
         self.ui.btnApplyToAll.clicked.connect(self.handle_apply_all_clicked)
+
+        self.region_restrict_model = QSortFilterProxyModel()
+        self.region_restrict_model.setSourceModel(self.state.colormap)
+        self.ui.regRestrictView.setModel(self.region_restrict_model)
+        self.region_restrict_model.setFilterRole(Qt.UserRole + 3)
+        self.region_restrict_model.setFilterFixedString('used')
         #self.ui.btnReset.clicked.connect(self.handle_reset_clicked)
+
+        self.selected_regions = []
+
+        self.label_sel_model: QItemSelection = self.ui.regRestrictView.selectionModel()
+        self.label_sel_model.selectionChanged.connect(self._handle_label_selection_changed)
 
     def set_show_region_computation(self, reg_comp: RegionComputation):
         self.ui.lblRegDesc.setText(reg_comp.info.description)
@@ -124,6 +139,13 @@ class PluginManager(QWidget):
 
     def handle_apply_all_clicked(self, chkd: bool):
         self.apply_region_computation.emit(self._current_reg_comp, ProcessType.ALL_PHOTOS)
+
+    def _handle_label_selection_changed(self, selection: QItemSelection):
+        indexes = self.label_sel_model.selectedIndexes()
+        labels = []
+        for index in indexes:
+            labels.append(self.region_restrict_model.data(index, Qt.UserRole))
+        self.selected_regions = labels
 
     @property
     def current_plugin(self) -> Plugin:
@@ -152,10 +174,25 @@ class PluginManager(QWidget):
             self._param_binding.param_widget = None
             self._param_binding.user_params = dict()
             self._reg_comp_param_widget.deleteLater()
+            self._reg_comp_param_widget = None
         self._reg_comp_param_widget = create_params_widget(self._current_reg_comp.user_params)
         self._param_binding.bind(self._current_reg_comp.user_params, self._reg_comp_param_widget)
+        self.ui.grpRegRestrict.setVisible(self._current_reg_comp.region_restricted)
         self.ui.grpRegionSettings.layout().addWidget(self._reg_comp_param_widget)
         self.ui.grpRegionSettings.update()
+
+        if self._current_reg_comp.region_restricted:
+            self.region_restrict_model.setSourceModel(self.state.colormap)
+            #self.state.colormap.used_labels = np.unique(self.state.label_img.label_img)
+            #self.state.colormap.set_used_labels(set(list(np.unique(self.state.label_img.label_img))))
+            self.region_restrict_model.setFilterFixedString('used')
+            self.ui.regRestrictView.setModel(self.region_restrict_model)
+            #self.ui.regRestrictView.dataChanged(self.region_restrict_model.createIndex(0, 0),
+            #                                    self.region_restrict_model.createIndex(len(self.state.colormap.used_labels)-1,
+            #                                                                          0))
+        else:
+            self.region_restrict_model.setFilterFixedString('')
+        self.ui.regRestrictView.setVisible(self._current_reg_comp.region_restricted)
 
     def _load_plugins(self) -> List[Plugin]:
         plugs = []
@@ -164,6 +201,10 @@ class PluginManager(QWidget):
                 continue
             plugs.append(load_plugin(Path(direntry.path)))
         return plugs
+
+    def _update_used_labels(self):
+        self.ui.regRestrictView.clear()
+        used_labels = np.unique(self.state.current_photo.segments_mask.label_img)
 
 
 def load_plugin(plugin_folder: Path) -> Plugin:

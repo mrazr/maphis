@@ -1,14 +1,16 @@
 import typing
+from pathlib import Path
 from typing import Optional, List
 import logging
 
 from PySide2.QtCore import Signal, QObject, QPointF, QPoint, QTimer
 from PySide2.QtGui import Qt, QImage
 from PySide2.QtWidgets import QWidget, QGraphicsScene, QToolButton, QGroupBox, QVBoxLayout, QSpinBox, QLineEdit, \
-    QCheckBox, QGridLayout, QLabel, QSizePolicy, QGraphicsProxyWidget, QGraphicsItem
+    QCheckBox, QGridLayout, QLabel, QSizePolicy, QGraphicsProxyWidget, QGraphicsItem, QToolBox
 import numpy as np
 from skimage import io
 
+from arthropod_describer.common.colormap import Colormap
 from arthropod_describer.common.label_change import LabelChange, DoType, CommandEntry, propagate_mask_changes_to
 from arthropod_describer.common.state import State
 from arthropod_describer.label_editor.colormap_widget import ColormapWidget
@@ -55,7 +57,8 @@ class LabelEditor(QObject):
         self._tools_: typing.List[ToolEntry] = []
 
         self.photo_view = CustomGraphicsView()
-        self.ui.center.addWidget(self.photo_view)
+        #self.ui.center.addWidget(self.photo_view)
+        self.ui.center.insertWidget(0, self.photo_view)
         self.photo_view.setScene(self._scene)
 
         self.photo_view.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -72,11 +75,21 @@ class LabelEditor(QObject):
         self.canvas.label_changed.connect(self.handle_label_changed)
         self.photo_view.view_dragging.connect(self.canvas.handle_view_dragging)
 
+        self._current_tool: typing.Optional[Tool] = None
+
         vbox = QVBoxLayout()
 
-        self.colormap_widget = ColormapWidget()
+        self.colormap_widget = ColormapWidget(state=state)
+        cmap = Colormap(cmap_path=Path('/home/radoslav/fakulta/arthropod_describer_py/colormap.json'))
+        self.colormap_widget.register_colormap(cmap)
+        self.state.colormap = cmap
+
         self.colormap_widget.primary_label_changed.connect(self._handle_primary_label_changed)
         self.colormap_widget.secondary_label_changed.connect(self._handle_secondary_label_changed)
+
+        self.colormap_widget.set_label_by_idx(0, 'left')
+        self.colormap_widget.set_label_by_idx(0, 'right')
+
         #self.colormap_widget.label_opacity_changed.connect(self.change_label_opacity)
 
         self.colormap_widget.label_opacity_changed.connect(self.canvas.set_label_opacity)
@@ -89,17 +102,22 @@ class LabelEditor(QObject):
         #self._tools: typing.List[Tool] = self._mock_load_tools()
         self._tool_param_widgets: typing.List[QWidget] = []
 
-        self._current_tool: typing.Optional[Tool] = None
 
         vbox.addWidget(self._tool_settings)
-        self._tool_settings.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Maximum)
-        #vbox.addStretch(2)
+        self._tool_settings.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Maximum)
 
-        self.side_widget = QWidget()
-        self.side_widget.setLayout(vbox)
-        self.side_widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
+        vbox.addStretch(2)
 
-        self.ui.center.addWidget(self.side_widget)
+        #self.side_widget = QWidget()
+        #self.side_widget.setLayout(vbox)
+        #self.side_widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
+
+        #self.ui.center.addWidget(self.side_widget)
+        #self.ui.center.addWidget(self.toolbox)
+
+        self.ui.tabSidebar.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.ui.tabPlugins.setLayout(QVBoxLayout())
+        self.ui.tabEditing.setLayout(vbox)
 
         #self._current_tool = self._tools[0]
         #self.canvas.set_current_tool(self._tools[0])
@@ -146,6 +164,11 @@ class LabelEditor(QObject):
         self.qtimer.setSingleShot(False)
         self.qtimer.timeout.connect(self._handle_view_changed)
         self.qtimer.stop()
+
+        #self.photo_view.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        #self.toolbox.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
+        #self.ui.center.setStretch(0, 3)
+        #self.ui.center.setStretch(1, 0)
 
     def register_tools(self, tools: typing.List[Tool]):
         for tool in tools:
@@ -271,7 +294,7 @@ class LabelEditor(QObject):
         self._scene.setSceneRect(self.canvas.sceneBoundingRect())
         self._scene.update()
         logging.info(f'LE - fitting image into view, canvas rect is {self.canvas.boundingRect()}')
-        logging.info(f'LE - photo size is {self.state.current_photo.image.size().toTuple()}')
+        logging.info(f'LE - photo size is {self.state.current_photo.image.shape[::-1]}')
         self.photo_view.fitInView(self.canvas, Qt.KeepAspectRatio)
 
     def zoom_on_bug(self):
@@ -438,6 +461,8 @@ class LabelEditor(QObject):
         else:
             self.redo_stack.append(reverse_commands)
             self.ui.tbtnRedo.setEnabled(True)
+
+        self.state.label_img_changed.emit(self.state.current_photo.segments_mask)
 
         #if update_canvas:
         #    for label_type in labels_changed:

@@ -1,3 +1,5 @@
+import math
+import typing
 from typing import List, Tuple, Dict
 
 import numpy as np
@@ -5,10 +7,12 @@ from PySide2.QtCore import QPoint
 from PySide2.QtGui import QPainter, QColor, QPen
 import skimage.draw
 import skimage.measure
+from skimage.morphology import binary_dilation, disk
 
 from arthropod_describer.common.label_change import LabelChange
 from arthropod_describer.common.state import State
 from arthropod_describer.common.tool import Tool, EditContext
+from arthropod_describer.common.user_params import ToolUserParam, ParamType
 
 
 class Tool_Knife(Tool):
@@ -17,6 +21,7 @@ class Tool_Knife(Tool):
         self._tool_name = "Knife"
         self._active = False
         self._first_endpoint: Tuple[int, int] = (-1, -1)
+        self._user_params = {'Cut width': ToolUserParam('cut_width', ParamType.INT, 3, min_val=1, max_val=9, step=2)}
 
     @property
     def tool_name(self) -> str:
@@ -25,6 +30,10 @@ class Tool_Knife(Tool):
     @property
     def active(self) -> bool:
         return self._active
+
+    @property
+    def user_params(self) -> typing.Dict[str, ToolUserParam]:
+        return self._user_params
 
     def left_press(self, painter: QPainter, pos: QPoint, context: EditContext) -> List[LabelChange]:
         self._first_endpoint = pos.toTuple()[::-1]
@@ -39,6 +48,20 @@ class Tool_Knife(Tool):
         #                                             pos.toTuple()[::-1],
         #                                             order=0,
         #                                             linewidth=1).astype(np.uint32)
+
+        line_width = self.user_params['Cut width'].value
+        if line_width > 1:
+
+            top, left = np.min(line_coords[0]), np.min(line_coords[1])
+            bottom, right = np.max(line_coords[0]), np.max(line_coords[1])
+
+            line_box = np.zeros((bottom - top + 1, right - left + 1), np.bool)
+
+            local_coords = (line_coords[0] - top, line_coords[1] - left)
+            line_box[local_coords[0], local_coords[1]] = 1
+            dil = binary_dilation(line_box, disk(line_width // 2))
+            line_coords = np.nonzero(dil)
+            line_coords = line_coords[0] + top, line_coords[1] + left
 
         label_profile = ctx.label_img.label_img[line_coords]
         labels = np.unique(label_profile)

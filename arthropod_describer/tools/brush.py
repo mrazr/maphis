@@ -20,6 +20,7 @@ class Tool_Brush(Tool):
         Tool.__init__(self, state)
         self._tool_name = "Brush"
         self._user_params = {'radius': ToolUserParam('radius', ParamType.INT, 9, min_val=1, max_val=75, step=2)}
+        self._user_params['radius'].value_changed.connect(self.set_user_param)
         self._current_img = None
         self.edit_mask = QImage()
         self.edit_painter = QPainter(self.edit_mask)

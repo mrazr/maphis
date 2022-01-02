@@ -3,7 +3,7 @@ import itertools
 import typing
 from typing import List, Dict, Callable, Any
 
-from PySide2.QtCore import QObject
+from PySide2.QtCore import QObject, Signal
 from PySide2.QtWidgets import QWidget, QGridLayout, QLabel, QSpinBox, QLineEdit, QCheckBox
 
 
@@ -33,11 +33,13 @@ class ToolUserParam(QObject):
         ParamType.STR: lambda s: s
     }
 
+    value_changed = Signal([str, int])
+
     def __init__(self, name: str = '', param_type: ParamType = ParamType.STR, default_value='',
                  min_val: int = -1, max_val: int = -1, step: int = 1, key: str = '', desc: str = '', parent: QObject = None):
         QObject.__init__(self, parent)
         self.name = name
-        self.key = key
+        self.key = key if key != '' else self.name
         self.desc = desc
         self.param_type = param_type
         self.default_value = default_value
@@ -58,6 +60,7 @@ class ToolUserParam(QObject):
         elif attr_name == 'param_type':
             value_ = ParamType.from_str(value)
         self.__setattr__(attr_name, value_)
+        self.value_changed.emit(self.key, value_)
 
     @classmethod
     def load_params_from_doc_str(cls, doc_str: str) -> Dict[str, 'ToolUserParam']:
@@ -112,7 +115,8 @@ class ToolUserParam(QObject):
 def get_val_setter(binding: 'UserParamWidgetBinding', param_name: str):
     def set_val(val: Any):
         print(f'settings {param_name}')
-        binding.user_params[param_name].value = val
+        #binding.user_params[param_name].value = val
+        binding.user_params[param_name].set_attr('value', val)
     return set_val
 
 

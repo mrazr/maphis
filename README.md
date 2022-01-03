@@ -2,10 +2,11 @@
 
 ## Outline
 1. [Features](#features)
-2. [Running](#running)
-3. [Installation](#installation)
-4. [User guide](#user-guide)
-5. [Plugins HOWTO](#plugins-howto)
+2. [Issues](#issues)
+4. [Installation](#installation)
+3. [Running](#running)
+5. [User guide](#user-guide)
+6. [Plugins HOWTO](#plugins-howto)
 
 
 ## Features
@@ -13,12 +14,18 @@
     - [x] Brush
     - [x] Knife
     - [x] Bucket
+- [ ] Change the working image size
 - [ ] Plugin system
   - [x] Region computations - plugin features that compute regions
   - [ ] Property computations - plugin features that compute properties of regions
     - deadline - Jan 4 2022
   - [ ] Tools - plugin specific tools
     - deadline - TBD
+
+## Issues
+1. The UI is still WIP, so when you click buttons when no folder is opened yet, the App may throw Exceptions
+2. The label modifying logic (e.g. Brush painting...) is done in the main Thread, therefore the interactive tools are still
+a bit unresponsive. I'll be optimizing this and moving critical stuff into separate process soon.
 
 ## Installation
 **Note**: This setup was tested on Ubuntu 20.04, Windows has not been tested yet.
@@ -44,13 +51,13 @@
      - `masks`: binary images marking bugs.
      - `sections`: integer label images marking sections of bug bodies
      - `reflections`: binary images marking reflection spots on bugs
-   - **NOTE: as the app modifies the folder structure, may be it's better to work with a copy of the data.**
+   - **NOTE: as the app modifies the folder structure, maybe it's better to work with a copy of the data.**
 2. On the left a photo can be selected to view and modify its label images.
 3. At top of photo view, active label image can be selected: `Bug`, `Segments`, `Reflections`
    - `Bug` serves as a mask for `Segments` and `Reflections`
 4. On the right, a *colormap* can be selected; for a selected *colormap* the active *label* can be selected.
    - The selected label will be used by *tools*, which can be selected below the colormap selection widget.
-5. On the `Plugin` tab you can browse the installed plugins and the computations that they provide.
+5. On the `Plugin` tab you can browse the installed plugins and the `Computations` that they provide.
 6. In photo view:
    - `Mouse wheel`: zooms in/out
    - `Mouse drag` + holding `Mouse wheel`: view panning
@@ -98,7 +105,7 @@ A plugin consists of `RegionComputation`s, `PropertyComputation`s and `Tool`s.
 ### Creating a new plugin
 
 To create a plugin, follow the above example directory structure, placed into the directory `plugins/`
-Plugin is essentially just a aggregation of `Computation`s and `Tool`s, so start with creating them first.
+Plugin is essentially just an aggregation of `Computation`s and `Tool`s, so start with creating them first.
 
 #### Computation info
 You must provide a name and description for every `Computation` that your plugin provides.
@@ -113,7 +120,7 @@ class BodyComp(RegionComputation):
   """
 ```
 
-For computation that require some sort of user input, you can provide the user the option to tweak parameters.
+For `Computations` that require user input, you can provide the user the option to tweak parameters.
 Again, you define the user parameters in the **docstring**:
 
 ```python
@@ -141,8 +148,6 @@ class BodyComp(RegionComputation):
   """
 ```
 
-Each parameter's `KEY` must be unique within the `Computation`.
-
 - `NAME` - this will be displayed in the App
 - `KEY` - for internal identification, must be unique within the defining `Computation`
 - `PARAM_TYPE` must be from `{INT, STR, BOOL}`
@@ -164,8 +169,8 @@ class RegionEraser(RegionComputation):
 ```
 
 Basically, put `REGION_RESTRICTED` anywhere in the **docstring**.
-When the user will activate a `REGION_RESTRICTED` Computation, besides the Computation's user parameters, the user will be
-also provided the option to select individual region labels on which the Computation will operate.
+When the user will activate a `REGION_RESTRICTED` `Computation`, besides the Computation's user parameters, the user will be
+also provided the option to select individual region labels on which the `Computation` will operate.
 
 #### Region computation
 Subclass the class `RegionComputation` located in the `arthropod_describer.common.plugin` module and override methods:

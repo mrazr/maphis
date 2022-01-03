@@ -34,6 +34,7 @@ class RegionComputation:
     def __init__(self, info: Optional[Info] = None):
         self.info = Info.load_from_doc_str(self) if info is None else info
         self._region_restricted = "REGION_RESTRICTED" in self.__doc__
+        self._user_params = ToolUserParam.load_params_from_doc_str(self.__doc__)
 
     @property
     @abc.abstractmethod
@@ -51,7 +52,7 @@ class RegionComputation:
 
     @property
     def user_params(self) -> List[ToolUserParam]:
-        return []
+        return list(self._user_params.values())
 
     @property
     def region_restricted(self) -> bool:

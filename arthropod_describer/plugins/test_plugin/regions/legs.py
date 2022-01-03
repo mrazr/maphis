@@ -27,7 +27,6 @@ class LegsRegion(RegionComputation):
     """
     def __init__(self):
         super().__init__(None)
-        self._user_params = ToolUserParam.load_params_from_doc_str(self.__doc__)
 
     @property
     def requires(self) -> Set[LabelType]:
@@ -49,7 +48,7 @@ class LegsRegion(RegionComputation):
         #cv.imshow('legs', cv.resize(legs, (0, 0), fx=0.5, fy=0.5))
         #cv.waitKey(0)
         #cv.destroyAllWindows()
-        cv.imwrite(f'/home/radoslav/fakulta/ad_stuff/{repr(LabelType.REGIONS)}__.tif', legs)
+        #cv.imwrite(f'/home/radoslav/fakulta/ad_stuff/{repr(LabelType.REGIONS)}__.tif', legs)
         photo.segments_mask.label_img = legs
         return {LabelType.REGIONS}
 

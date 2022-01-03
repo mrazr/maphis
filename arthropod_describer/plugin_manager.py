@@ -175,10 +175,14 @@ class PluginManager(QWidget):
             self._param_binding.user_params = dict()
             self._reg_comp_param_widget.deleteLater()
             self._reg_comp_param_widget = None
-        self._reg_comp_param_widget = create_params_widget(self._current_reg_comp.user_params)
-        self._param_binding.bind(self._current_reg_comp.user_params, self._reg_comp_param_widget)
+        if len(self._current_reg_comp.user_params) > 0:
+            self._reg_comp_param_widget = create_params_widget(self._current_reg_comp.user_params)
+            self._param_binding.bind(self._current_reg_comp.user_params, self._reg_comp_param_widget)
+            self.ui.grpRegionSettings.layout().addWidget(self._reg_comp_param_widget)
+            self.ui.grpRegionSettings.setVisible(True)
+        else:
+            self.ui.grpRegionSettings.setVisible(False)
         self.ui.grpRegRestrict.setVisible(self._current_reg_comp.region_restricted)
-        self.ui.grpRegionSettings.layout().addWidget(self._reg_comp_param_widget)
         self.ui.grpRegionSettings.update()
 
         if self._current_reg_comp.region_restricted:

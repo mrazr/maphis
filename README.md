@@ -51,6 +51,12 @@
 4. On the right, a *colormap* can be selected; for a selected *colormap* the active *label* can be selected.
    - The selected label will be used by *tools*, which can be selected below the colormap selection widget.
 5. On the `Plugin` tab you can browse the installed plugins and the computations that they provide.
+6. In photo view:
+   - `Mouse wheel`: zooms in/out
+   - `Mouse drag` + holding `Mouse wheel`: view panning
+   - `Left click`: active tool action
+   - `Right click`: nothing yet
+   - Twice `SHIFT` press - quick label search
 
 ### TODO - Saving
 - Currently the label images are saved to disk when the user changes switches to another photo. This should be discussed, 
@@ -162,4 +168,68 @@ When the user will activate a `REGION_RESTRICTED` Computation, besides the Compu
 also provided the option to select individual region labels on which the Computation will operate.
 
 #### Region computation
-Subclass the class `RegionComputation` located in the `arthropod_describer.common.plugin` module
+Subclass the class `RegionComputation` located in the `arthropod_describer.common.plugin` module and override methods:
+
+```python
+@property
+def requires(self) -> Set[LabelType]:
+    pass
+
+@property
+def computes(self) -> Set[LabelType]:
+    pass
+
+def __call__(self, photo: Photo, labels: Optional[Set[int]] = None) -> Set[LabelType]:
+    pass
+```
+
+Example `__call__` implementation:
+```python
+def __call__(self, photo: Photo, labels: Optional[Set[int]] = None) -> Set[LabelType]:
+    cop = photo.segments_mask.label_img.copy()
+    for lab in labels:
+        cop = np.where(cop == lab, 0, cop)
+    photo.segments_mask = cop
+    return {LabelType.REGIONS}
+```
+
+#### Plugin assembly
+When finished with implementing `Computation`, assembly them into `Plugin`.
+
+Subclass the class `Plugin` from `arthropod_describer.common.plugin`.
+
+Example:
+
+```python
+from arthropod_describer.common.plugin import Plugin, PropertyComputation, RegionComputation, Info
+from arthropod_describer.common.tool import Tool
+from arthropod_describer.plugins.test_plugin.regions.body import BodyComp
+from arthropod_describer.plugins.test_plugin.regions.eraser import RegionEraser
+from arthropod_describer.plugins.test_plugin.regions.legs import LegsRegion
+
+
+class TestPlugin(Plugin):
+    """
+    NAME: Test
+    DESCRIPTION: This is a test plugin for the arthropod describer tool
+    """
+    def __init__(self, info: Optional[Info] = None):
+        super().__init__(info)
+        self._region_computations = [LegsRegion(), BodyComp(), RegionEraser()]
+
+    @property
+    def plugin_id(self) -> int:
+        return super().plugin_id
+
+    @property
+    def region_computations(self) -> Optional[List[RegionComputation]]:
+        return self._region_computations
+
+    @property
+    def property_computations(self) -> Optional[List[PropertyComputation]]:
+        return super().property_computations
+
+    @property
+    def tools(self) -> Optional[List[Tool]]:
+        return super().tools
+```

@@ -349,7 +349,6 @@ class LabelEditor(QObject):
         self.photo_view.fitInView(self.canvas, Qt.KeepAspectRatio)
 
     def zoom_on_bug(self):
-        print(f'rect is {self.state.current_photo.bug_bbox}')
         l, t, r, b = self.state.current_photo.bug_bbox
         w = r - l
         h = b - t

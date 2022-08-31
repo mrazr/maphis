@@ -1,0 +1,2 @@
+DATE                          FILE                                                                                                 STATUS      MESSAGE
+2022-01-19 18:38:11           C:\Users\radoslav\fakulta\gitlab\arthropod_describer_py\arthropod_describer\plugins\pekar_unet\regio 0           

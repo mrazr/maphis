@@ -1,0 +1,5 @@
+// StandardDeviationReflectionsPlugin config file
+// !!! Do not edit key names
+{
+    "deviationWeight": 2.0 // float ... reflection: pixel < "deviationWeight" * deviation + average
+}

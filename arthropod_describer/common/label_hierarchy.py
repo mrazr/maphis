@@ -29,12 +29,7 @@ class Node:
 
 
 class LabelHierarchy:
-    """Class representing a particular hierarchy of labels.
-
-    Lorem ipsum dolor sit amet all the waaaaaaaaaaaay.
-
-    """
-
+    """Class representing a particular hierarchy of labels."""
     ROOT: int = -1
 
     def __init__(self):
@@ -62,7 +57,6 @@ class LabelHierarchy:
         """
         Checks whether `masks` represents a valid distribution of masks for `n_bits`-bit labels
         For `masks` to be a valid list of masks:
-
         1. each mask must have only one sequence of ones, e.g. 11110000 is valid, 11110011 is not valid
         2. no two distinct masks can overlap, e.g. 11110000, 00001111 is a valid distribution;
                    11110000, 00111111  is not a valid mask distribution
@@ -178,13 +172,10 @@ class LabelHierarchy:
         with open(path_to_json, 'w') as f:
             json.dump({'counts_of_bits': self.counts_of_bits, 'mask_names': self.mask_names}, f)
 
-    def get_level_name(self, label_or_code: Union[int, str]) -> str:
-        """Returns the name of the level that the `label` as specified by `label_or_code` belongs to.
+    def get_mask_name(self, label_or_code: Union[int, str]) -> str:
+        """Returns the name of the mask that the `label` as specified by `label_or_code` belongs to.
 
-        :param label_or_code: either the integer representation of the label or its textual code.
-        :type label_or_code: int or str
-        :return: name of the level the input label belongs to
-        :rtype: str
+        `label_or_code`: int or str - either the integer representation of the label or its textual code.
         """
         if type(label_or_code) == str:
             label = self.label(label_or_code)
@@ -254,14 +245,7 @@ class LabelHierarchy:
         return functools.reduce(operator.or_, bits)
 
     def level_mask(self, level: int) -> int:
-        """
-        Returns the union of self.masks[0],...,self.masks[level].
-        :param level: Number indicating the level a level mask should be returned for.
-        :type level: int
-        :return: The mask for the level.
-        :rtype: int
-        """
-
+        """Returns the union of self.masks[0],...,self.masks[level]."""
         mask = 0
         for l in range(level + 1):
             mask |= self.masks[l]

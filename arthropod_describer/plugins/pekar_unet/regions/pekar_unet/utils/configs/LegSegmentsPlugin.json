@@ -1,0 +1,5 @@
+// LegSegmentsPlugin config file
+// !!! Do not edit key names
+{
+    "numberOfSegments": 3 // number of segments for each leg (1 - 3)
+}

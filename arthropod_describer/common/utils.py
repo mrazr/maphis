@@ -16,18 +16,6 @@ from arthropod_describer.common.units import Value, Unit, BaseUnit, CompoundUnit
 
 
 def choose_folder(parent: QWidget, title = "Open folder", path: typing.Optional[Path] = None) -> typing.Optional[Path]:
-    """Shows a file dialog and lets the user choose a folder.
-
-    :param parent: Widget parent for the file dialog.
-    :type parent: QWidget
-    :param title: Title for the file dialog.
-    :type title: str
-    :param path: Optional path to set as the initial location of the file dialog.
-    :type path: pathlib.Path
-
-    :returns: Optional path if user confirmed their choice
-    :rtype: pathlib.Path
-    """
     file_dialog = QFileDialog(parent)
     if path is not None:
         file_dialog.setDirectory(str(path))

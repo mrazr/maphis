@@ -1,0 +1,16 @@
+// U-NetMaskPlugin config file
+// !!! Do not edit key names
+{
+    "modelPath": "utils/model.pt", // path to model for segmentation
+    "maxGapSize": 0.002, // fills all gaps of maximum size of: "main object area" * "maxGapSize"
+    "fragments": {
+        "keep": true,
+        // if "keep" is true
+        "maxDistance": 20, // maximum distance of fragments from main object
+        "minSize": 0.05 // minimum sizen of fragment: "main object area" * "minSize"
+    },
+    "regions": {
+        "save": true, // saves mask with regions
+        "iterations": 2 // number of cleaning iterations
+    }
+}

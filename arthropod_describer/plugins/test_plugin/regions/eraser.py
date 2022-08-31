@@ -1,15 +1,16 @@
-from typing import Optional, Set
+from typing import Optional, Set, List
 
 import numpy as np
 
-from arthropod_describer.common.photo import Photo, LabelType
-from arthropod_describer.common.plugin import RegionComputation, Info
+from arthropod_describer.common.common import Info
+from arthropod_describer.common.photo import Photo, LabelImg
+from arthropod_describer.common.plugin import RegionComputation
 
 
 class RegionEraser(RegionComputation):
     """
     NAME: Region eraser
-    DESC: Erases regions with the selected labels.
+    DESCRIPTION: Erases regions with the selected labels.
 
     REGION_RESTRICTED
     """
@@ -17,17 +18,8 @@ class RegionEraser(RegionComputation):
     def __init__(self, info: Optional[Info] = None):
         super().__init__(info)
 
-    @property
-    def requires(self) -> Set[LabelType]:
-        return {LabelType.REGIONS}
-
-    @property
-    def computes(self) -> Set[LabelType]:
-        return {LabelType.REGIONS}
-
-    def __call__(self, photo: Photo, labels: Optional[Set[int]] = None) -> Set[LabelType]:
-        cop = photo.segments_mask.label_img.copy()
+    def __call__(self, photo: Photo, labels: Optional[Set[int]] = None, storage=None) -> List[LabelImg]:
+        cop = photo['Labels'].clone()
         for lab in labels:
-            cop = np.where(cop == lab, 0, cop)
-        photo.segments_mask = cop
-        return {LabelType.REGIONS}
+            cop = np.where(cop.label_image == lab, 0, cop.label_image)
+        return [cop]

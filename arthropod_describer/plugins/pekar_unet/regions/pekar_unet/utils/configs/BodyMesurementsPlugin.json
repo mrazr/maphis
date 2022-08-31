@@ -1,0 +1,11 @@
+{
+    "contour": {
+        "identify": true,
+        "size": 100
+    },
+    "length": {
+        "extremeLength": true,
+        "identify": true,
+        "normalLength": true
+    }
+}

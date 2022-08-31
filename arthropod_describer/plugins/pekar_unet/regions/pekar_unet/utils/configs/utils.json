@@ -1,0 +1,9 @@
+// utils config file
+// !!! Do not edit key names
+{
+    "logs": {
+        "path": "logs.txt",
+        "fileLength": 100
+    },
+    "binPath": "bin"
+}

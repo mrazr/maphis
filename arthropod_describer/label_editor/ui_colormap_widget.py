@@ -90,7 +90,7 @@ class Ui_ColormapWidget(object):
         self.opacitySlider = QSlider(self.groupBox)
         self.opacitySlider.setObjectName(u"opacitySlider")
         self.opacitySlider.setMaximum(100)
-        self.opacitySlider.setValue(20)
+        self.opacitySlider.setValue(75)
         self.opacitySlider.setOrientation(Qt.Horizontal)
 
         self.verticalLayout.addWidget(self.opacitySlider)

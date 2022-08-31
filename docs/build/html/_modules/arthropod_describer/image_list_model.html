@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arthropod_describer.image_list_model &mdash; MAPHIS 0.1 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> MAPHIS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">arthropod_describer</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">MAPHIS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>arthropod_describer.image_list_model</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for arthropod_describer.image_list_model</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">typing</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+
+<span class="kn">import</span> <span class="nn">PySide2</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtCore</span> <span class="kn">import</span> <span class="n">QAbstractListModel</span><span class="p">,</span> <span class="n">QModelIndex</span><span class="p">,</span> <span class="n">Qt</span><span class="p">,</span> <span class="n">QSortFilterProxyModel</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtWidgets</span> <span class="kn">import</span> <span class="n">QWidget</span>
+
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.local_storage</span> <span class="kn">import</span> <span class="n">Storage</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.photo</span> <span class="kn">import</span> <span class="n">Photo</span><span class="p">,</span> <span class="n">UpdateContext</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.state</span> <span class="kn">import</span> <span class="n">State</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.thumbnail_storage</span> <span class="kn">import</span> <span class="n">ThumbnailStorage_</span>
+
+<span class="n">ROLE_IMAGE_NAME</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">UserRole</span> <span class="o">+</span> <span class="mi">1</span>
+<span class="n">ROLE_THUMBNAIL</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">UserRole</span> <span class="o">+</span> <span class="mi">3</span>
+<span class="n">ROLE_IS_APPROVED</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">UserRole</span> <span class="o">+</span> <span class="mi">42</span>
+<span class="n">ROLE_APPROVAL_COUNT</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">UserRole</span> <span class="o">+</span> <span class="mi">4</span>
+<span class="n">ROLE_IS_HIGHLIGHTED</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">UserRole</span> <span class="o">+</span> <span class="mi">5</span>
+<span class="n">ROLE_HAS_UNSAVED_CHANGES</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">UserRole</span> <span class="o">+</span> <span class="mi">6</span>
+<span class="n">ROLE_SCALE_MARKER_IMAGE</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">UserRole</span> <span class="o">+</span> <span class="mi">7</span>
+<span class="n">ROLE_IMAGE_PATH</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">UserRole</span> <span class="o">+</span> <span class="mi">8</span>
+<span class="n">ROLE_TAGS</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">UserRole</span> <span class="o">+</span> <span class="mi">9</span>
+
+
+<div class="viewcode-block" id="ImageListModel"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.image_list_model.ImageListModel">[docs]</a><span class="k">class</span> <span class="nc">ImageListModel</span><span class="p">(</span><span class="n">QAbstractListModel</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">QWidget</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">QAbstractListModel</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">highlighted_indexes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_paths</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># self.thumbnails: Optional[ThumbnailStorage] = None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dragging</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="p">:</span> <span class="n">Storage</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="ImageListModel.initialize"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.image_list_model.ImageListModel.initialize">[docs]</a>    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_paths</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Path</span><span class="p">],</span> <span class="n">thumbnail_storage</span><span class="p">:</span> <span class="n">ThumbnailStorage_</span><span class="p">,</span> <span class="n">processed_count</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">storage</span><span class="p">:</span> <span class="n">Storage</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">storage</span> <span class="o">=</span> <span class="n">storage</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">update_photo</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_handle_photo_update</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">storage_update</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_handle_storage_update</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thumbnail_storage</span> <span class="o">=</span> <span class="n">thumbnail_storage</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thumbnail_storage</span><span class="o">.</span><span class="n">update_photo</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_handle_thumbnail_update</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">highlighted_indexes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># if self.thumbnails is not None:</span>
+        <span class="c1">#     self.thumbnails.thumbnails_loaded.disconnect(self.handle_thumbnails_loaded)</span>
+        <span class="c1"># self.thumbnails = thumbnail_storage</span>
+        <span class="c1"># self.thumbnails.thumbnails_loaded.connect(self.handle_thumbnails_loaded)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">beginResetModel</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_paths</span> <span class="o">=</span> <span class="n">image_paths</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">endResetModel</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataChanged</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image_paths</span><span class="p">),</span> <span class="mi">0</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="ImageListModel.rowCount"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.image_list_model.ImageListModel.rowCount">[docs]</a>    <span class="k">def</span> <span class="nf">rowCount</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">QModelIndex</span> <span class="o">=</span> <span class="n">QModelIndex</span><span class="p">()):</span>
+        <span class="k">return</span> <span class="mi">0</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">image_count</span></div>
+
+<div class="viewcode-block" id="ImageListModel.columnCount"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.image_list_model.ImageListModel.columnCount">[docs]</a>    <span class="k">def</span> <span class="nf">columnCount</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">QModelIndex</span> <span class="o">=</span> <span class="n">QModelIndex</span><span class="p">()):</span>
+        <span class="k">return</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="ImageListModel.data"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.image_list_model.ImageListModel.data">[docs]</a>    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="n">QModelIndex</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="n">Qt</span><span class="o">.</span><span class="n">DisplayRole</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">index</span><span class="o">.</span><span class="n">isValid</span><span class="p">():</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">role</span> <span class="o">==</span> <span class="n">Qt</span><span class="o">.</span><span class="n">DisplayRole</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">index</span><span class="o">.</span><span class="n">column</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">image_names</span><span class="p">[</span><span class="n">index</span><span class="o">.</span><span class="n">row</span><span class="p">()]</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">role</span> <span class="o">==</span> <span class="n">ROLE_IMAGE_NAME</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">image_names</span><span class="p">[</span><span class="n">index</span><span class="o">.</span><span class="n">row</span><span class="p">()]</span>
+
+        <span class="k">if</span> <span class="n">role</span> <span class="o">==</span> <span class="n">ROLE_THUMBNAIL</span> <span class="ow">and</span> <span class="n">index</span><span class="o">.</span><span class="n">column</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">photo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">get_photo_by_idx</span><span class="p">(</span><span class="n">index</span><span class="o">.</span><span class="n">row</span><span class="p">(),</span> <span class="n">load_image</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">photo</span><span class="o">.</span><span class="n">thumbnail</span>
+
+        <span class="k">if</span> <span class="n">role</span> <span class="o">==</span> <span class="n">ROLE_IS_APPROVED</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">is_approved</span><span class="p">(</span><span class="n">index</span><span class="o">.</span><span class="n">row</span><span class="p">())</span>
+
+        <span class="k">if</span> <span class="n">role</span> <span class="o">==</span> <span class="n">ROLE_APPROVAL_COUNT</span><span class="p">:</span>
+            <span class="n">photo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">get_photo_by_idx</span><span class="p">(</span><span class="n">index</span><span class="o">.</span><span class="n">row</span><span class="p">(),</span> <span class="n">load_image</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">approval</span> <span class="o">=</span> <span class="n">photo</span><span class="o">.</span><span class="n">approved</span><span class="p">[</span><span class="s1">&#39;Labels&#39;</span><span class="p">]</span>
+            <span class="n">mask_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">get_label_hierarchy2</span><span class="p">(</span><span class="s1">&#39;Labels&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mask_names</span>
+            <span class="n">approval_count</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">approval</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">mask_names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">approval</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">return</span> <span class="n">approval_count</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">mask_names</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">role</span> <span class="o">==</span> <span class="n">ROLE_IS_HIGHLIGHTED</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">highlighted_indexes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">index</span><span class="o">.</span><span class="n">row</span><span class="p">()</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">highlighted_indexes</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">role</span> <span class="o">==</span> <span class="n">ROLE_HAS_UNSAVED_CHANGES</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">get_photo_by_idx</span><span class="p">(</span><span class="n">index</span><span class="o">.</span><span class="n">row</span><span class="p">(),</span> <span class="n">load_image</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">has_unsaved_changes</span>
+
+        <span class="k">if</span> <span class="n">role</span> <span class="o">==</span> <span class="n">ROLE_SCALE_MARKER_IMAGE</span><span class="p">:</span>
+            <span class="n">photo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">get_photo_by_idx</span><span class="p">(</span><span class="n">index</span><span class="o">.</span><span class="n">row</span><span class="p">(),</span> <span class="n">load_image</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">photo</span><span class="o">.</span><span class="n">scale_setting</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="n">photo</span><span class="o">.</span><span class="n">scale_setting</span><span class="o">.</span><span class="n">scale_marker_img</span>
+        <span class="k">if</span> <span class="n">role</span> <span class="o">==</span> <span class="n">ROLE_IMAGE_PATH</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">get_photo_by_idx</span><span class="p">(</span><span class="n">index</span><span class="o">.</span><span class="n">row</span><span class="p">(),</span> <span class="n">load_image</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">image_path</span>
+
+        <span class="k">if</span> <span class="n">role</span> <span class="o">==</span> <span class="n">ROLE_TAGS</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">get_photo_by_idx</span><span class="p">(</span><span class="n">index</span><span class="o">.</span><span class="n">row</span><span class="p">(),</span> <span class="n">load_image</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">tags</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="ImageListModel.highlight_indexes"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.image_list_model.ImageListModel.highlight_indexes">[docs]</a>    <span class="k">def</span> <span class="nf">highlight_indexes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idxs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">highlighted_indexes</span> <span class="o">=</span> <span class="n">idxs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataChanged</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">createIndex</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                              <span class="bp">self</span><span class="o">.</span><span class="n">createIndex</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rowCount</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="ImageListModel.handle_slider_pressed"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.image_list_model.ImageListModel.handle_slider_pressed">[docs]</a>    <span class="k">def</span> <span class="nf">handle_slider_pressed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dragging</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="ImageListModel.handle_slider_released"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.image_list_model.ImageListModel.handle_slider_released">[docs]</a>    <span class="k">def</span> <span class="nf">handle_slider_released</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">first_index</span><span class="p">:</span> <span class="n">QModelIndex</span><span class="p">,</span> <span class="n">last_index</span><span class="p">:</span> <span class="n">QModelIndex</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dragging</span> <span class="o">=</span> <span class="kc">False</span></div>
+        <span class="c1"># self.thumbnails.load_thumbnails(first_index.row() - 50, last_index.row() + 50)</span>
+
+<div class="viewcode-block" id="ImageListModel.handle_thumbnails_loaded"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.image_list_model.ImageListModel.handle_thumbnails_loaded">[docs]</a>    <span class="k">def</span> <span class="nf">handle_thumbnails_loaded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indices</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]):</span>
+        <span class="n">fidx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">indices</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">lidx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">indices</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataChanged</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">fidx</span><span class="p">,</span> <span class="n">lidx</span><span class="p">,</span> <span class="p">[</span><span class="n">ROLE_THUMBNAIL</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="ImageListModel.handle_approval_changed"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.image_list_model.ImageListModel.handle_approval_changed">[docs]</a>    <span class="k">def</span> <span class="nf">handle_approval_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">photo</span><span class="p">:</span> <span class="n">Photo</span><span class="p">):</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">image_names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">photo</span><span class="o">.</span><span class="n">image_name</span><span class="p">)</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataChanged</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="p">[</span><span class="n">ROLE_IS_APPROVED</span><span class="p">])</span></div>
+
+    <span class="k">def</span> <span class="nf">_handle_photo_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ctx</span><span class="p">:</span> <span class="n">UpdateContext</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]):</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">image_names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">img_name</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;tags&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dataChanged</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="p">[</span><span class="n">ROLE_TAGS</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">_handle_storage_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="s1">&#39;photos&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;deleted&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;photos&#39;</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">beginResetModel</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">endResetModel</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_handle_thumbnail_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ctx</span><span class="p">:</span> <span class="n">UpdateContext</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]):</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">image_names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">img_name</span><span class="p">)</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataChanged</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="p">[</span><span class="n">ROLE_THUMBNAIL</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="ImageListSortFilterProxyModel"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.image_list_model.ImageListSortFilterProxyModel">[docs]</a><span class="k">class</span> <span class="nc">ImageListSortFilterProxyModel</span><span class="p">(</span><span class="n">QSortFilterProxyModel</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">State</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">PySide2</span><span class="o">.</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QObject</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="o">=</span> <span class="n">state</span>
+
+<div class="viewcode-block" id="ImageListSortFilterProxyModel.filterAcceptsRow"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.image_list_model.ImageListSortFilterProxyModel.filterAcceptsRow">[docs]</a>    <span class="k">def</span> <span class="nf">filterAcceptsRow</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_row</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">source_parent</span><span class="p">:</span> <span class="n">PySide2</span><span class="o">.</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QModelIndex</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourceModel</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">source_row</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">source_parent</span><span class="p">)</span>
+        <span class="n">tags</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourceModel</span><span class="p">()</span><span class="o">.</span><span class="n">data</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">ROLE_TAGS</span><span class="p">)</span>
+        <span class="c1"># return self.filterRegExp().pattern() in tags</span>
+        <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_state</span><span class="o">.</span><span class="n">active_tags_filter</span><span class="p">)</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">tags</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, CBIA @ FI MUNI.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

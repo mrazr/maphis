@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arthropod_describer.plugins.test_plugin.properties.glcm_correlation &mdash; MAPHIS 0.1 documentation</title>
+      <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
+        <script src="../../../../../_static/jquery.js"></script>
+        <script src="../../../../../_static/underscore.js"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../../../_static/doctools.js"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../../../index.html" class="icon icon-home"> MAPHIS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../modules.html">arthropod_describer</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">MAPHIS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../../../index.html">Module code</a> &raquo;</li>
+      <li>arthropod_describer.plugins.test_plugin.properties.glcm_correlation</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for arthropod_describer.plugins.test_plugin.properties.glcm_correlation</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">typing</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">skimage</span> <span class="kn">import</span> <span class="n">img_as_ubyte</span>
+<span class="kn">from</span> <span class="nn">skimage.color</span> <span class="kn">import</span> <span class="n">rgb2hsv</span>
+<span class="kn">from</span> <span class="nn">skimage.feature</span> <span class="kn">import</span> <span class="n">graycoprops</span><span class="p">,</span> <span class="n">graycomatrix</span>
+
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.common</span> <span class="kn">import</span> <span class="n">Info</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.label_image</span> <span class="kn">import</span> <span class="n">RegionProperty</span><span class="p">,</span> <span class="n">PropertyType</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.photo</span> <span class="kn">import</span> <span class="n">Photo</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.plugin</span> <span class="kn">import</span> <span class="n">PropertyComputation</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.regions_cache</span> <span class="kn">import</span> <span class="n">RegionsCache</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.units</span> <span class="kn">import</span> <span class="n">UnitStore</span><span class="p">,</span> <span class="n">convert_value</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.user_params</span> <span class="kn">import</span> <span class="n">UserParam</span>
+
+
+<div class="viewcode-block" id="GLCMCorrelation"><a class="viewcode-back" href="../../../../../arthropod_describer.plugins.test_plugin.properties.html#arthropod_describer.plugins.test_plugin.properties.glcm_correlation.GLCMCorrelation">[docs]</a><span class="k">class</span> <span class="nc">GLCMCorrelation</span><span class="p">(</span><span class="n">PropertyComputation</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    GROUP: GLCM properties</span>
+<span class="sd">    NAME: Correlation</span>
+<span class="sd">    DESCRIPTION: GLCM correlation of the region</span>
+<span class="sd">    KEY: correlation</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">info</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Info</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">photo</span><span class="p">:</span> <span class="n">Photo</span><span class="p">,</span> <span class="n">region_labels</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">regions_cache</span><span class="p">:</span> <span class="n">RegionsCache</span><span class="p">)</span> <span class="o">-&gt;</span> \
+            <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">RegionProperty</span><span class="p">]:</span>
+
+        <span class="k">if</span> <span class="s1">&#39;photo_hsv&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">regions_cache</span><span class="o">.</span><span class="n">data_storage</span><span class="p">:</span>
+            <span class="n">regions_cache</span><span class="o">.</span><span class="n">data_storage</span><span class="p">[</span><span class="s1">&#39;photo_hsv&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rgb2hsv</span><span class="p">(</span><span class="n">photo</span><span class="o">.</span><span class="n">image</span><span class="p">)</span>
+
+        <span class="n">photo_image_hsv</span> <span class="o">=</span> <span class="n">regions_cache</span><span class="o">.</span><span class="n">data_storage</span><span class="p">[</span><span class="s1">&#39;photo_hsv&#39;</span><span class="p">]</span>
+        <span class="n">props</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">RegionProperty</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">lab_img</span> <span class="o">=</span> <span class="n">photo</span><span class="p">[</span><span class="s1">&#39;Labels&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">label_image</span>
+        <span class="n">refl</span> <span class="o">=</span> <span class="n">photo</span><span class="p">[</span><span class="s1">&#39;Reflections&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">label_image</span>
+
+        <span class="n">distances_in_mm</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.02</span><span class="p">,</span> <span class="mf">0.04</span><span class="p">,</span> <span class="mf">0.06</span><span class="p">]</span>  <span class="c1"># The GLCM will be calculated for these distances (in mm). TODO: Allow this to be user-specified (at least from some config file).</span>
+        <span class="k">if</span> <span class="n">photo</span><span class="o">.</span><span class="n">image_scale</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">photo</span><span class="o">.</span><span class="n">image_scale</span><span class="o">.</span><span class="n">value</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">unit_store</span> <span class="o">=</span> <span class="n">UnitStore</span><span class="p">()</span>
+            <span class="n">scale_in_px_per_mm</span> <span class="o">=</span> <span class="n">convert_value</span><span class="p">(</span><span class="n">photo</span><span class="o">.</span><span class="n">image_scale</span><span class="p">,</span> <span class="n">unit_store</span><span class="o">.</span><span class="n">units</span><span class="p">[</span><span class="s2">&quot;px/mm&quot;</span><span class="p">])</span>
+            <span class="n">distances_in_px</span> <span class="o">=</span> <span class="p">[</span><span class="nb">round</span><span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="n">scale_in_px_per_mm</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">distances_in_mm</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">distances_in_px</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+        <span class="c1">#print(f&quot;distances_in_px: {distances_in_px}&quot;)</span>
+
+        <span class="n">angles</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">]</span>  <span class="c1"># The GLCM will be calculated for these angles (in radians). TODO: Maybe turn on the symmetry in graycomatrix(), and only use half the range of the angles?</span>
+
+        <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">region_labels</span><span class="p">:</span>
+            <span class="c1"># Prepare a list of all GLCM properties requested for the current label, e.g. [&quot;contrast&quot;, &quot;homogeneity&quot;].</span>
+            <span class="c1"># properties_for_current_label = [glcm_property for glcm_property, label_list in prop_labels.items() if label in label_list]</span>
+
+            <span class="c1"># Binary mask of the current region, excluding the reflections.</span>
+            <span class="c1"># current_region_mask = np.logical_and(lab_img == label, refl == 0)</span>
+            <span class="k">if</span> <span class="n">label</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">regions_cache</span><span class="o">.</span><span class="n">regions</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">region_obj</span> <span class="o">=</span> <span class="n">regions_cache</span><span class="o">.</span><span class="n">regions</span><span class="p">[</span><span class="n">label</span><span class="p">]</span>
+            <span class="n">top</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="n">region_obj</span><span class="o">.</span><span class="n">bbox</span>
+            <span class="n">refl_roi</span> <span class="o">=</span> <span class="n">refl</span><span class="p">[</span><span class="n">top</span><span class="p">:</span><span class="n">top</span> <span class="o">+</span> <span class="n">height</span><span class="p">,</span> <span class="n">left</span><span class="p">:</span><span class="n">left</span> <span class="o">+</span> <span class="n">width</span><span class="p">]</span>
+
+            <span class="n">current_region_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">region_obj</span><span class="o">.</span><span class="n">mask</span><span class="p">,</span> <span class="n">refl_roi</span><span class="p">)</span>
+            <span class="n">photo_image_hsv_roi</span> <span class="o">=</span> <span class="n">photo_image_hsv</span><span class="p">[</span><span class="n">region_obj</span><span class="o">.</span><span class="n">bbox</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span><span class="n">region_obj</span><span class="o">.</span><span class="n">bbox</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">region_obj</span><span class="o">.</span><span class="n">mask</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                  <span class="n">region_obj</span><span class="o">.</span><span class="n">bbox</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">region_obj</span><span class="o">.</span><span class="n">bbox</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">region_obj</span><span class="o">.</span><span class="n">mask</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+
+            <span class="c1"># Prepare the GLCMs for all channels.</span>
+            <span class="n">filtered_glcms</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">current_channel</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+                <span class="n">current_channel_values</span> <span class="o">=</span> <span class="n">img_as_ubyte</span><span class="p">(</span><span class="n">photo_image_hsv_roi</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">current_channel</span><span class="p">])</span>
+                <span class="c1"># Make sure no pixel has the max value, so we can do the +1 in the next step, and use &quot;0&quot; exclusively as &quot;pixels to be ignored&quot;.</span>
+                <span class="n">current_channel_values</span><span class="p">[</span><span class="n">current_channel_values</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">iinfo</span><span class="p">(</span><span class="n">current_channel_values</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">iinfo</span><span class="p">(</span><span class="n">current_channel_values</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span><span class="o">.</span><span class="n">max</span> <span class="o">-</span> <span class="mi">1</span>
+                <span class="n">current_channel_values_masked</span> <span class="o">=</span> <span class="n">current_channel_values</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="n">current_channel_values_masked</span><span class="p">[</span><span class="n">current_region_mask</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="c1"># Whole image GLCM with pixels outside the current region zeroed-out, as a base for the filtered version.</span>
+                <span class="n">glcm</span> <span class="o">=</span> <span class="n">graycomatrix</span><span class="p">(</span><span class="n">current_channel_values_masked</span><span class="p">,</span> <span class="n">distances_in_px</span><span class="p">,</span> <span class="n">angles</span><span class="p">)</span>
+                <span class="c1"># GLCM of only the pixels belonging to the current region.</span>
+                <span class="n">filtered_glcms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">glcm</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:,</span> <span class="p">:,</span> <span class="p">:])</span>
+
+            <span class="c1"># Extract the requested properties from the GLCMs for each channel and append to props.</span>
+            <span class="c1"># for glcm_property in properties_for_current_label:</span>
+            <span class="n">current_property_values_for_all_channels</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">current_channel</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+                <span class="n">current_property_values_for_current_channel</span> <span class="o">=</span> <span class="n">graycoprops</span><span class="p">(</span><span class="n">filtered_glcms</span><span class="p">[</span><span class="n">current_channel</span><span class="p">],</span> <span class="n">prop</span><span class="o">=</span><span class="s1">&#39;correlation&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                <span class="n">current_property_values_for_all_channels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_property_values_for_current_channel</span><span class="p">)</span>
+            <span class="c1"># Append the results to props -- each requested property as one item containing three matrices (one for each HSV channel).</span>
+            <span class="n">prop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">example</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">key</span><span class="p">)</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">)</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">current_property_values_for_all_channels</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_no_unit</span><span class="p">)</span>
+            <span class="c1"># prop.prop_type = PropertyType.NDArray  # TODO: Maybe create a specific property type `Matrix` for this?</span>
+            <span class="c1"># prop.val_names = [&quot;H&quot;, &quot;S&quot;, &quot;V&quot;]</span>
+            <span class="c1"># prop.num_vals = 3</span>
+            <span class="n">props</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prop</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">props</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">user_params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">UserParam</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">user_params</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">region_restricted</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">region_restricted</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">computes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Info</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">key</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">}</span>
+
+<div class="viewcode-block" id="GLCMCorrelation.example"><a class="viewcode-back" href="../../../../../arthropod_describer.plugins.test_plugin.properties.html#arthropod_describer.plugins.test_plugin.properties.glcm_correlation.GLCMCorrelation.example">[docs]</a>    <span class="k">def</span> <span class="nf">example</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prop_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RegionProperty</span><span class="p">:</span>
+        <span class="n">prop</span> <span class="o">=</span> <span class="n">RegionProperty</span><span class="p">()</span>
+        <span class="n">prop</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">prop</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">prop</span><span class="o">.</span><span class="n">val_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;H&#39;</span><span class="p">,</span> <span class="s1">&#39;S&#39;</span><span class="p">,</span> <span class="s1">&#39;V&#39;</span><span class="p">]</span>
+        <span class="n">prop</span><span class="o">.</span><span class="n">row_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;distance 0.02 mm&#39;</span><span class="p">,</span> <span class="s1">&#39;distance 0.04 mm&#39;</span><span class="p">,</span> <span class="s1">&#39;distance 0.06 mm&#39;</span><span class="p">]</span>
+        <span class="n">prop</span><span class="o">.</span><span class="n">col_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;angle 0°&#39;</span><span class="p">,</span> <span class="s1">&#39;angle 90°&#39;</span><span class="p">,</span> <span class="s1">&#39;angle 180°&#39;</span><span class="p">,</span> <span class="s1">&#39;angle 270°&#39;</span><span class="p">]</span>
+        <span class="n">prop</span><span class="o">.</span><span class="n">num_vals</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="n">prop</span><span class="o">.</span><span class="n">prop_type</span> <span class="o">=</span> <span class="n">PropertyType</span><span class="o">.</span><span class="n">NDArray</span>
+        <span class="n">prop</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">prop</span></div>
+
+<div class="viewcode-block" id="GLCMCorrelation.target_worksheet"><a class="viewcode-back" href="../../../../../arthropod_describer.plugins.test_plugin.properties.html#arthropod_describer.plugins.test_plugin.properties.glcm_correlation.GLCMCorrelation.target_worksheet">[docs]</a>    <span class="k">def</span> <span class="nf">target_worksheet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prop_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;GLCM&quot;</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">group</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">group</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, CBIA @ FI MUNI.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arthropod_describer.common.photo_layer &mdash; MAPHIS 0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> MAPHIS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">arthropod_describer</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">MAPHIS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>arthropod_describer.common.photo_layer</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for arthropod_describer.common.photo_layer</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+
+<span class="kn">import</span> <span class="nn">PySide2</span>
+<span class="kn">import</span> <span class="nn">qimage2ndarray</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtCore</span> <span class="kn">import</span> <span class="n">QRectF</span><span class="p">,</span> <span class="n">QRect</span><span class="p">,</span> <span class="n">QPointF</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtGui</span> <span class="kn">import</span> <span class="n">QPixmap</span><span class="p">,</span> <span class="n">QImage</span><span class="p">,</span> <span class="n">Qt</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtWidgets</span> <span class="kn">import</span> <span class="n">QGraphicsPixmapItem</span>
+
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.layer</span> <span class="kn">import</span> <span class="n">Layer</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.photo</span> <span class="kn">import</span> <span class="n">Photo</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.state</span> <span class="kn">import</span> <span class="n">State</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.tool</span> <span class="kn">import</span> <span class="n">Tool</span><span class="p">,</span> <span class="n">EditContext</span>
+
+
+<div class="viewcode-block" id="PhotoLayer"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.photo_layer.PhotoLayer">[docs]</a><span class="k">class</span> <span class="nc">PhotoLayer</span><span class="p">(</span><span class="n">Layer</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">State</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PySide2</span><span class="o">.</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QGraphicsItem</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">state</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_image_pixmap</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">QPixmap</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_gpixmap</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">QGraphicsPixmapItem</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">photo_rect</span> <span class="o">=</span> <span class="n">QRect</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setAcceptedMouseButtons</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">NoButton</span><span class="p">)</span>
+
+<div class="viewcode-block" id="PhotoLayer.initialize"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.photo_layer.PhotoLayer.initialize">[docs]</a>    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_image_pixmap</span> <span class="o">=</span> <span class="n">QPixmap</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_gpixmap</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="p">()</span><span class="o">.</span><span class="n">addPixmap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_image_pixmap</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_gpixmap</span><span class="o">.</span><span class="n">setZValue</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PhotoLayer.set_tool"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.photo_layer.PhotoLayer.set_tool">[docs]</a>    <span class="k">def</span> <span class="nf">set_tool</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tool</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tool</span><span class="p">],</span> <span class="n">reset_current</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+    <span class="k">def</span> <span class="nf">_create_context</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EditContext</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">_set_pixmaps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span> <span class="n">QImage</span><span class="p">,</span> <span class="n">pixmap</span><span class="p">:</span> <span class="n">QPixmap</span><span class="p">,</span> <span class="n">gpixmap</span><span class="p">:</span> <span class="n">QGraphicsPixmapItem</span><span class="p">):</span>
+        <span class="n">pixmap</span><span class="o">.</span><span class="n">convertFromImage</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">Qt</span><span class="o">.</span><span class="n">MonoOnly</span><span class="p">)</span>
+        <span class="n">gpixmap</span><span class="o">.</span><span class="n">setPixmap</span><span class="p">(</span><span class="n">pixmap</span><span class="p">)</span>
+
+        <span class="n">gpixmap</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="n">QPointF</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span>
+        <span class="n">gpixmap</span><span class="o">.</span><span class="n">setTransformOriginPoint</span><span class="p">(</span><span class="n">pixmap</span><span class="o">.</span><span class="n">rect</span><span class="p">()</span><span class="o">.</span><span class="n">center</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">photo_rect</span> <span class="o">=</span> <span class="n">gpixmap</span><span class="o">.</span><span class="n">boundingRect</span><span class="p">()</span>
+        <span class="n">gpixmap</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+        <span class="n">gpixmap</span><span class="o">.</span><span class="n">setZValue</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="c1"># TODO let setting sceneRect be the responsibility of ImageViewer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="p">()</span><span class="o">.</span><span class="n">setSceneRect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">photo_rect</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="p">()</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+
+<div class="viewcode-block" id="PhotoLayer.set_photo"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.photo_layer.PhotoLayer.set_photo">[docs]</a>    <span class="k">def</span> <span class="nf">set_photo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">photo</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Photo</span><span class="p">],</span> <span class="n">reset_tool</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prepareGeometryChange</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">photo</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">image_gpixmap</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">image_gpixmap</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># img = nd2qimage(photo.image)</span>
+        <span class="n">img</span> <span class="o">=</span> <span class="n">qimage2ndarray</span><span class="o">.</span><span class="n">array2qimage</span><span class="p">(</span><span class="n">photo</span><span class="o">.</span><span class="n">image</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_pixmaps</span><span class="p">(</span><span class="n">img</span><span class="p">,</span>
+                          <span class="bp">self</span><span class="o">.</span><span class="n">_image_pixmap</span><span class="p">,</span>
+                          <span class="bp">self</span><span class="o">.</span><span class="n">image_gpixmap</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PhotoLayer.boundingRect"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.photo_layer.PhotoLayer.boundingRect">[docs]</a>    <span class="k">def</span> <span class="nf">boundingRect</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PySide2</span><span class="o">.</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QRectF</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">current_photo</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">photo_rect</span>
+        <span class="k">return</span> <span class="n">QRectF</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="PhotoLayer.paint"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.photo_layer.PhotoLayer.paint">[docs]</a>    <span class="k">def</span> <span class="nf">paint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">painter</span><span class="p">:</span> <span class="n">PySide2</span><span class="o">.</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPainter</span><span class="p">,</span> <span class="n">option</span><span class="p">:</span> <span class="n">PySide2</span><span class="o">.</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QStyleOptionGraphicsItem</span><span class="p">,</span>
+              <span class="n">widget</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PySide2</span><span class="o">.</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QWidget</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">pass</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, CBIA @ FI MUNI.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

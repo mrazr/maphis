@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arthropod_describer.ui_arthropod_describer &mdash; MAPHIS 0.1 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> MAPHIS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">arthropod_describer</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">MAPHIS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>arthropod_describer.ui_arthropod_describer</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for arthropod_describer.ui_arthropod_describer</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1">################################################################################</span>
+<span class="c1">## Form generated from reading UI file &#39;arthropod_describer.ui&#39;</span>
+<span class="c1">##</span>
+<span class="c1">## Created by: Qt User Interface Compiler version 5.14.2</span>
+<span class="c1">##</span>
+<span class="c1">## WARNING! All changes made in this file will be lost when recompiling UI file!</span>
+<span class="c1">################################################################################</span>
+
+<span class="kn">from</span> <span class="nn">PySide2.QtCore</span> <span class="kn">import</span> <span class="p">(</span><span class="n">QCoreApplication</span><span class="p">,</span> <span class="n">QDate</span><span class="p">,</span> <span class="n">QDateTime</span><span class="p">,</span> <span class="n">QMetaObject</span><span class="p">,</span>
+    <span class="n">QObject</span><span class="p">,</span> <span class="n">QPoint</span><span class="p">,</span> <span class="n">QRect</span><span class="p">,</span> <span class="n">QSize</span><span class="p">,</span> <span class="n">QTime</span><span class="p">,</span> <span class="n">QUrl</span><span class="p">,</span> <span class="n">Qt</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtGui</span> <span class="kn">import</span> <span class="p">(</span><span class="n">QBrush</span><span class="p">,</span> <span class="n">QColor</span><span class="p">,</span> <span class="n">QConicalGradient</span><span class="p">,</span> <span class="n">QCursor</span><span class="p">,</span> <span class="n">QFont</span><span class="p">,</span>
+    <span class="n">QFontDatabase</span><span class="p">,</span> <span class="n">QIcon</span><span class="p">,</span> <span class="n">QKeySequence</span><span class="p">,</span> <span class="n">QLinearGradient</span><span class="p">,</span> <span class="n">QPalette</span><span class="p">,</span> <span class="n">QPainter</span><span class="p">,</span>
+    <span class="n">QPixmap</span><span class="p">,</span> <span class="n">QRadialGradient</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtWidgets</span> <span class="kn">import</span> <span class="o">*</span>
+
+
+<div class="viewcode-block" id="Ui_ArhtropodDescriber"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.ui_arthropod_describer.Ui_ArhtropodDescriber">[docs]</a><span class="k">class</span> <span class="nc">Ui_ArhtropodDescriber</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Ui_ArhtropodDescriber.setupUi"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.ui_arthropod_describer.Ui_ArhtropodDescriber.setupUi">[docs]</a>    <span class="k">def</span> <span class="nf">setupUi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ArhtropodDescriber</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ArhtropodDescriber</span><span class="o">.</span><span class="n">objectName</span><span class="p">():</span>
+            <span class="n">ArhtropodDescriber</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;ArhtropodDescriber&quot;</span><span class="p">)</span>
+        <span class="n">ArhtropodDescriber</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="mi">925</span><span class="p">,</span> <span class="mi">481</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionCreateProject</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="n">ArhtropodDescriber</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionCreateProject</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;actionCreateProject&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionOpenProject</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="n">ArhtropodDescriber</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionOpenProject</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;actionOpenProject&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionRecentlyOpened</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="n">ArhtropodDescriber</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionRecentlyOpened</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;actionRecentlyOpened&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionRecentlyOpened</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionImportPhotos</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="n">ArhtropodDescriber</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionImportPhotos</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;actionImportPhotos&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionImportPhotos</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionVersion</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="n">ArhtropodDescriber</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionVersion</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;actionVersion&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionUndo</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="n">ArhtropodDescriber</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionUndo</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;actionUndo&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionRedo</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="n">ArhtropodDescriber</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionRedo</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;actionRedo&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionRedo</span><span class="o">.</span><span class="n">setShortcutContext</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">WindowShortcut</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionOpen_project_folder</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="n">ArhtropodDescriber</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionOpen_project_folder</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;actionOpen_project_folder&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionOpen_project_folder</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionExit</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="n">ArhtropodDescriber</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionExit</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;actionExit&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionSave</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="n">ArhtropodDescriber</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionSave</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;actionSave&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionSave</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">centralwidget</span> <span class="o">=</span> <span class="n">QWidget</span><span class="p">(</span><span class="n">ArhtropodDescriber</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">centralwidget</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;centralwidget&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout</span> <span class="o">=</span> <span class="n">QHBoxLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">centralwidget</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;horizontalLayout&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">imageListLayout</span> <span class="o">=</span> <span class="n">QVBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">imageListLayout</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;imageListLayout&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">imageListLayout</span><span class="o">.</span><span class="n">setContentsMargins</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tagsLayout</span> <span class="o">=</span> <span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tagsLayout</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;tagsLayout&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tagsLayout</span><span class="o">.</span><span class="n">setContentsMargins</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lblTagFilter</span> <span class="o">=</span> <span class="n">QLabel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">centralwidget</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lblTagFilter</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;lblTagFilter&quot;</span><span class="p">)</span>
+        <span class="n">sizePolicy</span> <span class="o">=</span> <span class="n">QSizePolicy</span><span class="p">(</span><span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Maximum</span><span class="p">,</span> <span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Preferred</span><span class="p">)</span>
+        <span class="n">sizePolicy</span><span class="o">.</span><span class="n">setHorizontalStretch</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">sizePolicy</span><span class="o">.</span><span class="n">setVerticalStretch</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">sizePolicy</span><span class="o">.</span><span class="n">setHeightForWidth</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lblTagFilter</span><span class="o">.</span><span class="n">sizePolicy</span><span class="p">()</span><span class="o">.</span><span class="n">hasHeightForWidth</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lblTagFilter</span><span class="o">.</span><span class="n">setSizePolicy</span><span class="p">(</span><span class="n">sizePolicy</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tagsLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lblTagFilter</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cmbTags</span> <span class="o">=</span> <span class="n">QComboBox</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">centralwidget</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cmbTags</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;cmbTags&quot;</span><span class="p">)</span>
+        <span class="n">sizePolicy1</span> <span class="o">=</span> <span class="n">QSizePolicy</span><span class="p">(</span><span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Preferred</span><span class="p">,</span> <span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Fixed</span><span class="p">)</span>
+        <span class="n">sizePolicy1</span><span class="o">.</span><span class="n">setHorizontalStretch</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">sizePolicy1</span><span class="o">.</span><span class="n">setVerticalStretch</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">sizePolicy1</span><span class="o">.</span><span class="n">setHeightForWidth</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cmbTags</span><span class="o">.</span><span class="n">sizePolicy</span><span class="p">()</span><span class="o">.</span><span class="n">hasHeightForWidth</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cmbTags</span><span class="o">.</span><span class="n">setSizePolicy</span><span class="p">(</span><span class="n">sizePolicy1</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tagsLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cmbTags</span><span class="p">)</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">imageListLayout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tagsLayout</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">imageListView</span> <span class="o">=</span> <span class="n">QListView</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">centralwidget</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">imageListView</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;imageListView&quot;</span><span class="p">)</span>
+        <span class="n">sizePolicy2</span> <span class="o">=</span> <span class="n">QSizePolicy</span><span class="p">(</span><span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Minimum</span><span class="p">,</span> <span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Expanding</span><span class="p">)</span>
+        <span class="n">sizePolicy2</span><span class="o">.</span><span class="n">setHorizontalStretch</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">sizePolicy2</span><span class="o">.</span><span class="n">setVerticalStretch</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">sizePolicy2</span><span class="o">.</span><span class="n">setHeightForWidth</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">imageListView</span><span class="o">.</span><span class="n">sizePolicy</span><span class="p">()</span><span class="o">.</span><span class="n">hasHeightForWidth</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">imageListView</span><span class="o">.</span><span class="n">setSizePolicy</span><span class="p">(</span><span class="n">sizePolicy2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">imageListView</span><span class="o">.</span><span class="n">setSizeAdjustPolicy</span><span class="p">(</span><span class="n">QAbstractScrollArea</span><span class="o">.</span><span class="n">AdjustIgnored</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">imageListView</span><span class="o">.</span><span class="n">setSelectionMode</span><span class="p">(</span><span class="n">QAbstractItemView</span><span class="o">.</span><span class="n">MultiSelection</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">imageListView</span><span class="o">.</span><span class="n">setVerticalScrollMode</span><span class="p">(</span><span class="n">QAbstractItemView</span><span class="o">.</span><span class="n">ScrollPerPixel</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">imageListLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">imageListView</span><span class="p">)</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">imageListLayout</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tabWidget</span> <span class="o">=</span> <span class="n">QTabWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">centralwidget</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tabWidget</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;tabWidget&quot;</span><span class="p">)</span>
+        <span class="n">sizePolicy3</span> <span class="o">=</span> <span class="n">QSizePolicy</span><span class="p">(</span><span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Expanding</span><span class="p">,</span> <span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Preferred</span><span class="p">)</span>
+        <span class="n">sizePolicy3</span><span class="o">.</span><span class="n">setHorizontalStretch</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">sizePolicy3</span><span class="o">.</span><span class="n">setVerticalStretch</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">sizePolicy3</span><span class="o">.</span><span class="n">setHeightForWidth</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tabWidget</span><span class="o">.</span><span class="n">sizePolicy</span><span class="p">()</span><span class="o">.</span><span class="n">hasHeightForWidth</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tabWidget</span><span class="o">.</span><span class="n">setSizePolicy</span><span class="p">(</span><span class="n">sizePolicy3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tabLabelEditor</span> <span class="o">=</span> <span class="n">QWidget</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tabLabelEditor</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;tabLabelEditor&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tabWidget</span><span class="o">.</span><span class="n">addTab</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tabLabelEditor</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tabMeasurements</span> <span class="o">=</span> <span class="n">QWidget</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tabMeasurements</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;tabMeasurements&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tabWidget</span><span class="o">.</span><span class="n">addTab</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tabMeasurements</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tabWidget</span><span class="p">)</span>
+
+        <span class="n">ArhtropodDescriber</span><span class="o">.</span><span class="n">setCentralWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">centralwidget</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar</span> <span class="o">=</span> <span class="n">QMenuBar</span><span class="p">(</span><span class="n">ArhtropodDescriber</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;menubar&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar</span><span class="o">.</span><span class="n">setGeometry</span><span class="p">(</span><span class="n">QRect</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">925</span><span class="p">,</span> <span class="mi">22</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menuFile</span> <span class="o">=</span> <span class="n">QMenu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">menubar</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menuFile</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;menuFile&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menuAbout</span> <span class="o">=</span> <span class="n">QMenu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">menubar</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menuAbout</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;menuAbout&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menuEdit</span> <span class="o">=</span> <span class="n">QMenu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">menubar</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menuEdit</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;menuEdit&quot;</span><span class="p">)</span>
+        <span class="n">ArhtropodDescriber</span><span class="o">.</span><span class="n">setMenuBar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">menubar</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">statusbar</span> <span class="o">=</span> <span class="n">QStatusBar</span><span class="p">(</span><span class="n">ArhtropodDescriber</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">statusbar</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;statusbar&quot;</span><span class="p">)</span>
+        <span class="n">ArhtropodDescriber</span><span class="o">.</span><span class="n">setStatusBar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">statusbar</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">menuFile</span><span class="o">.</span><span class="n">menuAction</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">menuEdit</span><span class="o">.</span><span class="n">menuAction</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">menuAbout</span><span class="o">.</span><span class="n">menuAction</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menuFile</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">actionCreateProject</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menuFile</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">actionOpenProject</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menuFile</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">actionRecentlyOpened</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menuFile</span><span class="o">.</span><span class="n">addSeparator</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menuFile</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">actionSave</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menuFile</span><span class="o">.</span><span class="n">addSeparator</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menuFile</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">actionImportPhotos</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menuFile</span><span class="o">.</span><span class="n">addSeparator</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menuFile</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">actionOpen_project_folder</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menuFile</span><span class="o">.</span><span class="n">addSeparator</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menuFile</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">actionExit</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menuAbout</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">actionVersion</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menuEdit</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">actionUndo</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menuEdit</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">actionRedo</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">retranslateUi</span><span class="p">(</span><span class="n">ArhtropodDescriber</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tabWidget</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+
+        <span class="n">QMetaObject</span><span class="o">.</span><span class="n">connectSlotsByName</span><span class="p">(</span><span class="n">ArhtropodDescriber</span><span class="p">)</span></div>
+    <span class="c1"># setupUi</span>
+
+<div class="viewcode-block" id="Ui_ArhtropodDescriber.retranslateUi"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.ui_arthropod_describer.Ui_ArhtropodDescriber.retranslateUi">[docs]</a>    <span class="k">def</span> <span class="nf">retranslateUi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ArhtropodDescriber</span><span class="p">):</span>
+        <span class="n">ArhtropodDescriber</span><span class="o">.</span><span class="n">setWindowTitle</span><span class="p">(</span><span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;ArhtropodDescriber&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;Arthropod Describer&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionCreateProject</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;ArhtropodDescriber&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;&amp;New project...&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+<span class="c1">#if QT_CONFIG(shortcut)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionCreateProject</span><span class="o">.</span><span class="n">setShortcut</span><span class="p">(</span><span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;ArhtropodDescriber&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;Ctrl+N&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+<span class="c1">#endif // QT_CONFIG(shortcut)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionOpenProject</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;ArhtropodDescriber&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;&amp;Open project...&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+<span class="c1">#if QT_CONFIG(shortcut)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionOpenProject</span><span class="o">.</span><span class="n">setShortcut</span><span class="p">(</span><span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;ArhtropodDescriber&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;Ctrl+O&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+<span class="c1">#endif // QT_CONFIG(shortcut)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionRecentlyOpened</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;ArhtropodDescriber&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;&amp;Recent projects&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionImportPhotos</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;ArhtropodDescriber&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;&amp;Import photos...&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+<span class="c1">#if QT_CONFIG(shortcut)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionImportPhotos</span><span class="o">.</span><span class="n">setShortcut</span><span class="p">(</span><span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;ArhtropodDescriber&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;Ctrl+I&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+<span class="c1">#endif // QT_CONFIG(shortcut)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionVersion</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;ArhtropodDescriber&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;&amp;Version&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionUndo</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;ArhtropodDescriber&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;&amp;Undo&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+<span class="c1">#if QT_CONFIG(shortcut)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionUndo</span><span class="o">.</span><span class="n">setShortcut</span><span class="p">(</span><span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;ArhtropodDescriber&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;Ctrl+Z&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+<span class="c1">#endif // QT_CONFIG(shortcut)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionRedo</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;ArhtropodDescriber&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;&amp;Redo&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+<span class="c1">#if QT_CONFIG(shortcut)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionRedo</span><span class="o">.</span><span class="n">setShortcut</span><span class="p">(</span><span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;ArhtropodDescriber&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;Ctrl+Y&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+<span class="c1">#endif // QT_CONFIG(shortcut)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionOpen_project_folder</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;ArhtropodDescriber&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;Show project &amp;folder in explorer&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionExit</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;ArhtropodDescriber&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;E&amp;xit&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionSave</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;ArhtropodDescriber&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;&amp;Save&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+<span class="c1">#if QT_CONFIG(shortcut)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionSave</span><span class="o">.</span><span class="n">setShortcut</span><span class="p">(</span><span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;ArhtropodDescriber&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;Ctrl+S&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+<span class="c1">#endif // QT_CONFIG(shortcut)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lblTagFilter</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;ArhtropodDescriber&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;Tag filter:&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cmbTags</span><span class="o">.</span><span class="n">setCurrentText</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tabWidget</span><span class="o">.</span><span class="n">setTabText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tabWidget</span><span class="o">.</span><span class="n">indexOf</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tabLabelEditor</span><span class="p">),</span> <span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;ArhtropodDescriber&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;Label editor&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tabWidget</span><span class="o">.</span><span class="n">setTabText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tabWidget</span><span class="o">.</span><span class="n">indexOf</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tabMeasurements</span><span class="p">),</span> <span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;ArhtropodDescriber&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;Measurements&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menuFile</span><span class="o">.</span><span class="n">setTitle</span><span class="p">(</span><span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;ArhtropodDescriber&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;&amp;File&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menuAbout</span><span class="o">.</span><span class="n">setTitle</span><span class="p">(</span><span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;ArhtropodDescriber&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;&amp;About&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menuEdit</span><span class="o">.</span><span class="n">setTitle</span><span class="p">(</span><span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;ArhtropodDescriber&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;&amp;Edit&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span></div></div>
+    <span class="c1"># retranslateUi</span>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, CBIA @ FI MUNI.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

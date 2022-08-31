@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arthropod_describer.measurements_viewer.measurements_model &mdash; MAPHIS 0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> MAPHIS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">arthropod_describer</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">MAPHIS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>arthropod_describer.measurements_viewer.measurements_model</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for arthropod_describer.measurements_viewer.measurements_model</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">typing</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span>
+<span class="kn">import</span> <span class="nn">functools</span>
+
+<span class="kn">import</span> <span class="nn">PySide2</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">qimage2ndarray</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtCore</span> <span class="kn">import</span> <span class="n">QAbstractTableModel</span><span class="p">,</span> <span class="n">QModelIndex</span><span class="p">,</span> <span class="n">Qt</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtGui</span> <span class="kn">import</span> <span class="n">QVector3D</span><span class="p">,</span> <span class="n">QColor</span><span class="p">,</span> <span class="n">QPixmap</span>
+<span class="kn">from</span> <span class="nn">skimage.color</span> <span class="kn">import</span> <span class="n">hsv2rgb</span>
+
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.label_image</span> <span class="kn">import</span> <span class="n">PropertyType</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.state</span> <span class="kn">import</span> <span class="n">State</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.utils</span> <span class="kn">import</span> <span class="n">vector_to_img</span>
+
+<span class="n">PropKey</span> <span class="o">=</span> <span class="nb">str</span>
+<span class="n">Label</span> <span class="o">=</span> <span class="nb">int</span>
+<span class="n">PropName</span> <span class="o">=</span> <span class="nb">str</span>
+<span class="n">PhotoName</span> <span class="o">=</span> <span class="nb">str</span>
+
+
+<div class="viewcode-block" id="MeasurementsTableModel"><a class="viewcode-back" href="../../../arthropod_describer.measurements_viewer.html#arthropod_describer.measurements_viewer.measurements_model.MeasurementsTableModel">[docs]</a><span class="k">class</span> <span class="nc">MeasurementsTableModel</span><span class="p">(</span><span class="n">QAbstractTableModel</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">State</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">PySide2</span><span class="o">.</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QObject</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prop_tuple_list</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Label</span><span class="p">,</span> <span class="n">PropKey</span><span class="p">,</span> <span class="n">PropName</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">:</span> <span class="n">State</span> <span class="o">=</span> <span class="n">state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">single_photo_mode</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">header_labels</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">displayed_property_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_display_intensity_in_color</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># color value will either be displayed as QColor(True) or numbers(False)</span>
+
+<div class="viewcode-block" id="MeasurementsTableModel.rowCount"><a class="viewcode-back" href="../../../arthropod_describer.measurements_viewer.html#arthropod_describer.measurements_viewer.measurements_model.MeasurementsTableModel.rowCount">[docs]</a>    <span class="k">def</span> <span class="nf">rowCount</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span><span class="n">PySide2</span><span class="o">.</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QModelIndex</span><span class="o">=</span><span class="n">QModelIndex</span><span class="p">())</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">storage</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">image_count</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="MeasurementsTableModel.columnCount"><a class="viewcode-back" href="../../../arthropod_describer.measurements_viewer.html#arthropod_describer.measurements_viewer.measurements_model.MeasurementsTableModel.columnCount">[docs]</a>    <span class="k">def</span> <span class="nf">columnCount</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span><span class="n">PySide2</span><span class="o">.</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QModelIndex</span><span class="o">=</span><span class="n">QModelIndex</span><span class="p">())</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">storage</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MeasurementsTableModel.data"><a class="viewcode-back" href="../../../arthropod_describer.measurements_viewer.html#arthropod_describer.measurements_viewer.measurements_model.MeasurementsTableModel.data">[docs]</a>    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span><span class="n">PySide2</span><span class="o">.</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QModelIndex</span><span class="p">,</span> <span class="n">role</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="n">Qt</span><span class="o">.</span><span class="n">DisplayRole</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">storage</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">photo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">get_photo_by_idx</span><span class="p">(</span><span class="n">index</span><span class="o">.</span><span class="n">row</span><span class="p">(),</span> <span class="n">load_image</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prop_tuple_list</span><span class="p">[</span><span class="n">index</span><span class="o">.</span><span class="n">column</span><span class="p">()][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">props</span> <span class="o">=</span> <span class="n">photo</span><span class="p">[</span><span class="s1">&#39;Labels&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get_region_props</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">role</span> <span class="o">==</span> <span class="n">Qt</span><span class="o">.</span><span class="n">UserRole</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">label</span>
+        <span class="k">elif</span> <span class="n">role</span> <span class="o">==</span> <span class="n">Qt</span><span class="o">.</span><span class="n">UserRole</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">prop_tuple_list</span><span class="p">[</span><span class="n">index</span><span class="o">.</span><span class="n">column</span><span class="p">()][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">role</span> <span class="o">==</span> <span class="n">Qt</span><span class="o">.</span><span class="n">UserRole</span> <span class="o">+</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">prop_tuple_list</span><span class="p">[</span><span class="n">index</span><span class="o">.</span><span class="n">column</span><span class="p">()][</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">role</span> <span class="o">==</span> <span class="n">Qt</span><span class="o">.</span><span class="n">UserRole</span> <span class="o">+</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">photo</span><span class="o">.</span><span class="n">image_name</span>
+
+        <span class="k">if</span> <span class="n">props</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">role</span> <span class="o">==</span> <span class="n">Qt</span><span class="o">.</span><span class="n">DisplayRole</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s1">&#39;N/A&#39;</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="c1">#if self.displayed_property_key not in props:</span>
+        <span class="c1">#    return None</span>
+        <span class="n">prop_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prop_tuple_list</span><span class="p">[</span><span class="n">index</span><span class="o">.</span><span class="n">column</span><span class="p">()][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">prop_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">props</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">role</span> <span class="o">==</span> <span class="n">Qt</span><span class="o">.</span><span class="n">DisplayRole</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s1">&#39;N/A&#39;</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">prop</span> <span class="o">=</span> <span class="n">props</span><span class="p">[</span><span class="n">prop_key</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">role</span> <span class="o">==</span> <span class="n">Qt</span><span class="o">.</span><span class="n">DisplayRole</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">prop</span><span class="o">.</span><span class="n">prop_type</span> <span class="ow">in</span> <span class="p">{</span><span class="n">PropertyType</span><span class="o">.</span><span class="n">Scalar</span><span class="p">,</span> <span class="n">PropertyType</span><span class="o">.</span><span class="n">String</span><span class="p">}:</span>
+                <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">prop</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">prop</span><span class="o">.</span><span class="n">prop_type</span> <span class="o">==</span> <span class="n">PropertyType</span><span class="o">.</span><span class="n">Intensity</span> <span class="ow">or</span> <span class="n">prop</span><span class="o">.</span><span class="n">prop_type</span> <span class="o">==</span> <span class="n">PropertyType</span><span class="o">.</span><span class="n">IntensityHSV</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_display_intensity_in_color</span><span class="p">:</span>
+                <span class="n">str_val</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+                <span class="n">vals</span> <span class="o">=</span> <span class="n">prop</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">prop</span><span class="o">.</span><span class="n">num_vals</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="p">[</span><span class="n">prop</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">vals</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">==</span> <span class="nb">float</span><span class="p">:</span>
+                        <span class="n">str_val</span> <span class="o">=</span> <span class="n">str_val</span> <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39;, </span><span class="si">{</span><span class="n">val</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">prop</span><span class="o">.</span><span class="n">val_names</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">str_val</span> <span class="o">=</span> <span class="n">str_val</span> <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39;, </span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">prop</span><span class="o">.</span><span class="n">val_names</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span>
+                <span class="k">return</span> <span class="n">str_val</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+            <span class="c1"># if prop.prop_type == PropertyType.Vector:</span>
+            <span class="c1">#     return prop.format_value()</span>
+            <span class="k">if</span> <span class="n">prop</span><span class="o">.</span><span class="n">prop_type</span> <span class="o">==</span> <span class="n">PropertyType</span><span class="o">.</span><span class="n">NDArray</span><span class="p">:</span>
+                <span class="n">val</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">prop</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">val</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="si">}</span><span class="s1"> matrices for </span><span class="si">{</span><span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">prop</span><span class="o">.</span><span class="n">val_names</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">role</span> <span class="o">==</span> <span class="n">Qt</span><span class="o">.</span><span class="n">BackgroundRole</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_display_intensity_in_color</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">prop</span><span class="o">.</span><span class="n">prop_type</span> <span class="o">==</span> <span class="n">PropertyType</span><span class="o">.</span><span class="n">Intensity</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">prop</span><span class="o">.</span><span class="n">num_vals</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="n">QColor</span><span class="o">.</span><span class="n">fromRgbF</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">prop</span><span class="o">.</span><span class="n">value</span> <span class="o">/</span> <span class="mf">255.0</span><span class="p">,</span> <span class="p">)</span> <span class="o">*</span> <span class="mi">3</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="n">prop</span><span class="o">.</span><span class="n">num_vals</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                        <span class="n">clr</span> <span class="o">=</span> <span class="p">[</span><span class="n">val</span> <span class="o">/</span> <span class="mf">255.0</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">prop</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+                        <span class="k">return</span> <span class="n">QColor</span><span class="o">.</span><span class="n">fromRgbF</span><span class="p">(</span><span class="o">*</span><span class="n">clr</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">prop</span><span class="o">.</span><span class="n">prop_type</span> <span class="o">==</span> <span class="n">PropertyType</span><span class="o">.</span><span class="n">IntensityHSV</span><span class="p">:</span>
+                    <span class="n">val</span> <span class="o">=</span> <span class="n">prop</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mf">360.0</span><span class="p">,</span> <span class="n">val</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mf">100.0</span><span class="p">,</span> <span class="n">val</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">/</span> <span class="mf">100.0</span><span class="p">]])</span>
+                    <span class="n">clr</span> <span class="o">=</span> <span class="n">hsv2rgb</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">return</span> <span class="n">QColor</span><span class="o">.</span><span class="n">fromRgbF</span><span class="p">(</span><span class="o">*</span><span class="n">clr</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">role</span> <span class="o">==</span> <span class="n">Qt</span><span class="o">.</span><span class="n">DecorationRole</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">prop</span><span class="o">.</span><span class="n">prop_type</span> <span class="o">==</span> <span class="n">PropertyType</span><span class="o">.</span><span class="n">Vector</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">prop</span><span class="o">.</span><span class="n">vector_viz</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">viz</span> <span class="o">=</span> <span class="n">vector_to_img</span><span class="p">(</span><span class="n">prop</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">24</span><span class="p">))</span>
+                    <span class="n">prop</span><span class="o">.</span><span class="n">vector_viz</span> <span class="o">=</span> <span class="n">QPixmap</span><span class="o">.</span><span class="n">fromImage</span><span class="p">(</span><span class="n">qimage2ndarray</span><span class="o">.</span><span class="n">array2qimage</span><span class="p">(</span><span class="n">viz</span><span class="p">))</span>
+                <span class="k">return</span> <span class="n">prop</span><span class="o">.</span><span class="n">vector_viz</span>
+        <span class="k">if</span> <span class="n">role</span> <span class="o">==</span> <span class="n">Qt</span><span class="o">.</span><span class="n">UserRole</span> <span class="o">+</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">prop</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="MeasurementsTableModel.headerData"><a class="viewcode-back" href="../../../arthropod_describer.measurements_viewer.html#arthropod_describer.measurements_viewer.measurements_model.MeasurementsTableModel.headerData">[docs]</a>    <span class="k">def</span> <span class="nf">headerData</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">orientation</span><span class="p">:</span><span class="n">PySide2</span><span class="o">.</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Orientation</span><span class="p">,</span> <span class="n">role</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="n">Qt</span><span class="o">.</span><span class="n">DisplayRole</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">storage</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">role</span> <span class="o">==</span> <span class="n">Qt</span><span class="o">.</span><span class="n">DisplayRole</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">orientation</span> <span class="o">==</span> <span class="n">Qt</span><span class="o">.</span><span class="n">Horizontal</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="p">[</span><span class="n">section</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">orientation</span> <span class="o">==</span> <span class="n">Qt</span><span class="o">.</span><span class="n">Vertical</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">image_names</span><span class="p">[</span><span class="n">section</span><span class="p">]</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="MeasurementsTableModel.display_property"><a class="viewcode-back" href="../../../arthropod_describer.measurements_viewer.html#arthropod_describer.measurements_viewer.measurements_model.MeasurementsTableModel.display_property">[docs]</a>    <span class="k">def</span> <span class="nf">display_property</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prop_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">displayed_property_key</span> <span class="o">=</span> <span class="n">prop_key</span>
+        <span class="n">lab_hierarchy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">label_hierarchy</span>
+        <span class="n">header_labels</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">image_count</span><span class="p">):</span>
+            <span class="n">photo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">get_photo_by_idx</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">load_image</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="c1">#header_labels = header_labels.union({self.state.colormap.label_names[prop.label] for prop in photo[&#39;Labels&#39;].prop_list})</span>
+            <span class="n">labels</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">union</span><span class="p">({</span><span class="n">prop</span><span class="o">.</span><span class="n">label</span> <span class="k">for</span> <span class="n">prop</span> <span class="ow">in</span> <span class="n">photo</span><span class="p">[</span><span class="s1">&#39;Labels&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">prop_list</span><span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="c1"># TODO REMOVE</span>
+        <span class="c1">#self.header_labels = [self.state.colormap.label_names[label] for label in self.labels]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">header_labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">lab_hierarchy</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="p">]</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rowCount</span><span class="p">()</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">columnCount</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataChanged</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MeasurementsTableModel.display_intensity_in_color"><a class="viewcode-back" href="../../../arthropod_describer.measurements_viewer.html#arthropod_describer.measurements_viewer.measurements_model.MeasurementsTableModel.display_intensity_in_color">[docs]</a>    <span class="k">def</span> <span class="nf">display_intensity_in_color</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_color</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_display_intensity_in_color</span> <span class="o">=</span> <span class="n">in_color</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rowCount</span><span class="p">()</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">columnCount</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataChanged</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MeasurementsTableModel.update_model"><a class="viewcode-back" href="../../../arthropod_describer.measurements_viewer.html#arthropod_describer.measurements_viewer.measurements_model.MeasurementsTableModel.update_model">[docs]</a>    <span class="k">def</span> <span class="nf">update_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">prop_tuple_set</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Label</span><span class="p">,</span> <span class="n">PropKey</span><span class="p">,</span> <span class="n">PropName</span><span class="p">]]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">image_count</span><span class="p">):</span>
+            <span class="n">photo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">get_photo_by_idx</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">load_image</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">prop</span> <span class="ow">in</span> <span class="n">photo</span><span class="p">[</span><span class="s1">&#39;Labels&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">prop_list</span><span class="p">:</span>
+                <span class="c1">#prop_tuple = (prop.info.key, prop.label, prop.info.name)</span>
+                <span class="n">prop_tuple</span> <span class="o">=</span> <span class="p">(</span><span class="n">prop</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">prop</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="n">prop</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                <span class="n">prop_tuple_set</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">prop_tuple</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prop_tuple_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">prop_tuple_set</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">tup</span><span class="p">:</span> <span class="n">tup</span><span class="p">[:</span><span class="mi">2</span><span class="p">]))</span>  <span class="c1"># same count as column count</span>
+        <span class="c1">#self.column_names = [f&#39;{tup[2]}:{self.state.colormap.label_names[tup[1]]}&#39; for tup in self.prop_tuple_list]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="c1">#cur_prop_key = &#39;&#39;</span>
+        <span class="c1"># TODO replace hardcoded `Labels`</span>
+        <span class="n">hierarchy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">get_label_hierarchy2</span><span class="p">(</span><span class="s1">&#39;Labels&#39;</span><span class="p">)</span>
+        <span class="n">cur_label</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">prop_tuple_list</span><span class="p">:</span>
+            <span class="c1">#if cur_prop_key != key:</span>
+            <span class="c1">#if cur_label != label:</span>
+                <span class="c1">#col_name = f&#39;{name}:{self.state.colormap.label_names[label]}&#39;</span>
+                <span class="c1"># TODO REMOVE</span>
+                <span class="c1">#col_name = f&#39;{self.state.colormap.label_names[label]}:{name}&#39;</span>
+            <span class="n">col_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">hierarchy</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">:</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="c1">#cur_label = label</span>
+                <span class="c1">#cur_prop_key = key</span>
+            <span class="c1">#else:</span>
+                <span class="c1">#col_name = f&#39;:{self.state.colormap.label_names[label]}&#39;</span>
+            <span class="c1">#    col_name = f&#39;:{name}&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">col_name</span><span class="p">)</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rowCount</span><span class="p">()</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">columnCount</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataChanged</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span></div></div>
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, CBIA @ FI MUNI.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arthropod_describer.plugins.profile_register.general.profile_registering &mdash; MAPHIS 0.1 documentation</title>
+      <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
+        <script src="../../../../../_static/jquery.js"></script>
+        <script src="../../../../../_static/underscore.js"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../../../_static/doctools.js"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../../../index.html" class="icon icon-home"> MAPHIS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../modules.html">arthropod_describer</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">MAPHIS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../../../index.html">Module code</a> &raquo;</li>
+      <li>arthropod_describer.plugins.profile_register.general.profile_registering</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for arthropod_describer.plugins.profile_register.general.profile_registering</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">csv</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">typing</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">skimage</span> <span class="kn">import</span> <span class="n">io</span>
+<span class="kn">import</span> <span class="nn">openpyxl</span>
+<span class="c1"># import matplotlib.pyplot as plt</span>
+
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.common</span> <span class="kn">import</span> <span class="n">Info</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.label_image</span> <span class="kn">import</span> <span class="n">LabelImg</span><span class="p">,</span> <span class="n">RegionProperty</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.photo</span> <span class="kn">import</span> <span class="n">Photo</span>
+
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.plugin</span> <span class="kn">import</span> <span class="n">GeneralAction</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.state</span> <span class="kn">import</span> <span class="n">State</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.storage</span> <span class="kn">import</span> <span class="n">Storage</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.user_params</span> <span class="kn">import</span> <span class="n">UserParam</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.plugins.profile_register.general.profiles</span> <span class="kn">import</span> <span class="n">get_median_profile</span><span class="p">,</span> <span class="n">merge_profiles</span>
+
+
+<div class="viewcode-block" id="ProfileFusion"><a class="viewcode-back" href="../../../../../arthropod_describer.plugins.profile_register.general.html#arthropod_describer.plugins.profile_register.general.profile_registering.ProfileFusion">[docs]</a><span class="k">class</span> <span class="nc">ProfileFusion</span><span class="p">(</span><span class="n">GeneralAction</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    NAME: Profile fusion</span>
+<span class="sd">    DESCRIPTION: Fuse body profiles based on their tags. A median profile is created for each group of images that</span>
+<span class="sd">    matches the given tags. (how to specify and use the tags must be found)</span>
+
+<span class="sd">    USER_PARAMS:</span>
+<span class="sd">        PARAM_NAME: Iteration tag</span>
+<span class="sd">        PARAM_KEY: iteration_tags</span>
+<span class="sd">        PARAM_SOURCE: Storage</span>
+<span class="sd">        PARAM_SOURCE_FIELD: tag_prefixes</span>
+<span class="sd">        PARAM_VALUE_CARDINALITY: SingleValue</span>
+
+<span class="sd">        PARAM_NAME: Model group tags</span>
+<span class="sd">        PARAM_KEY: model_group_tags</span>
+<span class="sd">        PARAM_SOURCE: Storage</span>
+<span class="sd">        PARAM_SOURCE_FIELD: tag_prefixes</span>
+<span class="sd">        PARAM_VALUE_CARDINALITY: MultiValue</span>
+
+<span class="sd">        PARAM_NAME: Mimic group tags</span>
+<span class="sd">        PARAM_KEY: mimic_group_tags</span>
+<span class="sd">        PARAM_SOURCE: Storage</span>
+<span class="sd">        PARAM_SOURCE_FIELD: tag_prefixes</span>
+<span class="sd">        PARAM_VALUE_CARDINALITY: MultiValue</span>
+
+<span class="sd">        PARAM_NAME: Delete existing xlsx files</span>
+<span class="sd">        PARAM_KEY: delete_existing_xlsx</span>
+<span class="sd">        PARAM_TYPE: BOOL</span>
+<span class="sd">        DEFAULT_VALUE: FALSE</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">info</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Info</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">State</span><span class="p">):</span>
+        <span class="c1"># state.storage</span>
+        <span class="c1"># state.storage.image_names</span>
+        <span class="c1"># image = state.storage.get_photo_by_name()</span>
+        <span class="c1"># extract model and mimic image names from storage.image_names</span>
+        <span class="c1"># get model and mimic images by calling storage.get_photo_by_name(&lt;image_name&gt;)</span>
+        <span class="c1"># for each `image` the contour vector is stored in `image[&#39;Labels&#39;].region_props[16842752][&#39;contour&#39;].value`,</span>
+        <span class="c1"># that is of type `RegionProperty`, and the vector is stored in `RegionProperty.value`, and in the case of</span>
+        <span class="c1"># the contour vector, it is a List[float]</span>
+        <span class="c1"># print(f&#39;model prefix is {self._user_params[&quot;iteration_tags&quot;].value}, mimic prefix is {self._user_params[&quot;group_tags&quot;].value}&#39;)</span>
+
+        <span class="n">output_folder</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">location</span> <span class="o">/</span> <span class="s1">&#39;registered_profiles&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">output_folder</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="n">output_folder</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;iteration tags are </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_user_params</span><span class="p">[</span><span class="s2">&quot;iteration_tags&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">param_instances</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;model group tags are: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_user_params</span><span class="p">[</span><span class="s2">&quot;model_group_tags&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;mimic group tags are: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_user_params</span><span class="p">[</span><span class="s2">&quot;mimic_group_tags&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="c1"># for group_tags in self._user_params[&#39;group_tags&#39;].param_instances.values():</span>
+        <span class="c1">#     print(group_tags.value)</span>
+
+        <span class="n">prefix_tags_map</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">all_storage_tags</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">used_tags</span>
+
+        <span class="k">for</span> <span class="n">tag_prefix</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_params</span><span class="p">[</span><span class="s1">&#39;iteration_tags&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">all_storage_tags</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">tag</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">tag_prefix</span><span class="p">):</span>
+                    <span class="n">prefix_tags_map</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">tag_prefix</span><span class="p">,</span> <span class="nb">list</span><span class="p">())</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;prefix_tags_map = </span><span class="si">{</span><span class="n">prefix_tags_map</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="c1"># print(f&#39;iteration tag sets are {list(itertools.product(*prefix_tags_map.values()))}&#39;)</span>
+
+        <span class="n">iteration_tags</span> <span class="o">=</span> <span class="p">[</span><span class="n">tag</span> <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">all_storage_tags</span> <span class="k">if</span> <span class="n">tag</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_user_params</span><span class="p">[</span><span class="s2">&quot;iteration_tags&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;iteration tags are </span><span class="si">{</span><span class="n">iteration_tags</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">model_tags</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_params</span><span class="p">[</span><span class="s2">&quot;model_group_tags&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">model_column_name</span> <span class="o">=</span> <span class="s2">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">model_tags</span><span class="p">))</span>
+
+        <span class="n">mimic_tags</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_params</span><span class="p">[</span><span class="s2">&quot;mimic_group_tags&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">mimic_column_name</span> <span class="o">=</span> <span class="s2">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">mimic_tags</span><span class="p">))</span>
+        <span class="n">registered_column_name</span> <span class="o">=</span> <span class="n">model_column_name</span> <span class="o">+</span> <span class="s2">&quot;;&quot;</span> <span class="o">+</span> <span class="n">mimic_column_name</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_params</span><span class="p">[</span><span class="s1">&#39;delete_existing_xlsx&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">iteration_tag</span> <span class="ow">in</span> <span class="n">iteration_tags</span><span class="p">:</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">output_folder</span> <span class="o">/</span> <span class="n">iteration_tag</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">iteration_tag</span> <span class="ow">in</span> <span class="n">iteration_tags</span><span class="p">:</span>
+            <span class="n">sample_folder</span> <span class="o">=</span> <span class="n">output_folder</span> <span class="o">/</span> <span class="n">iteration_tag</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">sample_folder</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="n">sample_folder</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">worksheet_path</span> <span class="o">:=</span> <span class="n">sample_folder</span> <span class="o">/</span> <span class="s1">&#39;profiles.xlsx&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="n">wb</span> <span class="o">=</span> <span class="n">openpyxl</span><span class="o">.</span><span class="n">load_workbook</span><span class="p">(</span><span class="n">worksheet_path</span><span class="p">,</span> <span class="n">read_only</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">wb</span> <span class="o">=</span> <span class="n">openpyxl</span><span class="o">.</span><span class="n">Workbook</span><span class="p">()</span>
+                <span class="n">ws_med_prof</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">active</span>
+                <span class="n">ws_med_prof</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;Median profiles&#39;</span>
+                <span class="n">ws_med_prof</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="s1">&#39;ProfileID&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;G_BP_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">40</span><span class="p">)])</span>
+
+                <span class="n">ws_aligned</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">create_sheet</span><span class="p">(</span><span class="s1">&#39;Aligned profiles&#39;</span><span class="p">)</span>
+                <span class="n">ws_aligned</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="s1">&#39;ProfileID&#39;</span><span class="p">,</span> <span class="s1">&#39;AlignedTo&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;G_BP_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">40</span><span class="p">)])</span>
+
+            <span class="n">ws_med_prof</span> <span class="o">=</span> <span class="n">wb</span><span class="p">[</span><span class="s1">&#39;Median profiles&#39;</span><span class="p">]</span>
+
+            <span class="n">model_median</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_median_profile_for</span><span class="p">(</span><span class="n">iteration_tag</span><span class="p">,</span> <span class="n">model_tags</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+            <span class="n">mimic_median</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_median_profile_for</span><span class="p">(</span><span class="n">iteration_tag</span><span class="p">,</span> <span class="n">mimic_tags</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+
+            <span class="n">ws_med_prof</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">model_column_name</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">val</span><span class="p">))</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">model_median</span><span class="p">])</span>
+            <span class="n">ws_med_prof</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">mimic_column_name</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">val</span><span class="p">))</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">mimic_median</span><span class="p">])</span>
+
+            <span class="c1"># if model_median is not None:</span>
+            <span class="c1">#     np.savetxt(str(sample_folder / f&#39;{model_column_name}.txt&#39;), model_median)</span>
+            <span class="c1"># if mimic_median is not None:</span>
+            <span class="c1">#     np.savetxt(str(sample_folder / f&#39;{mimic_column_name}.txt&#39;), mimic_median)</span>
+
+            <span class="k">if</span> <span class="n">model_median</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">mimic_median</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>  <span class="c1"># TODO log a message</span>
+
+            <span class="c1"># registered = merge_profiles(model_median, mimic_median, show_matches=True)</span>
+            <span class="c1"># np.savetxt(str(sample_folder / f&#39;{registered_column_name}.txt&#39;), registered)</span>
+
+            <span class="c1"># model_mimic_1 = merge_profiles(model_median, mimic_median, x_weight=1.0, y_weight=1.0)</span>
+            <span class="n">model_mimic_05</span> <span class="o">=</span> <span class="n">merge_profiles</span><span class="p">(</span><span class="n">model_median</span><span class="p">,</span> <span class="n">mimic_median</span><span class="p">)</span>
+            <span class="c1"># model_mimic_0 = merge_profiles(model_median, mimic_median, x_weight=0.0, y_weight=0.0)</span>
+
+            <span class="c1"># mimic_aligned_to_model = merge_profiles(mimic_median, model_mimic_1)</span>
+            <span class="c1"># mimic_aligned_to_mimic = merge_profiles(mimic_median, model_mimic_0)</span>
+            <span class="n">mimic_aligned_to_both</span> <span class="o">=</span> <span class="n">merge_profiles</span><span class="p">(</span><span class="n">mimic_median</span><span class="p">,</span> <span class="n">model_mimic_05</span><span class="p">)</span>
+
+            <span class="c1"># model_aligned_to_model = merge_profiles(model_median, model_mimic_1)</span>
+            <span class="c1"># model_aligned_to_mimic = merge_profiles(model_median, model_mimic_0)</span>
+            <span class="n">model_aligned_to_both</span> <span class="o">=</span> <span class="n">merge_profiles</span><span class="p">(</span><span class="n">model_median</span><span class="p">,</span> <span class="n">model_mimic_05</span><span class="p">)</span>
+
+            <span class="c1"># plt.subplots(nrows=1, ncols=2)</span>
+            <span class="c1"># plt.subplot(121)</span>
+            <span class="c1"># plt.plot(range(40), model_aligned_to_both)</span>
+            <span class="c1">#</span>
+            <span class="c1"># plt.subplot(122)</span>
+            <span class="c1"># plt.plot(range(40), mimic_aligned_to_both)</span>
+            <span class="c1">#</span>
+            <span class="c1"># plt.savefig(&#39;D:/plot.png&#39;)</span>
+            <span class="c1"># plt.show()</span>
+
+            <span class="n">ws_aligned</span> <span class="o">=</span> <span class="n">wb</span><span class="p">[</span><span class="s1">&#39;Aligned profiles&#39;</span><span class="p">]</span>
+
+            <span class="c1"># ws_aligned.append([mimic_column_name, model_column_name] + [str(float(val)) for val in mimic_aligned_to_model])</span>
+            <span class="c1"># ws_aligned.append([mimic_column_name, mimic_column_name] + [str(float(val)) for val in mimic_aligned_to_mimic])</span>
+
+            <span class="n">ws_aligned</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">model_column_name</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">model_column_name</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">mimic_column_name</span><span class="si">}</span><span class="s1">_0.5_0.5&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">val</span><span class="p">))</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">model_aligned_to_both</span><span class="p">])</span>
+
+            <span class="n">ws_aligned</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">mimic_column_name</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">model_column_name</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">mimic_column_name</span><span class="si">}</span><span class="s1">_0.5_0.5&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">val</span><span class="p">))</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">mimic_aligned_to_both</span><span class="p">])</span>
+
+            <span class="c1"># ws_aligned.append([model_column_name, model_column_name] + [str(float(val)) for val in model_aligned_to_model])</span>
+            <span class="c1"># ws_aligned.append([model_column_name, mimic_column_name] + [str(float(val)) for val in model_aligned_to_mimic])</span>
+
+            <span class="n">wb</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">worksheet_path</span><span class="p">)</span>
+            <span class="n">wb</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+            <span class="c1"># with open(sample_folder / f&#39;{registered_column_name};profiles.csv&#39;, newline=&#39;\n&#39;, mode=&#39;w&#39;) as csvfile:</span>
+            <span class="c1">#     writer = csv.writer(csvfile, dialect=&#39;excel&#39;)</span>
+            <span class="c1">#     writer.writerow([model_column_name, mimic_column_name, registered_column_name])</span>
+            <span class="c1">#</span>
+            <span class="c1">#     for mod_val, mim_val, reg_val in zip(model_median, mimic_median, registered):</span>
+            <span class="c1">#         writer.writerow([mod_val, mim_val, reg_val])</span>
+
+    <span class="k">def</span> <span class="nf">_get_median_profile_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iteration_tag</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">group_tags</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">state</span><span class="p">:</span> <span class="n">State</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+        <span class="n">tags_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">group_tags</span><span class="p">)</span><span class="o">.</span><span class="n">union</span><span class="p">({</span><span class="n">iteration_tag</span><span class="p">})</span>
+
+        <span class="n">photos</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">photos_satisfying_tags</span><span class="p">(</span><span class="n">tags_set</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">photos</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">profiles</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">photos</span><span class="p">),</span> <span class="mi">40</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;number of photos satisfying the tag set </span><span class="si">{</span><span class="n">tags_set</span><span class="si">}</span><span class="s1"> = </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">photos</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">unit</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">photo</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">photos</span><span class="p">):</span>
+            <span class="c1"># io.imsave(str(save_dest / photo.image_name), photo.image)</span>
+            <span class="n">profiles</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">photo</span><span class="p">[</span><span class="s1">&#39;Labels&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">region_props</span><span class="p">[</span><span class="mi">16842752</span><span class="p">][</span><span class="s2">&quot;arthropod_describer.plugins.profile_register.properties.contour&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="c1"># unit = photo[&#39;Labels&#39;].region_props[16842752][&quot;arthropod_describer.plugins.profile_register.properties.contour&quot;].value[1]</span>
+        <span class="n">median</span> <span class="o">=</span> <span class="n">get_median_profile</span><span class="p">(</span><span class="n">profiles</span><span class="p">,</span> <span class="n">show_fig</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="c1"># prop = RegionProperty()</span>
+        <span class="c1"># prop.label = 16842752</span>
+        <span class="c1"># prop.num_vals = profiles.shape[1]</span>
+        <span class="c1"># prop.value = (median, unit)</span>
+        <span class="c1"># state.storage.properties[self.info.key][&#39;_&#39;.join(tags_set)] = prop</span>
+        <span class="c1"># np.save(&#39;D:/profiles_registering_test/median.npy&#39;, median)</span>
+        <span class="c1"># np.savetxt(f&#39;median{&quot;_&quot;.join(tags_set)}.txt&#39;, median)</span>
+        <span class="k">return</span> <span class="n">median</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">user_params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">UserParam</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">user_params</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, CBIA @ FI MUNI.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

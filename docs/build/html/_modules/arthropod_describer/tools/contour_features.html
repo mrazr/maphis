@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arthropod_describer.tools.contour_features &mdash; MAPHIS 0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> MAPHIS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">arthropod_describer</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">MAPHIS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>arthropod_describer.tools.contour_features</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for arthropod_describer.tools.contour_features</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">typing</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Any</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.linalg</span>
+<span class="kn">import</span> <span class="nn">scipy.ndimage</span>
+<span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtCore</span> <span class="kn">import</span> <span class="n">QPoint</span><span class="p">,</span> <span class="n">QObject</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtGui</span> <span class="kn">import</span> <span class="n">QColor</span><span class="p">,</span> <span class="n">QPen</span>
+<span class="kn">from</span> <span class="nn">skimage</span> <span class="kn">import</span> <span class="n">io</span>
+<span class="kn">from</span> <span class="nn">skimage.morphology</span> <span class="kn">import</span> <span class="n">binary_erosion</span>
+<span class="kn">import</span> <span class="nn">skimage.transform</span>
+
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.label_image</span> <span class="kn">import</span> <span class="n">LabelImg</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.state</span> <span class="kn">import</span> <span class="n">State</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.tool</span> <span class="kn">import</span> <span class="n">Tool</span><span class="p">,</span> <span class="n">PaintCommand</span><span class="p">,</span> <span class="n">line_command</span>
+
+
+<div class="viewcode-block" id="Too_Contour"><a class="viewcode-back" href="../../../arthropod_describer.tools.html#arthropod_describer.tools.contour_features.Too_Contour">[docs]</a><span class="k">class</span> <span class="nc">Too_Contour</span><span class="p">(</span><span class="n">Tool</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">State</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">QObject</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">:</span> <span class="n">State</span> <span class="o">=</span> <span class="n">state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_viz_active</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_viz_commands</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">PaintCommand</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">tool_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;Contour impl.&#39;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">viz_active</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_viz_active</span>
+
+<div class="viewcode-block" id="Too_Contour.viz_left_press"><a class="viewcode-back" href="../../../arthropod_describer.tools.html#arthropod_describer.tools.contour_features.Too_Contour.viz_left_press">[docs]</a>    <span class="k">def</span> <span class="nf">viz_left_press</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="n">QPoint</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">PaintCommand</span><span class="p">]:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_viz_active</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="p">[]</span></div>
+
+<div class="viewcode-block" id="Too_Contour.viz_left_release"><a class="viewcode-back" href="../../../arthropod_describer.tools.html#arthropod_describer.tools.contour_features.Too_Contour.viz_left_release">[docs]</a>    <span class="k">def</span> <span class="nf">viz_left_release</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="n">QPoint</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">PaintCommand</span><span class="p">]:</span>
+        <span class="n">lbl_img</span><span class="p">:</span> <span class="n">LabelImg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">current_photo</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">current_label_name</span><span class="p">]</span>
+        <span class="n">level_lab</span> <span class="o">=</span> <span class="n">lbl_img</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">current_label_level</span><span class="p">]</span>
+        <span class="n">picked_label</span> <span class="o">=</span> <span class="n">level_lab</span><span class="p">[</span><span class="n">pos</span><span class="o">.</span><span class="n">y</span><span class="p">(),</span> <span class="n">pos</span><span class="o">.</span><span class="n">x</span><span class="p">()]</span>
+
+        <span class="n">region</span> <span class="o">=</span> <span class="n">lbl_img</span><span class="o">.</span><span class="n">mask_for</span><span class="p">(</span><span class="n">picked_label</span><span class="p">)</span>
+
+        <span class="n">pixels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">region</span><span class="p">)</span>
+
+        <span class="n">top</span><span class="p">,</span> <span class="n">left</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">pixels</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">pixels</span><span class="p">[:,</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">bottom</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">pixels</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">pixels</span><span class="p">[:,</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="n">roi</span> <span class="o">=</span> <span class="n">region</span><span class="p">[</span><span class="n">top</span><span class="p">:</span><span class="n">bottom</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">left</span><span class="p">:</span><span class="n">right</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">pixels</span> <span class="o">=</span> <span class="n">pixels</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">top</span><span class="p">,</span> <span class="n">left</span><span class="p">])</span>
+        <span class="n">yy</span><span class="p">,</span> <span class="n">xx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">roi</span><span class="p">)</span>
+
+        <span class="n">io</span><span class="o">.</span><span class="n">imsave</span><span class="p">(</span><span class="s1">&#39;C:</span><span class="se">\\</span><span class="s1">Users</span><span class="se">\\</span><span class="s1">radoslav</span><span class="se">\\</span><span class="s1">Desktop</span><span class="se">\\</span><span class="s1">region.png&#39;</span><span class="p">,</span> <span class="n">roi</span><span class="p">)</span>
+        <span class="n">io</span><span class="o">.</span><span class="n">imsave</span><span class="p">(</span><span class="s1">&#39;C:</span><span class="se">\\</span><span class="s1">Users</span><span class="se">\\</span><span class="s1">radoslav</span><span class="se">\\</span><span class="s1">Desktop</span><span class="se">\\</span><span class="s1">outline.png&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_xor</span><span class="p">(</span><span class="n">roi</span><span class="p">,</span> <span class="n">binary_erosion</span><span class="p">(</span><span class="n">roi</span><span class="p">,</span> <span class="n">footprint</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)))))</span>
+
+        <span class="n">x_c</span><span class="p">,</span> <span class="n">y_c</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">xx</span><span class="p">)),</span> <span class="nb">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">yy</span><span class="p">))</span>
+
+        <span class="n">pen</span> <span class="o">=</span> <span class="n">QPen</span><span class="p">(</span><span class="n">QColor</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">125</span><span class="p">))</span>
+        <span class="n">pen</span><span class="o">.</span><span class="n">setWidthF</span><span class="p">(</span><span class="mf">1.5</span><span class="p">)</span>
+
+        <span class="n">pca</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">pca</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">pixels</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;mean is </span><span class="si">{</span><span class="n">pca</span><span class="o">.</span><span class="n">mean_</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;centroid is </span><span class="si">{</span><span class="n">y_c</span><span class="p">,</span> <span class="n">x_c</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">next_pixel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">y_c</span> <span class="o">+</span> <span class="n">top</span><span class="p">,</span> <span class="n">x_c</span> <span class="o">+</span> <span class="n">left</span><span class="p">])</span> <span class="o">+</span> <span class="mf">150.0</span> <span class="o">*</span> <span class="n">pca</span><span class="o">.</span><span class="n">components_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">prev_pixel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">y_c</span> <span class="o">+</span> <span class="n">top</span><span class="p">,</span> <span class="n">x_c</span> <span class="o">+</span> <span class="n">left</span><span class="p">])</span> <span class="o">-</span> <span class="mf">150.0</span> <span class="o">*</span> <span class="n">pca</span><span class="o">.</span><span class="n">components_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">angle</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]),</span> <span class="n">pca</span><span class="o">.</span><span class="n">components_</span><span class="p">[</span><span class="mi">0</span><span class="p">])))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;the angle with the y-axis is </span><span class="si">{</span><span class="n">angle</span><span class="si">}</span><span class="s1"> deg&#39;</span><span class="p">)</span>
+
+        <span class="n">rotated</span> <span class="o">=</span> <span class="n">skimage</span><span class="o">.</span><span class="n">transform</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">roi</span><span class="p">,</span> <span class="n">angle</span><span class="o">=</span><span class="n">angle</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="p">(</span><span class="n">y_c</span><span class="p">,</span> <span class="n">x_c</span><span class="p">),</span> <span class="n">resize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">rotated</span><span class="p">))</span>
+
+        <span class="n">io</span><span class="o">.</span><span class="n">imsave</span><span class="p">(</span><span class="s1">&#39;C:</span><span class="se">\\</span><span class="s1">Users</span><span class="se">\\</span><span class="s1">radoslav</span><span class="se">\\</span><span class="s1">Desktop</span><span class="se">\\</span><span class="s1">rotated.png&#39;</span><span class="p">,</span> <span class="n">rotated</span><span class="p">,</span> <span class="n">check_contrast</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="n">outline</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_xor</span><span class="p">(</span><span class="n">rotated</span><span class="p">,</span> <span class="n">binary_erosion</span><span class="p">(</span><span class="n">rotated</span><span class="p">,</span> <span class="n">footprint</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))))</span>
+        <span class="n">io</span><span class="o">.</span><span class="n">imsave</span><span class="p">(</span><span class="s1">&#39;C:</span><span class="se">\\</span><span class="s1">Users</span><span class="se">\\</span><span class="s1">radoslav</span><span class="se">\\</span><span class="s1">Desktop</span><span class="se">\\</span><span class="s1">rotated_outline.png&#39;</span><span class="p">,</span> <span class="n">outline</span><span class="p">,</span> <span class="n">check_contrast</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="n">outline_yy</span><span class="p">,</span> <span class="n">outline_xx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">outline</span><span class="p">)</span>
+
+        <span class="n">xs_by_y</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">outline_yy</span><span class="p">,</span> <span class="n">outline_xx</span><span class="p">):</span>
+            <span class="n">xs_by_y</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="n">y_sort_inds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">outline_yy</span><span class="p">)</span>
+
+        <span class="n">col_outline</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">outline</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">outline</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">y_sort_inds</span><span class="p">:</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">outline_yy</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+            <span class="n">left</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">xs_by_y</span><span class="p">[</span><span class="n">y</span><span class="p">])</span>
+            <span class="n">right</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">xs_by_y</span><span class="p">[</span><span class="n">y</span><span class="p">])</span>
+            <span class="n">col_outline</span><span class="p">[</span><span class="n">y</span><span class="p">,</span> <span class="n">left</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="n">col_outline</span><span class="p">[</span><span class="n">y</span><span class="p">,</span> <span class="n">right</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">]</span>
+
+        <span class="n">io</span><span class="o">.</span><span class="n">imsave</span><span class="p">(</span><span class="s1">&#39;C:</span><span class="se">\\</span><span class="s1">Users</span><span class="se">\\</span><span class="s1">radoslav</span><span class="se">\\</span><span class="s1">Desktop</span><span class="se">\\</span><span class="s1">left_right.png&#39;</span><span class="p">,</span> <span class="n">col_outline</span><span class="p">)</span>
+
+        <span class="n">right_outline</span> <span class="o">=</span> <span class="n">outline</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="n">mask_out_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">outline_xx</span> <span class="o">&lt;</span> <span class="n">x_c</span><span class="p">)</span>
+        <span class="n">right_outline</span><span class="p">[</span><span class="n">outline_yy</span><span class="p">[</span><span class="n">mask_out_idx</span><span class="p">],</span> <span class="n">outline_xx</span><span class="p">[</span><span class="n">mask_out_idx</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="n">left_outline</span> <span class="o">=</span> <span class="n">outline</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">mask_out_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">outline_xx</span> <span class="o">&gt;</span> <span class="n">x_c</span><span class="p">)</span>
+        <span class="n">left_outline</span><span class="p">[</span><span class="n">outline_yy</span><span class="p">[</span><span class="n">mask_out_idx</span><span class="p">],</span> <span class="n">outline_xx</span><span class="p">[</span><span class="n">mask_out_idx</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="n">io</span><span class="o">.</span><span class="n">imsave</span><span class="p">(</span><span class="s1">&#39;C:</span><span class="se">\\</span><span class="s1">Users</span><span class="se">\\</span><span class="s1">radoslav</span><span class="se">\\</span><span class="s1">Desktop</span><span class="se">\\</span><span class="s1">left_outline.png&#39;</span><span class="p">,</span> <span class="n">left_outline</span><span class="p">,</span> <span class="n">check_contrast</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">io</span><span class="o">.</span><span class="n">imsave</span><span class="p">(</span><span class="s1">&#39;C:</span><span class="se">\\</span><span class="s1">Users</span><span class="se">\\</span><span class="s1">radoslav</span><span class="se">\\</span><span class="s1">Desktop</span><span class="se">\\</span><span class="s1">right_outline.png&#39;</span><span class="p">,</span> <span class="n">right_outline</span><span class="p">,</span> <span class="n">check_contrast</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_viz_commands</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">line_command</span><span class="p">(</span><span class="n">QPoint</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">prev_pixel</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="nb">round</span><span class="p">(</span><span class="n">prev_pixel</span><span class="p">[</span><span class="mi">0</span><span class="p">])),</span>
+                         <span class="n">QPoint</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">next_pixel</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="nb">round</span><span class="p">(</span><span class="n">next_pixel</span><span class="p">[</span><span class="mi">0</span><span class="p">])),</span>
+                         <span class="n">pen</span><span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_viz_commands</span></div>
+
+<div class="viewcode-block" id="Too_Contour.viz_right_release"><a class="viewcode-back" href="../../../arthropod_describer.tools.html#arthropod_describer.tools.contour_features.Too_Contour.viz_right_release">[docs]</a>    <span class="k">def</span> <span class="nf">viz_right_release</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="n">QPoint</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">PaintCommand</span><span class="p">]:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_viz_active</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="p">[]</span></div>
+
+<div class="viewcode-block" id="Too_Contour.viz_hover_move"><a class="viewcode-back" href="../../../arthropod_describer.tools.html#arthropod_describer.tools.contour_features.Too_Contour.viz_hover_move">[docs]</a>    <span class="k">def</span> <span class="nf">viz_hover_move</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_pos</span><span class="p">:</span> <span class="n">QPoint</span><span class="p">,</span> <span class="n">old_pos</span><span class="p">:</span> <span class="n">QPoint</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">PaintCommand</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_viz_commands</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, CBIA @ FI MUNI.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

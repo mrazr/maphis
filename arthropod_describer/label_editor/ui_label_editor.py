@@ -20,7 +20,7 @@ class Ui_LabelEditor(object):
     def setupUi(self, LabelEditor):
         if not LabelEditor.objectName():
             LabelEditor.setObjectName(u"LabelEditor")
-        LabelEditor.resize(1059, 704)
+        LabelEditor.resize(1220, 704)
         sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -33,27 +33,24 @@ class Ui_LabelEditor(object):
         self.tbtnUndo = QToolButton(LabelEditor)
         self.tbtnUndo.setObjectName(u"tbtnUndo")
         self.tbtnUndo.setEnabled(False)
+        self.tbtnUndo.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
 
         self.toolBar.addWidget(self.tbtnUndo)
 
         self.tbtnRedo = QToolButton(LabelEditor)
         self.tbtnRedo.setObjectName(u"tbtnRedo")
         self.tbtnRedo.setEnabled(False)
+        self.tbtnRedo.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
 
         self.toolBar.addWidget(self.tbtnRedo)
 
-        self.btnResetZoom = QPushButton(LabelEditor)
-        self.btnResetZoom.setObjectName(u"btnResetZoom")
-
-        self.toolBar.addWidget(self.btnResetZoom)
-
-        self.btnZoomBug = QPushButton(LabelEditor)
-        self.btnZoomBug.setObjectName(u"btnZoomBug")
-
-        self.toolBar.addWidget(self.btnZoomBug)
-
         self.toolBox = QGroupBox(LabelEditor)
         self.toolBox.setObjectName(u"toolBox")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.toolBox.sizePolicy().hasHeightForWidth())
+        self.toolBox.setSizePolicy(sizePolicy1)
         self.toolBox.setFlat(False)
         self.toolBox.setCheckable(False)
         self.horizontalLayout = QHBoxLayout(self.toolBox)
@@ -63,44 +60,79 @@ class Ui_LabelEditor(object):
 
         self.MaskGroup = QGroupBox(LabelEditor)
         self.MaskGroup.setObjectName(u"MaskGroup")
+        sizePolicy1.setHeightForWidth(self.MaskGroup.sizePolicy().hasHeightForWidth())
+        self.MaskGroup.setSizePolicy(sizePolicy1)
         self.horizontalLayout_2 = QHBoxLayout(self.MaskGroup)
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.tbtnBugMask = QToolButton(self.MaskGroup)
-        self.tbtnBugMask.setObjectName(u"tbtnBugMask")
-        self.tbtnBugMask.setCheckable(True)
-        self.tbtnBugMask.setAutoExclusive(True)
-
-        self.horizontalLayout_2.addWidget(self.tbtnBugMask)
-
-        self.tbtnSegmentsMask = QToolButton(self.MaskGroup)
-        self.tbtnSegmentsMask.setObjectName(u"tbtnSegmentsMask")
-        self.tbtnSegmentsMask.setCheckable(True)
-        self.tbtnSegmentsMask.setAutoExclusive(True)
-
-        self.horizontalLayout_2.addWidget(self.tbtnSegmentsMask)
-
-        self.tbtnReflectionMask = QToolButton(self.MaskGroup)
-        self.tbtnReflectionMask.setObjectName(u"tbtnReflectionMask")
-        self.tbtnReflectionMask.setCheckable(True)
-        self.tbtnReflectionMask.setAutoExclusive(True)
-
-        self.horizontalLayout_2.addWidget(self.tbtnReflectionMask)
-
-        self.line = QFrame(self.MaskGroup)
-        self.line.setObjectName(u"line")
-        self.line.setFrameShape(QFrame.VLine)
-        self.line.setFrameShadow(QFrame.Sunken)
-
-        self.horizontalLayout_2.addWidget(self.line)
-
-        self.btnResetLabel = QPushButton(self.MaskGroup)
-        self.btnResetLabel.setObjectName(u"btnResetLabel")
-        self.btnResetLabel.setEnabled(False)
-
-        self.horizontalLayout_2.addWidget(self.btnResetLabel)
-
 
         self.toolBar.addWidget(self.MaskGroup)
+
+        self.grpMaskStyle = QGroupBox(LabelEditor)
+        self.grpMaskStyle.setObjectName(u"grpMaskStyle")
+        sizePolicy1.setHeightForWidth(self.grpMaskStyle.sizePolicy().hasHeightForWidth())
+        self.grpMaskStyle.setSizePolicy(sizePolicy1)
+        self.grpMaskStyle.setFlat(False)
+        self.grpMaskStyle.setCheckable(False)
+        self.horizontalLayout_3 = QHBoxLayout(self.grpMaskStyle)
+        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
+        self.verticalLayout_2 = QVBoxLayout()
+        self.verticalLayout_2.setObjectName(u"verticalLayout_2")
+        self.verticalLayout_2.setContentsMargins(0, -1, -1, -1)
+        self.label_2 = QLabel(self.grpMaskStyle)
+        self.label_2.setObjectName(u"label_2")
+
+        self.verticalLayout_2.addWidget(self.label_2)
+
+        self.sliderOpacity = QSlider(self.grpMaskStyle)
+        self.sliderOpacity.setObjectName(u"sliderOpacity")
+        self.sliderOpacity.setMaximum(100)
+        self.sliderOpacity.setSingleStep(5)
+        self.sliderOpacity.setValue(75)
+        self.sliderOpacity.setOrientation(Qt.Horizontal)
+        self.sliderOpacity.setTickPosition(QSlider.TicksBelow)
+        self.sliderOpacity.setTickInterval(15)
+
+        self.verticalLayout_2.addWidget(self.sliderOpacity)
+
+
+        self.horizontalLayout_3.addLayout(self.verticalLayout_2)
+
+        self.btnFilledStyle = QRadioButton(self.grpMaskStyle)
+        self.btnFilledStyle.setObjectName(u"btnFilledStyle")
+        self.btnFilledStyle.setCheckable(True)
+        self.btnFilledStyle.setChecked(True)
+        self.btnFilledStyle.setAutoExclusive(True)
+
+        self.horizontalLayout_3.addWidget(self.btnFilledStyle, 0, Qt.AlignVCenter)
+
+        self.btnOutlineStyle = QRadioButton(self.grpMaskStyle)
+        self.btnOutlineStyle.setObjectName(u"btnOutlineStyle")
+        self.btnOutlineStyle.setCheckable(True)
+        self.btnOutlineStyle.setAutoExclusive(True)
+
+        self.horizontalLayout_3.addWidget(self.btnOutlineStyle)
+
+        self.label = QLabel(self.grpMaskStyle)
+        self.label.setObjectName(u"label")
+        sizePolicy2 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.label.sizePolicy().hasHeightForWidth())
+        self.label.setSizePolicy(sizePolicy2)
+
+        self.horizontalLayout_3.addWidget(self.label)
+
+        self.spinOutlineWidth = QSpinBox(self.grpMaskStyle)
+        self.spinOutlineWidth.setObjectName(u"spinOutlineWidth")
+        self.spinOutlineWidth.setEnabled(False)
+        self.spinOutlineWidth.setMinimum(1)
+        self.spinOutlineWidth.setMaximum(7)
+        self.spinOutlineWidth.setValue(3)
+
+        self.horizontalLayout_3.addWidget(self.spinOutlineWidth)
+
+
+        self.toolBar.addWidget(self.grpMaskStyle)
 
         self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
@@ -116,28 +148,34 @@ class Ui_LabelEditor(object):
         self.photo_view.setContentsMargins(0, -1, -1, 0)
         self.controls = QHBoxLayout()
         self.controls.setObjectName(u"controls")
-        self.btnPrevious = QPushButton(LabelEditor)
-        self.btnPrevious.setObjectName(u"btnPrevious")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
-        sizePolicy1.setHorizontalStretch(0)
-        sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.btnPrevious.sizePolicy().hasHeightForWidth())
-        self.btnPrevious.setSizePolicy(sizePolicy1)
-
-        self.controls.addWidget(self.btnPrevious)
-
         self.hspcLeft = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         self.controls.addItem(self.hspcLeft)
 
+        self.layoutLabelInfo = QHBoxLayout()
+        self.layoutLabelInfo.setObjectName(u"layoutLabelInfo")
+        self.layoutLabelInfo.setContentsMargins(0, -1, -1, -1)
+        self.lblHovered = QLabel(LabelEditor)
+        self.lblHovered.setObjectName(u"lblHovered")
+
+        self.layoutLabelInfo.addWidget(self.lblHovered)
+
+        self.lblLabelIcon = QLabel(LabelEditor)
+        self.lblLabelIcon.setObjectName(u"lblLabelIcon")
+
+        self.layoutLabelInfo.addWidget(self.lblLabelIcon)
+
+        self.lblLabelInfo = QLabel(LabelEditor)
+        self.lblLabelInfo.setObjectName(u"lblLabelInfo")
+
+        self.layoutLabelInfo.addWidget(self.lblLabelInfo)
+
+
+        self.controls.addLayout(self.layoutLabelInfo)
+
         self.hspcRight = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         self.controls.addItem(self.hspcRight)
-
-        self.btnNext = QPushButton(LabelEditor)
-        self.btnNext.setObjectName(u"btnNext")
-
-        self.controls.addWidget(self.btnNext)
 
 
         self.photo_view.addLayout(self.controls)
@@ -145,25 +183,11 @@ class Ui_LabelEditor(object):
 
         self.center.addLayout(self.photo_view)
 
-        self.tabSidebar = QTabWidget(LabelEditor)
-        self.tabSidebar.setObjectName(u"tabSidebar")
-        self.tabEditing = QWidget()
-        self.tabEditing.setObjectName(u"tabEditing")
-        self.tabSidebar.addTab(self.tabEditing, "")
-        self.tabPlugins = QWidget()
-        self.tabPlugins.setObjectName(u"tabPlugins")
-        self.tabSidebar.addTab(self.tabPlugins, "")
-
-        self.center.addWidget(self.tabSidebar)
-
 
         self.verticalLayout.addLayout(self.center)
 
 
         self.retranslateUi(LabelEditor)
-
-        self.tabSidebar.setCurrentIndex(0)
-
 
         QMetaObject.connectSlotsByName(LabelEditor)
     # setupUi
@@ -172,17 +196,16 @@ class Ui_LabelEditor(object):
         LabelEditor.setWindowTitle(QCoreApplication.translate("LabelEditor", u"Form", None))
         self.tbtnUndo.setText(QCoreApplication.translate("LabelEditor", u"Undo", None))
         self.tbtnRedo.setText(QCoreApplication.translate("LabelEditor", u"Redo", None))
-        self.btnResetZoom.setText(QCoreApplication.translate("LabelEditor", u"Reset zoom", None))
-        self.btnZoomBug.setText(QCoreApplication.translate("LabelEditor", u"Zoom on bug", None))
         self.toolBox.setTitle(QCoreApplication.translate("LabelEditor", u"Mask tools", None))
         self.MaskGroup.setTitle(QCoreApplication.translate("LabelEditor", u"Active mask", None))
-        self.tbtnBugMask.setText(QCoreApplication.translate("LabelEditor", u"Bug", None))
-        self.tbtnSegmentsMask.setText(QCoreApplication.translate("LabelEditor", u"Segments", None))
-        self.tbtnReflectionMask.setText(QCoreApplication.translate("LabelEditor", u"Reflections", None))
-        self.btnResetLabel.setText(QCoreApplication.translate("LabelEditor", u"Reset", None))
-        self.btnPrevious.setText(QCoreApplication.translate("LabelEditor", u"<", None))
-        self.btnNext.setText(QCoreApplication.translate("LabelEditor", u">", None))
-        self.tabSidebar.setTabText(self.tabSidebar.indexOf(self.tabEditing), QCoreApplication.translate("LabelEditor", u"Editing", None))
-        self.tabSidebar.setTabText(self.tabSidebar.indexOf(self.tabPlugins), QCoreApplication.translate("LabelEditor", u"Plugins", None))
+        self.grpMaskStyle.setTitle(QCoreApplication.translate("LabelEditor", u"Mask style", None))
+        self.label_2.setText(QCoreApplication.translate("LabelEditor", u"Opacity", None))
+        self.btnFilledStyle.setText(QCoreApplication.translate("LabelEditor", u"Filled", None))
+        self.btnOutlineStyle.setText(QCoreApplication.translate("LabelEditor", u"Outline", None))
+        self.label.setText(QCoreApplication.translate("LabelEditor", u"Width", None))
+        self.spinOutlineWidth.setSuffix(QCoreApplication.translate("LabelEditor", u"px", None))
+        self.lblHovered.setText(QCoreApplication.translate("LabelEditor", u"Hovered label:", None))
+        self.lblLabelIcon.setText("")
+        self.lblLabelInfo.setText("")
     # retranslateUi
 

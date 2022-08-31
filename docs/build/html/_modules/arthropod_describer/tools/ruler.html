@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arthropod_describer.tools.ruler &mdash; MAPHIS 0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> MAPHIS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">arthropod_describer</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">MAPHIS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>arthropod_describer.tools.ruler</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for arthropod_describer.tools.ruler</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">importlib</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">typing</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">List</span>
+
+<span class="kn">from</span> <span class="nn">PySide2.QtCore</span> <span class="kn">import</span> <span class="n">QPoint</span><span class="p">,</span> <span class="n">QRect</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtGui</span> <span class="kn">import</span> <span class="n">QIcon</span><span class="p">,</span> <span class="n">QPen</span><span class="p">,</span> <span class="n">QColor</span><span class="p">,</span> <span class="n">QPainter</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtWidgets</span> <span class="kn">import</span> <span class="n">QWidget</span><span class="p">,</span> <span class="n">QVBoxLayout</span><span class="p">,</span> <span class="n">QLabel</span><span class="p">,</span> <span class="n">QGroupBox</span><span class="p">,</span> <span class="n">QGridLayout</span><span class="p">,</span> <span class="n">QToolButton</span>
+
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.label_change</span> <span class="kn">import</span> <span class="n">CommandEntry</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.photo</span> <span class="kn">import</span> <span class="n">UpdateContext</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.state</span> <span class="kn">import</span> <span class="n">State</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.storage</span> <span class="kn">import</span> <span class="n">Storage</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.tool</span> <span class="kn">import</span> <span class="n">Tool</span><span class="p">,</span> <span class="n">PaintCommand</span><span class="p">,</span> <span class="n">line_command</span><span class="p">,</span> <span class="n">text_command</span><span class="p">,</span> <span class="n">EditContext</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.units</span> <span class="kn">import</span> <span class="n">BaseUnit</span><span class="p">,</span> <span class="n">Value</span><span class="p">,</span> <span class="n">Unit</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.user_params</span> <span class="kn">import</span> <span class="n">UserParam</span><span class="p">,</span> <span class="n">ParamType</span>
+
+
+<div class="viewcode-block" id="Tool_Ruler"><a class="viewcode-back" href="../../../arthropod_describer.tools.html#arthropod_describer.tools.ruler.Tool_Ruler">[docs]</a><span class="k">class</span> <span class="nc">Tool_Ruler</span><span class="p">(</span><span class="n">Tool</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">State</span><span class="p">):</span>
+        <span class="n">Tool</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tool_name</span> <span class="o">=</span> <span class="s2">&quot;Ruler&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_active</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">with</span> <span class="n">importlib</span><span class="o">.</span><span class="n">resources</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="s1">&#39;tools.icons&#39;</span><span class="p">,</span> <span class="s1">&#39;ruler.png&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">path</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_tool_icon</span> <span class="o">=</span> <span class="n">QIcon</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">QPoint</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outline_pen</span> <span class="o">=</span> <span class="n">QPen</span><span class="p">(</span><span class="n">QColor</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outline_pen</span><span class="o">.</span><span class="n">setWidthF</span><span class="p">(</span><span class="mf">3.5</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">line_pen</span> <span class="o">=</span> <span class="n">QPen</span><span class="p">(</span><span class="n">QColor</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">line_pen</span><span class="o">.</span><span class="n">setWidthF</span><span class="p">(</span><span class="mf">2.5</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text_pen</span> <span class="o">=</span> <span class="n">QPen</span><span class="p">(</span><span class="n">QColor</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text_pen</span><span class="o">.</span><span class="n">setWidthF</span><span class="p">(</span><span class="mf">2.5</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_viz_commands</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">PaintCommand</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">px_measurement</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Value</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">px_measurements</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Value</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">real_measurement</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Value</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">real_measurements</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Value</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_show_real_units</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_px_unit</span><span class="p">:</span> <span class="n">Unit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">units</span><span class="o">.</span><span class="n">units</span><span class="p">[</span><span class="s1">&#39;px&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">multi_ruler</span><span class="p">:</span> <span class="n">UserParam</span> <span class="o">=</span> <span class="n">UserParam</span><span class="p">(</span><span class="s1">&#39;Multiple measurements&#39;</span><span class="p">,</span> <span class="n">ParamType</span><span class="o">.</span><span class="n">BOOL</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span>
+                                                <span class="n">key</span><span class="o">=</span><span class="s1">&#39;multi-ruler&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Value</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">out_layout</span> <span class="o">=</span> <span class="n">QGridLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">out_value_px_label</span> <span class="o">=</span> <span class="n">QLabel</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">out_value_unit_label</span> <span class="o">=</span> <span class="n">QLabel</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">out_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">out_value_px_label</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">out_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">out_value_unit_label</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">storage_changed</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_handle_storage_changed</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_handle_storage_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">storage</span><span class="p">:</span> <span class="n">Storage</span><span class="p">,</span> <span class="n">old_storage</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Storage</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="n">old_storage</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">old_storage</span><span class="o">.</span><span class="n">update_photo</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_handle_update_photo</span><span class="p">)</span>
+        <span class="n">storage</span><span class="o">.</span><span class="n">update_photo</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_handle_update_photo</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">user_params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">UserParam</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">multi_ruler</span><span class="o">.</span><span class="n">param_key</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">multi_ruler</span><span class="p">}</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">tool_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tool_name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">active</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_active</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">viz_active</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_active</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">value_storage</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">px_measurements</span>
+
+    <span class="c1"># def left_press(self, painter: QPainter, pos: QPoint, context: EditContext) -&gt; Tuple[Optional[CommandEntry], QRect]:</span>
+    <span class="c1">#    if not self._active:</span>
+    <span class="c1">#        self.endpoints.append(pos)</span>
+    <span class="c1">#    self._active = True</span>
+    <span class="c1">#    return self.mouse_move(painter, pos, pos, context)</span>
+
+<div class="viewcode-block" id="Tool_Ruler.right_press"><a class="viewcode-back" href="../../../arthropod_describer.tools.html#arthropod_describer.tools.ruler.Tool_Ruler.right_press">[docs]</a>    <span class="k">def</span> <span class="nf">right_press</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">painter</span><span class="p">:</span> <span class="n">QPainter</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="n">QPoint</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">EditContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">CommandEntry</span><span class="p">],</span> <span class="n">QRect</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">QRect</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Tool_Ruler.viz_left_press"><a class="viewcode-back" href="../../../arthropod_describer.tools.html#arthropod_describer.tools.ruler.Tool_Ruler.viz_left_press">[docs]</a>    <span class="k">def</span> <span class="nf">viz_left_press</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="n">QPoint</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">PaintCommand</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">multi_ruler</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">viz_right_release</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">px_measurement</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">current_photo</span><span class="o">.</span><span class="n">image_scale</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_active</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">viz_mouse_move</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">pos</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Tool_Ruler.viz_mouse_move"><a class="viewcode-back" href="../../../arthropod_describer.tools.html#arthropod_describer.tools.ruler.Tool_Ruler.viz_mouse_move">[docs]</a>    <span class="k">def</span> <span class="nf">viz_mouse_move</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_pos</span><span class="p">:</span> <span class="n">QPoint</span><span class="p">,</span> <span class="n">old_pos</span><span class="p">:</span> <span class="n">QPoint</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">PaintCommand</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">new_pos</span> <span class="o">==</span> <span class="n">old_pos</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_viz_commands</span>
+        <span class="c1"># self.state.viz_layer.clear_layer()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_pos</span><span class="p">)</span>
+        <span class="n">cmds</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">PaintCommand</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
+            <span class="c1"># self.state.viz_layer.put_line_segment(self.endpoints[i], self.endpoints[i+1], self.line_pen)</span>
+            <span class="n">cmds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line_command</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">outline_pen</span><span class="p">))</span>
+            <span class="n">cmds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line_command</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">line_pen</span><span class="p">))</span>
+            <span class="n">vec</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">length_px</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">QPoint</span><span class="o">.</span><span class="n">dotProduct</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span> <span class="n">vec</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">px_measurement</span> <span class="o">=</span> <span class="n">Value</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">length_px</span><span class="p">)),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_px_unit</span><span class="p">)</span>
+            <span class="n">mid_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">vec</span>
+            <span class="c1"># self.state.viz_layer.put_text(mid_, f&#39;{length_px:.2f} px&#39;, self.text_pen)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_show_real_units</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="o">.</span><span class="n">value</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">cmds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">text_command</span><span class="p">(</span><span class="n">mid_</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">px_measurement</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="si">}</span><span class="s1"> (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">px_measurement</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
+                                         <span class="bp">self</span><span class="o">.</span><span class="n">outline_pen</span><span class="p">))</span>
+                <span class="n">cmds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">text_command</span><span class="p">(</span><span class="n">mid_</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">px_measurement</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="si">}</span><span class="s1"> (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">px_measurement</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_pen</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">cmds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">text_command</span><span class="p">(</span><span class="n">mid_</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">px_measurement</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">outline_pen</span><span class="p">))</span>
+                <span class="n">cmds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">text_command</span><span class="p">(</span><span class="n">mid_</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">px_measurement</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_pen</span><span class="p">))</span>
+        <span class="c1"># FIXME self.value_storage is empty although self._measurement is not. Might cause `IndexError: list index out of range`</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">px_measurement</span><span class="o">.</span><span class="n">value</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_value</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">px_measurement</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_viz_commands</span> <span class="o">=</span> <span class="n">cmds</span>
+        <span class="k">return</span> <span class="n">cmds</span></div>
+
+<div class="viewcode-block" id="Tool_Ruler.viz_left_release"><a class="viewcode-back" href="../../../arthropod_describer.tools.html#arthropod_describer.tools.ruler.Tool_Ruler.viz_left_release">[docs]</a>    <span class="k">def</span> <span class="nf">viz_left_release</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="n">QPoint</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">PaintCommand</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">pos</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_viz_commands</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">px_measurement</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">px_measurement</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c1"># Do not place (or emit placement signal of) a zero-length ruler. If it has been started (odd number of endpoints), remove its endpoint and viz commands.</span>
+                <span class="c1"># TODO: Hopefully, not emitting the signal and keeping self._active = True at the end of the function is ok;</span>
+                <span class="c1">#       otherwise, self.current_value.emit(0) and self._active = False might be needed, as in Tool_Ruler.viz_right_release().</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_viz_commands</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">4</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_viz_commands</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_viz_commands</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_viz_commands</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_viz_commands</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">px_measurements</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">px_measurement</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_update_out_labels</span><span class="p">()</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">px_measurement</span><span class="o">.</span><span class="n">value</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">current_value</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">px_measurement</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_active</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="c1"># self._measurement = Value(0, self._px_unit)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">px_measurement</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_viz_commands</span></div>
+
+<div class="viewcode-block" id="Tool_Ruler.viz_right_release"><a class="viewcode-back" href="../../../arthropod_describer.tools.html#arthropod_describer.tools.ruler.Tool_Ruler.viz_right_release">[docs]</a>    <span class="k">def</span> <span class="nf">viz_right_release</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="n">QPoint</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">PaintCommand</span><span class="p">]:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_viz_commands</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">px_measurements</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_out_labels</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">px_measurement</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># self.current_value.emit(Value(0, self.state.units.units[&#39;px&#39;]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_value</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+        <span class="c1"># self.state.viz_layer.clear_layer()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_active</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="p">[]</span></div>
+
+<div class="viewcode-block" id="Tool_Ruler.viz_hover_move"><a class="viewcode-back" href="../../../arthropod_describer.tools.html#arthropod_describer.tools.ruler.Tool_Ruler.viz_hover_move">[docs]</a>    <span class="k">def</span> <span class="nf">viz_hover_move</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_pos</span><span class="p">:</span> <span class="n">QPoint</span><span class="p">,</span> <span class="n">old_pos</span><span class="p">:</span> <span class="n">QPoint</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">PaintCommand</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_viz_commands</span></div>
+
+<div class="viewcode-block" id="Tool_Ruler.show_real_units"><a class="viewcode-back" href="../../../arthropod_describer.tools.html#arthropod_describer.tools.ruler.Tool_Ruler.show_real_units">[docs]</a>    <span class="k">def</span> <span class="nf">show_real_units</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">show</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_show_real_units</span> <span class="o">=</span> <span class="n">show</span></div>
+
+<div class="viewcode-block" id="Tool_Ruler.set_scale"><a class="viewcode-back" href="../../../arthropod_describer.tools.html#arthropod_describer.tools.ruler.Tool_Ruler.set_scale">[docs]</a>    <span class="k">def</span> <span class="nf">set_scale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scale</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Value</span><span class="p">]):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scale</span> <span class="o">=</span> <span class="n">scale</span></div>
+
+    <span class="c1"># def left_release(self, painter: QPainter, pos: QPoint, context: EditContext) -&gt; Tuple[</span>
+    <span class="c1">#    Optional[CommandEntry], QRect]:</span>
+    <span class="c1">#    #self.endpoints.append(pos)</span>
+    <span class="c1">#    #self._active = False</span>
+    <span class="c1">#    #self.endpoints.clear()</span>
+    <span class="c1">#    return None, QRect()</span>
+
+    <span class="c1"># def right_release(self, painter: QPainter, pos: QPoint, context: EditContext) -&gt; Tuple[Optional[CommandEntry], QRect]:</span>
+    <span class="c1">#    self.endpoints.clear()</span>
+    <span class="c1">#    self.state.viz_layer.clear_layer()</span>
+    <span class="c1">#    self._active = False</span>
+    <span class="c1">#    return None, QRect()</span>
+
+    <span class="c1"># def mouse_move(self, painter: QPainter, new_pos: QPoint, old_pos: QPoint, context: EditContext) -&gt; Tuple[</span>
+    <span class="c1">#    Optional[CommandEntry], QRect]:</span>
+    <span class="c1">#    if len(self.endpoints) &lt; 1:</span>
+    <span class="c1">#        return None, QRect()</span>
+    <span class="c1">#    self.state.viz_layer.clear_layer()</span>
+    <span class="c1">#    self.endpoints.append(new_pos)</span>
+    <span class="c1">#    for i in range(0, len(self.endpoints) - 1, 2):</span>
+    <span class="c1">#        self.state.viz_layer.put_line_segment(self.endpoints[i], self.endpoints[i+1], self.line_pen)</span>
+    <span class="c1">#        vec = (self.endpoints[i+1] - self.endpoints[i])</span>
+    <span class="c1">#        length_px = math.sqrt(QPoint.dotProduct(vec, vec))</span>
+    <span class="c1">#        mid_ = self.endpoints[i] + 0.5 * vec</span>
+    <span class="c1">#        self.state.viz_layer.put_text(mid_, f&#39;{length_px:.2f} px&#39;, self.text_pen)</span>
+    <span class="c1">#    self.endpoints.pop()</span>
+    <span class="c1">#    return None, QRect()</span>
+
+<div class="viewcode-block" id="Tool_Ruler.reset_tool"><a class="viewcode-back" href="../../../arthropod_describer.tools.html#arthropod_describer.tools.ruler.Tool_Ruler.reset_tool">[docs]</a>    <span class="k">def</span> <span class="nf">reset_tool</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_active</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">px_measurement</span> <span class="o">=</span> <span class="n">Value</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_px_unit</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">px_measurements</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_viz_commands</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="c1"># self.state.viz_layer.clear_layer()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_out_labels</span><span class="p">()</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">viz_commands</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">PaintCommand</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_viz_commands</span>
+
+<div class="viewcode-block" id="Tool_Ruler.set_line"><a class="viewcode-back" href="../../../arthropod_describer.tools.html#arthropod_describer.tools.ruler.Tool_Ruler.set_line">[docs]</a>    <span class="k">def</span> <span class="nf">set_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p1</span><span class="p">:</span> <span class="n">QPoint</span><span class="p">,</span> <span class="n">p2</span><span class="p">:</span> <span class="n">QPoint</span><span class="p">,</span> <span class="n">reset_others</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">reset_others</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">px_measurements</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">real_measurements</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_viz_commands</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="n">cmds</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">PaintCommand</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">line_command</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">line_pen</span><span class="p">)]</span>
+
+        <span class="n">vec</span> <span class="o">=</span> <span class="p">(</span><span class="n">p2</span> <span class="o">-</span> <span class="n">p1</span><span class="p">)</span>
+        <span class="n">length_px</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">QPoint</span><span class="o">.</span><span class="n">dotProduct</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span> <span class="n">vec</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">px_measurement</span> <span class="o">=</span> <span class="n">Value</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">length_px</span><span class="p">)),</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">units</span><span class="o">.</span><span class="n">units</span><span class="p">[</span><span class="s1">&#39;px&#39;</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">multi_ruler</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">px_measurements</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">px_measurement</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">px_measurements</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">px_measurement</span><span class="p">]</span>
+
+        <span class="n">scale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">current_photo</span><span class="o">.</span><span class="n">image_scale</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_out_labels</span><span class="p">()</span>
+
+        <span class="n">mid_</span> <span class="o">=</span> <span class="n">p1</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">vec</span>
+        <span class="c1"># self.state.viz_layer.put_text(mid_, f&#39;{length_px:.2f} px&#39;, self.text_pen)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_show_real_units</span> <span class="ow">and</span> <span class="n">scale</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">scale</span><span class="o">.</span><span class="n">value</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">real_measurements</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">px_measurements</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">scale</span><span class="p">)</span>
+            <span class="n">cmds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">text_command</span><span class="p">(</span><span class="n">mid_</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">px_measurement</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="si">}</span><span class="s1"> (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">px_measurement</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
+                                     <span class="bp">self</span><span class="o">.</span><span class="n">outline_pen</span><span class="p">))</span>
+            <span class="n">cmds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">text_command</span><span class="p">(</span><span class="n">mid_</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">px_measurement</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="si">}</span><span class="s1"> (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">px_measurement</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_pen</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cmds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">text_command</span><span class="p">(</span><span class="n">mid_</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">px_measurement</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">outline_pen</span><span class="p">))</span>
+            <span class="n">cmds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">text_command</span><span class="p">(</span><span class="n">mid_</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">px_measurement</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_pen</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_viz_commands</span> <span class="o">=</span> <span class="n">cmds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_active</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+    <span class="k">def</span> <span class="nf">_update_out_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">measurement_sum</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">measurement</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">px_measurements</span><span class="p">):</span>
+            <span class="n">measurement_sum</span> <span class="o">+=</span> <span class="n">measurement</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">measurement_sum</span> <span class="o">=</span> <span class="n">Value</span><span class="p">(</span><span class="n">measurement_sum</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_px_unit</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">out_value_px_label</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">measurement_sum</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_show_real_units</span>\
+                <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>\
+                <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">current_photo</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>\
+                <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">current_photo</span><span class="o">.</span><span class="n">image_scale</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>\
+                <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">current_photo</span><span class="o">.</span><span class="n">image_scale</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">real_measurement_sum</span> <span class="o">=</span> <span class="n">measurement_sum</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">current_photo</span><span class="o">.</span><span class="n">image_scale</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_value_unit_label</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">real_measurement_sum</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_value_unit_label</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Tool_Ruler.rotate"><a class="viewcode-back" href="../../../arthropod_describer.tools.html#arthropod_describer.tools.ruler.Tool_Ruler.rotate">[docs]</a>    <span class="k">def</span> <span class="nf">rotate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ccw</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">origin</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">endpoint</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="p">:</span>
+            <span class="c1">#print(f&quot;\nrotating ruler endpoint ({endpoint.x()}, {endpoint.y()}) around ({origin[0]}, {origin[1]}), ccw = {ccw}&quot;)</span>
+            <span class="n">p1_c</span> <span class="o">=</span> <span class="nb">complex</span><span class="p">(</span><span class="n">endpoint</span><span class="o">.</span><span class="n">x</span><span class="p">()</span> <span class="o">-</span> <span class="n">origin</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">endpoint</span><span class="o">.</span><span class="n">y</span><span class="p">()</span> <span class="o">-</span> <span class="n">origin</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">p1_c</span> <span class="o">=</span> <span class="n">p1_c</span> <span class="o">*</span> <span class="nb">complex</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span> <span class="k">if</span> <span class="n">ccw</span> <span class="k">else</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">p1</span> <span class="o">=</span> <span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">p1_c</span><span class="o">.</span><span class="n">real</span><span class="p">),</span> <span class="nb">round</span><span class="p">(</span><span class="n">p1_c</span><span class="o">.</span><span class="n">imag</span><span class="p">))</span>
+            <span class="n">p1</span> <span class="o">=</span> <span class="p">(</span><span class="n">p1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">origin</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">p1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">origin</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">endpoint</span><span class="o">.</span><span class="n">setX</span><span class="p">(</span><span class="n">p1</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">endpoint</span><span class="o">.</span><span class="n">setY</span><span class="p">(</span><span class="n">p1</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="c1">#print(f&quot;rotated to ({endpoint.x()}, {endpoint.y()})\n&quot;)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">regenerate_viz</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Tool_Ruler.set_out_widget"><a class="viewcode-back" href="../../../arthropod_describer.tools.html#arthropod_describer.tools.ruler.Tool_Ruler.set_out_widget">[docs]</a>    <span class="k">def</span> <span class="nf">set_out_widget</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">widg</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">QGroupBox</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="n">widg</span><span class="o">.</span><span class="n">setTitle</span><span class="p">(</span><span class="s1">&#39;Total measurements&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_out_labels</span><span class="p">()</span>
+        <span class="n">widg</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">out_layout</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="Tool_Ruler.regenerate_real_measurements"><a class="viewcode-back" href="../../../arthropod_describer.tools.html#arthropod_describer.tools.ruler.Tool_Ruler.regenerate_real_measurements">[docs]</a>    <span class="k">def</span> <span class="nf">regenerate_real_measurements</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">real_measurements</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="n">scale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">current_photo</span><span class="o">.</span><span class="n">image_scale</span>
+        <span class="k">if</span> <span class="n">scale</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">scale</span><span class="o">.</span><span class="n">value</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">px_meas</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">px_measurements</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">real_measurements</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">px_meas</span> <span class="o">/</span> <span class="n">scale</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">regenerate_viz</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Tool_Ruler.regenerate_viz"><a class="viewcode-back" href="../../../arthropod_describer.tools.html#arthropod_describer.tools.ruler.Tool_Ruler.regenerate_viz">[docs]</a>    <span class="k">def</span> <span class="nf">regenerate_viz</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># print(&#39;regenerating&#39;)</span>
+        <span class="n">cmds</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">PaintCommand</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">scale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">current_photo</span><span class="o">.</span><span class="n">image_scale</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
+            <span class="c1"># self.state.viz_layer.put_line_segment(self.endpoints[i], self.endpoints[i+1], self.line_pen)</span>
+            <span class="n">cmds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line_command</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">outline_pen</span><span class="p">))</span>
+            <span class="n">cmds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line_command</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">line_pen</span><span class="p">))</span>
+            <span class="n">vec</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">length_px</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">QPoint</span><span class="o">.</span><span class="n">dotProduct</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span> <span class="n">vec</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">px_measurement</span> <span class="o">=</span> <span class="n">Value</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">length_px</span><span class="p">)),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_px_unit</span><span class="p">)</span>
+            <span class="n">mid_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">vec</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_show_real_units</span> <span class="ow">and</span> <span class="n">scale</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">scale</span><span class="o">.</span><span class="n">value</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">cmds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">text_command</span><span class="p">(</span><span class="n">mid_</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">px_measurement</span> <span class="o">/</span> <span class="n">scale</span><span class="si">}</span><span class="s1"> (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">px_measurement</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
+                                         <span class="bp">self</span><span class="o">.</span><span class="n">outline_pen</span><span class="p">))</span>
+                <span class="n">cmds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">text_command</span><span class="p">(</span><span class="n">mid_</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">px_measurement</span> <span class="o">/</span> <span class="n">scale</span><span class="si">}</span><span class="s1"> (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">px_measurement</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_pen</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">cmds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">text_command</span><span class="p">(</span><span class="n">mid_</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">px_measurement</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">outline_pen</span><span class="p">))</span>
+                <span class="n">cmds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">text_command</span><span class="p">(</span><span class="n">mid_</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">px_measurement</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_pen</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_viz_commands</span> <span class="o">=</span> <span class="n">cmds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_viz</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">_handle_update_photo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ctx</span><span class="p">:</span> <span class="n">UpdateContext</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="n">img_name</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">current_photo</span><span class="o">.</span><span class="n">image_name</span> <span class="ow">or</span> <span class="n">ctx</span> <span class="o">!=</span> <span class="n">UpdateContext</span><span class="o">.</span><span class="n">Photo</span> <span class="ow">or</span> <span class="s1">&#39;type&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;image_scale&#39;</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">regenerate_real_measurements</span><span class="p">()</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, CBIA @ FI MUNI.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

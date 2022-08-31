@@ -1,14 +1,16 @@
+import importlib.resources
 import typing
+from typing import Tuple, Optional
 
 import numpy as np
-from PySide2.QtCore import QPoint
-from PySide2.QtGui import QImage, QPainter, QColor
+from PySide2.QtCore import QPoint, QRect
+from PySide2.QtGui import QImage, QPainter, QColor, QRegion, QIcon, Qt
 from skimage.segmentation import flood
 
-from arthropod_describer.common.label_change import LabelChange, label_difference_to_label_changes
+from arthropod_describer.common.label_change import label_difference_to_command, CommandEntry, compute_label_difference
 from arthropod_describer.common.state import State
-from arthropod_describer.common.tool import Tool, EditContext
-from arthropod_describer.common.user_params import ToolUserParam
+from arthropod_describer.common.tool import Tool, EditContext, clip_mask_from_bool_nd
+from arthropod_describer.common.user_params import UserParam
 
 TOOL_CLASS_NAME = 'Bucket'
 
@@ -21,17 +23,19 @@ class Tool_Bucket(Tool):
         self._secondary_label = None
         self._primary_label = None
         self._tool_name = 'Bucket'
+        with importlib.resources.path("tools.icons", "paint-bucket.png") as path:
+            self._tool_icon = QIcon(str(path))
 
     @property
     def tool_name(self) -> str:
         return self._tool_name
 
     @property
-    def cursor_image(self) -> QImage:
-        return QImage()
+    def cursor_image(self) -> Optional[typing.Union[QImage, Qt.CursorShape]]:
+        return Qt.ArrowCursor
 
     @property
-    def user_params(self) -> typing.Dict[str, ToolUserParam]:
+    def user_params(self) -> typing.Dict[str, UserParam]:
         return {}
 
     def set_user_param(self, param_name: str, value: typing.Any):
@@ -52,14 +56,33 @@ class Tool_Bucket(Tool):
             return
         self.cmap = cmap
 
-    def left_release(self, painter: QPainter, pos: QPoint, ctx: EditContext) -> typing.List[LabelChange]:
-        picked_label = ctx.label_img.label_img[pos.y(), pos.x()]
-        # TODO should probably make distinction between connectivity for bg and fg, definitely
-        flood_mask = flood(ctx.label_img.label_img, pos.toTuple()[::-1], connectivity=1)
-        flood_coords = np.nonzero(flood_mask)
-        lab_change = LabelChange(np.nonzero(flood_mask), ctx.label, picked_label, ctx.label_img.label_type)
-        color = QColor(*ctx.colormap[ctx.label]).rgba()
-        for y, x in zip(*flood_coords):
-            ctx.label_viz.setPixel(x, y, color)
+    def left_release(self, painter: QPainter, pos: QPoint, ctx: EditContext) -> Tuple[Optional[CommandEntry], QRect]:
+        picked_label = ctx.label_img[ctx.label_level][pos.y(), pos.x()]
+        if picked_label == ctx.label or \
+                (ctx.label_level > 0 and ctx.edit_mask[pos.y(), pos.x()] > 0): # In edit_mask, pixels with value 0 are pixels we are not allowed to modify.
+                #(ctx.label_img.label_type != LabelType.BUG and ctx.photo.bug_mask.label_img[pos.y(), pos.x()] == 0):
+            return None, QRect()
+        if ctx.edit_mask is not None: # TODO 0 label does not respect label image
+            label_img_negative_bg = np.where(ctx.edit_mask == 0, ctx.label_img[ctx.label_level], -1)
+            flood_mask = flood(label_img_negative_bg, pos.toTuple()[::-1], connectivity=1)
+        else:
+            flood_mask = flood(ctx.label_img.label_image, pos.toTuple()[::-1], connectivity=1)
+        new_label = np.where(flood_mask > 0, ctx.label, ctx.label_img.label_image)
+        lab_diff = compute_label_difference(ctx.label_img.label_image, new_label)
 
-        return [lab_change]
+        color = QColor(*ctx.colormap[ctx.label])
+        if ctx.label == 0:
+            color.setAlpha(0)
+
+        flood_bitmap = clip_mask_from_bool_nd(flood_mask)
+        clip_reg = QRegion(flood_bitmap)
+        painter = QPainter(ctx.label_viz)
+        painter.setClipRegion(clip_reg)
+        painter.setCompositionMode(QPainter.CompositionMode_Source)
+        painter.fillRect(0, 0, ctx.label_img.label_image.shape[1], ctx.label_img.label_image.shape[0],
+                         color)
+        painter.end()
+        cmd = label_difference_to_command(lab_diff, ctx.label_img)
+        cmd.source = self.tool_name
+        bbox = cmd.bbox
+        return cmd, QRect(bbox[2], bbox[0], bbox[2]+bbox[3]+1, bbox[0]+bbox[1]+1)

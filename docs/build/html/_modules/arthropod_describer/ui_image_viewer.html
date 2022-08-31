@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arthropod_describer.ui_image_viewer &mdash; MAPHIS 0.1 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> MAPHIS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">arthropod_describer</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">MAPHIS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>arthropod_describer.ui_image_viewer</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for arthropod_describer.ui_image_viewer</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1">################################################################################</span>
+<span class="c1">## Form generated from reading UI file &#39;image_viewer.ui&#39;</span>
+<span class="c1">##</span>
+<span class="c1">## Created by: Qt User Interface Compiler version 5.14.2</span>
+<span class="c1">##</span>
+<span class="c1">## WARNING! All changes made in this file will be lost when recompiling UI file!</span>
+<span class="c1">################################################################################</span>
+
+<span class="kn">from</span> <span class="nn">PySide2.QtCore</span> <span class="kn">import</span> <span class="p">(</span><span class="n">QCoreApplication</span><span class="p">,</span> <span class="n">QDate</span><span class="p">,</span> <span class="n">QDateTime</span><span class="p">,</span> <span class="n">QMetaObject</span><span class="p">,</span>
+    <span class="n">QObject</span><span class="p">,</span> <span class="n">QPoint</span><span class="p">,</span> <span class="n">QRect</span><span class="p">,</span> <span class="n">QSize</span><span class="p">,</span> <span class="n">QTime</span><span class="p">,</span> <span class="n">QUrl</span><span class="p">,</span> <span class="n">Qt</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtGui</span> <span class="kn">import</span> <span class="p">(</span><span class="n">QBrush</span><span class="p">,</span> <span class="n">QColor</span><span class="p">,</span> <span class="n">QConicalGradient</span><span class="p">,</span> <span class="n">QCursor</span><span class="p">,</span> <span class="n">QFont</span><span class="p">,</span>
+    <span class="n">QFontDatabase</span><span class="p">,</span> <span class="n">QIcon</span><span class="p">,</span> <span class="n">QKeySequence</span><span class="p">,</span> <span class="n">QLinearGradient</span><span class="p">,</span> <span class="n">QPalette</span><span class="p">,</span> <span class="n">QPainter</span><span class="p">,</span>
+    <span class="n">QPixmap</span><span class="p">,</span> <span class="n">QRadialGradient</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtWidgets</span> <span class="kn">import</span> <span class="o">*</span>
+
+
+<div class="viewcode-block" id="Ui_ImageViewer"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.ui_image_viewer.Ui_ImageViewer">[docs]</a><span class="k">class</span> <span class="nc">Ui_ImageViewer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Ui_ImageViewer.setupUi"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.ui_image_viewer.Ui_ImageViewer.setupUi">[docs]</a>    <span class="k">def</span> <span class="nf">setupUi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ImageViewer</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ImageViewer</span><span class="o">.</span><span class="n">objectName</span><span class="p">():</span>
+            <span class="n">ImageViewer</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;ImageViewer&quot;</span><span class="p">)</span>
+        <span class="n">ImageViewer</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="mi">1020</span><span class="p">,</span> <span class="mi">621</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verticalLayout</span> <span class="o">=</span> <span class="n">QVBoxLayout</span><span class="p">(</span><span class="n">ImageViewer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verticalLayout</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;verticalLayout&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">controlBarContainer</span> <span class="o">=</span> <span class="n">QVBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">controlBarContainer</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;controlBarContainer&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">controlBar</span> <span class="o">=</span> <span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">controlBar</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;controlBar&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">grpImageControls</span> <span class="o">=</span> <span class="n">QGroupBox</span><span class="p">(</span><span class="n">ImageViewer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">grpImageControls</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;grpImageControls&quot;</span><span class="p">)</span>
+        <span class="n">sizePolicy</span> <span class="o">=</span> <span class="n">QSizePolicy</span><span class="p">(</span><span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Fixed</span><span class="p">,</span> <span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Fixed</span><span class="p">)</span>
+        <span class="n">sizePolicy</span><span class="o">.</span><span class="n">setHorizontalStretch</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">sizePolicy</span><span class="o">.</span><span class="n">setVerticalStretch</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">sizePolicy</span><span class="o">.</span><span class="n">setHeightForWidth</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grpImageControls</span><span class="o">.</span><span class="n">sizePolicy</span><span class="p">()</span><span class="o">.</span><span class="n">hasHeightForWidth</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">grpImageControls</span><span class="o">.</span><span class="n">setSizePolicy</span><span class="p">(</span><span class="n">sizePolicy</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout_4</span> <span class="o">=</span> <span class="n">QHBoxLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grpImageControls</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout_4</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;horizontalLayout_4&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tbtnRotateCCW</span> <span class="o">=</span> <span class="n">QToolButton</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grpImageControls</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tbtnRotateCCW</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;tbtnRotateCCW&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tbtnRotateCCW</span><span class="o">.</span><span class="n">setIconSize</span><span class="p">(</span><span class="n">QSize</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span> <span class="mi">24</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout_4</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tbtnRotateCCW</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tbtnRotateCW</span> <span class="o">=</span> <span class="n">QToolButton</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grpImageControls</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tbtnRotateCW</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;tbtnRotateCW&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tbtnRotateCW</span><span class="o">.</span><span class="n">setIconSize</span><span class="p">(</span><span class="n">QSize</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span> <span class="mi">24</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout_4</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tbtnRotateCW</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">QLabel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grpImageControls</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;label&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout_4</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cbxZoom</span> <span class="o">=</span> <span class="n">QComboBox</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grpImageControls</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cbxZoom</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cbxZoom</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cbxZoom</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cbxZoom</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cbxZoom</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cbxZoom</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cbxZoom</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cbxZoom</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cbxZoom</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cbxZoom</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;cbxZoom&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cbxZoom</span><span class="o">.</span><span class="n">setEditable</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cbxZoom</span><span class="o">.</span><span class="n">setInsertPolicy</span><span class="p">(</span><span class="n">QComboBox</span><span class="o">.</span><span class="n">NoInsert</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout_4</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cbxZoom</span><span class="p">)</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">controlBar</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grpImageControls</span><span class="p">)</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">controlBarContainer</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">controlBar</span><span class="p">)</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">verticalLayout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">controlBarContainer</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">viewFrame</span> <span class="o">=</span> <span class="n">QFrame</span><span class="p">(</span><span class="n">ImageViewer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">viewFrame</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;viewFrame&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">viewFrame</span><span class="o">.</span><span class="n">setFrameShape</span><span class="p">(</span><span class="n">QFrame</span><span class="o">.</span><span class="n">StyledPanel</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">viewFrame</span><span class="o">.</span><span class="n">setFrameShadow</span><span class="p">(</span><span class="n">QFrame</span><span class="o">.</span><span class="n">Raised</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">verticalLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">viewFrame</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout</span> <span class="o">=</span> <span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;horizontalLayout&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalSpacer</span> <span class="o">=</span> <span class="n">QSpacerItem</span><span class="p">(</span><span class="mi">40</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Expanding</span><span class="p">,</span> <span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Minimum</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">horizontalSpacer</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tbtnFirst</span> <span class="o">=</span> <span class="n">QToolButton</span><span class="p">(</span><span class="n">ImageViewer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tbtnFirst</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;tbtnFirst&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tbtnFirst</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tbtnPrev</span> <span class="o">=</span> <span class="n">QToolButton</span><span class="p">(</span><span class="n">ImageViewer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tbtnPrev</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;tbtnPrev&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tbtnPrev</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tbtnNext</span> <span class="o">=</span> <span class="n">QToolButton</span><span class="p">(</span><span class="n">ImageViewer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tbtnNext</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;tbtnNext&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tbtnNext</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tbtnLast</span> <span class="o">=</span> <span class="n">QToolButton</span><span class="p">(</span><span class="n">ImageViewer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tbtnLast</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;tbtnLast&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tbtnLast</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalSpacer_2</span> <span class="o">=</span> <span class="n">QSpacerItem</span><span class="p">(</span><span class="mi">40</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Expanding</span><span class="p">,</span> <span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Minimum</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">horizontalSpacer_2</span><span class="p">)</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">verticalLayout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout</span><span class="p">)</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">retranslateUi</span><span class="p">(</span><span class="n">ImageViewer</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cbxZoom</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+
+        <span class="n">QMetaObject</span><span class="o">.</span><span class="n">connectSlotsByName</span><span class="p">(</span><span class="n">ImageViewer</span><span class="p">)</span></div>
+    <span class="c1"># setupUi</span>
+
+<div class="viewcode-block" id="Ui_ImageViewer.retranslateUi"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.ui_image_viewer.Ui_ImageViewer.retranslateUi">[docs]</a>    <span class="k">def</span> <span class="nf">retranslateUi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ImageViewer</span><span class="p">):</span>
+        <span class="n">ImageViewer</span><span class="o">.</span><span class="n">setWindowTitle</span><span class="p">(</span><span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;ImageViewer&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;Form&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">grpImageControls</span><span class="o">.</span><span class="n">setTitle</span><span class="p">(</span><span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;ImageViewer&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;Controls&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tbtnRotateCCW</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tbtnRotateCW</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;ImageViewer&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;Zoom:&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cbxZoom</span><span class="o">.</span><span class="n">setItemText</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;ImageViewer&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;Fit photo&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cbxZoom</span><span class="o">.</span><span class="n">setItemText</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;ImageViewer&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;Fit specimen&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cbxZoom</span><span class="o">.</span><span class="n">setItemText</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;ImageViewer&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;10%&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cbxZoom</span><span class="o">.</span><span class="n">setItemText</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;ImageViewer&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;25%&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cbxZoom</span><span class="o">.</span><span class="n">setItemText</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;ImageViewer&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;50%&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cbxZoom</span><span class="o">.</span><span class="n">setItemText</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;ImageViewer&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;100%&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cbxZoom</span><span class="o">.</span><span class="n">setItemText</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;ImageViewer&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;200%&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cbxZoom</span><span class="o">.</span><span class="n">setItemText</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;ImageViewer&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;300%&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cbxZoom</span><span class="o">.</span><span class="n">setItemText</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;ImageViewer&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;400%&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+
+<span class="c1">#if QT_CONFIG(tooltip)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tbtnFirst</span><span class="o">.</span><span class="n">setToolTip</span><span class="p">(</span><span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;ImageViewer&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;First&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+<span class="c1">#endif // QT_CONFIG(tooltip)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tbtnFirst</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;ImageViewer&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;|&lt;&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+<span class="c1">#if QT_CONFIG(tooltip)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tbtnPrev</span><span class="o">.</span><span class="n">setToolTip</span><span class="p">(</span><span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;ImageViewer&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;Previous&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+<span class="c1">#endif // QT_CONFIG(tooltip)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tbtnPrev</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;ImageViewer&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;&lt;&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+<span class="c1">#if QT_CONFIG(tooltip)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tbtnNext</span><span class="o">.</span><span class="n">setToolTip</span><span class="p">(</span><span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;ImageViewer&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;Next&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+<span class="c1">#endif // QT_CONFIG(tooltip)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tbtnNext</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;ImageViewer&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+<span class="c1">#if QT_CONFIG(tooltip)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tbtnLast</span><span class="o">.</span><span class="n">setToolTip</span><span class="p">(</span><span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;ImageViewer&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;Last&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+<span class="c1">#endif // QT_CONFIG(tooltip)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tbtnLast</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;ImageViewer&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;&gt;|&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span></div></div>
+    <span class="c1"># retranslateUi</span>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, CBIA @ FI MUNI.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

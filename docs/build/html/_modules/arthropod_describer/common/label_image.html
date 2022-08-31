@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arthropod_describer.common.label_image &mdash; MAPHIS 0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> MAPHIS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">arthropod_describer</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">MAPHIS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>arthropod_describer.common.label_image</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for arthropod_describer.common.label_image</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">IntEnum</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">typing</span>
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtGui</span> <span class="kn">import</span> <span class="n">QPixmap</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">ndimage</span>
+<span class="kn">from</span> <span class="nn">skimage</span> <span class="kn">import</span> <span class="n">io</span>
+
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.common</span> <span class="kn">import</span> <span class="n">Info</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.label_hierarchy</span> <span class="kn">import</span> <span class="n">LabelHierarchy</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.units</span> <span class="kn">import</span> <span class="n">Value</span><span class="p">,</span> <span class="n">CompoundUnit</span><span class="p">,</span> <span class="n">Unit</span><span class="p">,</span> <span class="n">BaseUnit</span><span class="p">,</span> <span class="n">SIPrefix</span>
+
+
+<div class="viewcode-block" id="PropertyType"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_image.PropertyType">[docs]</a><span class="k">class</span> <span class="nc">PropertyType</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+    <span class="n">String</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">Scalar</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">Vector</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="n">Intensity</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="n">Other</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">NDArray</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">IntensityHSV</span> <span class="o">=</span> <span class="mi">6</span></div>
+
+
+<div class="viewcode-block" id="RegionProperty"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_image.RegionProperty">[docs]</a><span class="k">class</span> <span class="nc">RegionProperty</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_info</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Info</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Value</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">Union</span><span class="p">[</span><span class="n">CompoundUnit</span><span class="p">,</span> <span class="n">Unit</span><span class="p">]]]]</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># either Value, or a tuple of list of values(float, int...) and a Unit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prop_type</span><span class="p">:</span> <span class="n">PropertyType</span> <span class="o">=</span> <span class="n">PropertyType</span><span class="o">.</span><span class="n">Scalar</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_vals</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">val_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># names of individual scalar values or matrices</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">col_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># in the case when self.prop_type = PropertyType.NDArray</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">row_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># same here</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vector_viz</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">QPixmap</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_str_rep</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_str_rep</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Info</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_info</span>
+
+    <span class="nd">@info</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">info</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Info</span><span class="p">]):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_info</span> <span class="o">=</span> <span class="n">info</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_str_rep</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="c1"># return f&#39;{self.info.name}: {self.format_value()} {self.unit}&#39;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_str_rep</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_str_rep</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_str_rep</span>
+
+    <span class="k">def</span> <span class="nf">_update_str_rep</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">Value</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_str_rep</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="s2">&quot;&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_info</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_info</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="k">return</span>
+        <span class="n">val_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_value</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_str_rep</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="s2">&quot;&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_info</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">val_str</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span>
+
+<div class="viewcode-block" id="RegionProperty.format_value"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_image.RegionProperty.format_value">[docs]</a>    <span class="k">def</span> <span class="nf">format_value</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">prop_type</span> <span class="o">==</span> <span class="n">PropertyType</span><span class="o">.</span><span class="n">Scalar</span><span class="p">:</span>  <span class="c1"># So self.value is of type `Value`</span>
+            <span class="c1"># if type(self.value) == float:</span>
+            <span class="c1">#     return f&#39;{self.value:.2f}&#39;</span>
+            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">prop_type</span> <span class="o">==</span> <span class="n">PropertyType</span><span class="o">.</span><span class="n">Intensity</span><span class="p">:</span> <span class="c1"># self.value is of type Tuple[List[Any], CompoundUnit]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_vals</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="nb">float</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">val_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span>
+                <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">val_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">val_string</span> <span class="o">=</span> <span class="s1">&#39;(&#39;</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_vals</span><span class="p">):</span>
+                    <span class="n">val_string</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">val_names</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s1">, &#39;</span>
+                <span class="k">return</span> <span class="n">val_string</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">prop_type</span> <span class="o">==</span> <span class="n">PropertyType</span><span class="o">.</span><span class="n">Vector</span><span class="p">:</span>
+            <span class="n">val_string</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_vals</span><span class="p">):</span>
+                <span class="n">val_string</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">, &#39;</span>
+            <span class="k">return</span> <span class="n">val_string</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">val_string</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="c1">#print(f&quot;self.prop_type: {self.prop_type}&quot;)</span>
+            <span class="c1">#print(f&quot;self.num_vals: {self.num_vals}&quot;)</span>
+            <span class="c1">#print(f&quot;self.value: {self.value}&quot;)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_vals</span><span class="p">):</span>
+                <span class="n">val_string</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s1">, &#39;</span>
+            <span class="c1">#print(f&quot;val_string[:-2]: {val_string[:-2]}&quot;)</span>
+            <span class="k">return</span> <span class="n">val_string</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unsupported type of value: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RegionProperty.from_dict"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_image.RegionProperty.from_dict">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">dict_obj</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s1">&#39;RegionProperty&#39;</span><span class="p">:</span>
+        <span class="n">reg_prop</span> <span class="o">=</span> <span class="n">RegionProperty</span><span class="p">()</span>
+        <span class="n">reg_prop</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">dict_obj</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]</span>
+        <span class="n">reg_prop</span><span class="o">.</span><span class="n">prop_type</span> <span class="o">=</span> <span class="n">PropertyType</span><span class="p">(</span><span class="n">dict_obj</span><span class="p">[</span><span class="s1">&#39;prop_type&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">reg_prop</span><span class="o">.</span><span class="n">prop_type</span> <span class="o">==</span> <span class="n">PropertyType</span><span class="o">.</span><span class="n">NDArray</span><span class="p">:</span>
+            <span class="n">path_unit</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">dict_obj</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">])</span>
+            <span class="n">reg_prop</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">path_unit</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">path_unit</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">reg_prop</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">dict_obj</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">])</span>
+        <span class="c1"># reg_prop.unit = dict_obj[&#39;unit&#39;]</span>
+        <span class="n">reg_prop</span><span class="o">.</span><span class="n">num_vals</span> <span class="o">=</span> <span class="n">dict_obj</span><span class="p">[</span><span class="s1">&#39;num_vals&#39;</span><span class="p">]</span>
+        <span class="n">reg_prop</span><span class="o">.</span><span class="n">val_names</span> <span class="o">=</span> <span class="n">dict_obj</span><span class="p">[</span><span class="s1">&#39;val_names&#39;</span><span class="p">]</span>
+        <span class="n">reg_prop</span><span class="o">.</span><span class="n">col_names</span> <span class="o">=</span> <span class="n">dict_obj</span><span class="p">[</span><span class="s1">&#39;col_names&#39;</span><span class="p">]</span>
+        <span class="n">reg_prop</span><span class="o">.</span><span class="n">row_names</span> <span class="o">=</span> <span class="n">dict_obj</span><span class="p">[</span><span class="s1">&#39;row_names&#39;</span><span class="p">]</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="n">Info</span><span class="p">()</span>
+        <span class="n">info</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">dict_obj</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+        <span class="n">info</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">dict_obj</span><span class="p">[</span><span class="s1">&#39;key&#39;</span><span class="p">]</span>
+        <span class="n">info</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">dict_obj</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span>
+        <span class="n">reg_prop</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="n">info</span>
+        <span class="k">return</span> <span class="n">reg_prop</span></div></div>
+
+
+<div class="viewcode-block" id="LabelImgType"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_image.LabelImgType">[docs]</a><span class="k">class</span> <span class="nc">LabelImgType</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+    <span class="n">Mask</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">Regions</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span></div>
+
+
+<div class="viewcode-block" id="LabelImgInfo"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_image.LabelImgInfo">[docs]</a><span class="k">class</span> <span class="nc">LabelImgInfo</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Info about a particular `LabelImg` object.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">is_default</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">always_constrain_to</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">allow_constrain_to</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">label_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_default</span> <span class="o">=</span> <span class="n">is_default</span>  <span class="c1"># if this is the default label image to show at startup</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">constrain_to</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">always_constrain_to</span>  <span class="c1"># whether the editing should be always constrained to some other label image</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">can_constrain_to</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">allow_constrain_to</span>  <span class="c1"># what other label images can serve as constraints</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">constrain_to</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">can_constrain_to</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">can_be_constrained</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">constrain_to</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">can_constrain_to</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="LabelImg"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_image.LabelImg">[docs]</a><span class="k">class</span> <span class="nc">LabelImg</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;A class representing a label image.</span>
+
+<span class="sd">    image_size: (int, int) in format (height, width) format</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_size</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_label_img</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="n">image_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bbox</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_region_props</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">RegionProperty</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_label_hierarchy</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">LabelHierarchy</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_img_type</span><span class="p">:</span> <span class="n">LabelImgType</span> <span class="o">=</span> <span class="n">LabelImgType</span><span class="o">.</span><span class="n">Regions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_info</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">LabelImgInfo</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_semantic</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_used_labels</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dirty_flag</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prop_list</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">RegionProperty</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_segmented</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">filename</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">label_image</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_img</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_label_img</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">is_segmented</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_label_img</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_label_img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">uint32</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_img</span>
+
+    <span class="nd">@label_image</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">label_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lbl_nd</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_img</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_label_img</span> <span class="o">=</span> <span class="n">lbl_nd</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_image</span><span class="p">(</span><span class="n">lbl_nd</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_segmented</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_label_img</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dirty_flag</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">is_set</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_img</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="LabelImg.reload"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_image.LabelImg.reload">[docs]</a>    <span class="k">def</span> <span class="nf">reload</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="n">loaded_img</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_label_img</span> <span class="o">=</span> <span class="n">loaded_img</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint32</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_used_labels</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_label_img</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_label_img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint32</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_used_labels</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">}</span></div>
+
+<div class="viewcode-block" id="LabelImg.unload"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_image.LabelImg.unload">[docs]</a>    <span class="k">def</span> <span class="nf">unload</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_label_img</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+    <span class="k">def</span> <span class="nf">_serialize_prop_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reg_prop</span><span class="p">:</span> <span class="n">RegionProperty</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Returns a representation of `RegionProperty.value` in a form suitable for serialization in .json.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">reg_prop</span><span class="o">.</span><span class="n">prop_type</span> <span class="o">==</span> <span class="n">PropertyType</span><span class="o">.</span><span class="n">NDArray</span><span class="p">:</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">reg_prop</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">reg_prop</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s1">.npy&#39;</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">reg_prop</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">return</span> <span class="nb">repr</span><span class="p">((</span><span class="n">path</span><span class="p">,</span> <span class="n">reg_prop</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>  <span class="c1"># return path to the serialized ndarray and the unit that the array is in</span>
+        <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="n">reg_prop</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+<div class="viewcode-block" id="LabelImg.save"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_image.LabelImg.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dirty_flag</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_img</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_used_labels</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_label_img</span><span class="p">))</span>
+                <span class="n">io</span><span class="o">.</span><span class="n">imsave</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_img</span><span class="p">,</span> <span class="n">check_contrast</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="c1">#im = Image.fromarray(self._label_img)</span>
+                <span class="c1">#im.save(self._path)</span>
+            <span class="n">prop_dict</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">label_hierarchy</span><span class="o">.</span><span class="n">code</span><span class="p">(</span><span class="n">label</span><span class="p">):</span> <span class="p">{</span>
+                    <span class="s1">&#39;measurements&#39;</span><span class="p">:</span> <span class="p">[</span>
+                        <span class="p">{</span>
+                            <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">prop</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                            <span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="n">prop</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
+                            <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_serialize_prop_value</span><span class="p">(</span><span class="n">prop</span><span class="p">),</span>
+                            <span class="c1"># &#39;unit&#39;: prop.unit,</span>
+                            <span class="s1">&#39;prop_type&#39;</span><span class="p">:</span> <span class="n">prop</span><span class="o">.</span><span class="n">prop_type</span><span class="p">,</span>
+                            <span class="s1">&#39;num_vals&#39;</span><span class="p">:</span> <span class="n">prop</span><span class="o">.</span><span class="n">num_vals</span><span class="p">,</span>
+                            <span class="s1">&#39;val_names&#39;</span><span class="p">:</span> <span class="n">prop</span><span class="o">.</span><span class="n">val_names</span><span class="p">,</span>
+                            <span class="s1">&#39;col_names&#39;</span><span class="p">:</span> <span class="n">prop</span><span class="o">.</span><span class="n">col_names</span><span class="p">,</span>
+                            <span class="s1">&#39;row_names&#39;</span><span class="p">:</span> <span class="n">prop</span><span class="o">.</span><span class="n">row_names</span><span class="p">,</span>
+                            <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="n">prop</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">key</span><span class="p">,</span>
+                            <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="n">prop</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">description</span>
+                        <span class="p">}</span>
+                        <span class="k">for</span> <span class="n">prop</span> <span class="ow">in</span> <span class="n">prop_dict</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+                    <span class="p">]</span>
+                <span class="p">}</span> <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">prop_dict</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_region_props</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="p">}</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="si">}</span><span class="s1">_measurements.json&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">prop_dict</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dirty_flag</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="LabelImg.create2"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_image.LabelImg.create2">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">create2</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">image_size</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">label_info</span><span class="p">:</span> <span class="n">LabelImgInfo</span><span class="p">,</span> <span class="n">label_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;LabelImg&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Creates new `LabelImg` object.</span>
+
+<span class="sd">        path: Path - where this label image should be stored</span>
+<span class="sd">        image_size: (height, width)</span>
+<span class="sd">        label_info: LabelImgInfo</span>
+<span class="sd">        label_name: str - not used, stored in `label_info`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">lbl</span> <span class="o">=</span> <span class="n">LabelImg</span><span class="p">(</span><span class="n">image_size</span><span class="p">)</span>
+        <span class="c1">#lbl._type = label_type</span>
+        <span class="n">lbl</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="n">path</span>
+        <span class="c1">#lbl.label_img_type = label_type</span>
+        <span class="n">lbl</span><span class="o">.</span><span class="n">label_info</span> <span class="o">=</span> <span class="n">label_info</span>
+        <span class="n">lbl</span><span class="o">.</span><span class="n">label_semantic</span> <span class="o">=</span> <span class="n">label_info</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">lbl</span><span class="o">.</span><span class="n">_load_measurements</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">lbl</span></div>
+
+<div class="viewcode-block" id="LabelImg.make_empty"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_image.LabelImg.make_empty">[docs]</a>    <span class="k">def</span> <span class="nf">make_empty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_label_img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">uint32</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_used_labels</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">}</span></div>
+
+<div class="viewcode-block" id="LabelImg.set_image"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_image.LabelImg.set_image">[docs]</a>    <span class="k">def</span> <span class="nf">set_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_img</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">img</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_img</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;The shape must be </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_label_img</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">, got </span><span class="si">{</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_img</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">img</span><span class="o">.</span><span class="n">dtype</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;The dtype must be </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_label_img</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s1">, got </span><span class="si">{</span><span class="n">img</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_label_img</span> <span class="o">=</span> <span class="n">img</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dirty_flag</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="LabelImg.clone"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_image.LabelImg.clone">[docs]</a>    <span class="k">def</span> <span class="nf">clone</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;LabelImg&#39;</span><span class="p">:</span>
+        <span class="n">lbl</span> <span class="o">=</span> <span class="n">LabelImg</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+        <span class="n">lbl</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span>
+        <span class="n">lbl</span><span class="o">.</span><span class="n">_label_img</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_img</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_img</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="c1"># lbl.label_img_type = self.label_img_type</span>
+        <span class="n">lbl</span><span class="o">.</span><span class="n">label_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_info</span>
+        <span class="n">lbl</span><span class="o">.</span><span class="n">label_semantic</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_semantic</span>
+        <span class="n">lbl</span><span class="o">.</span><span class="n">_label_hierarchy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_hierarchy</span>
+        <span class="n">lbl</span><span class="o">.</span><span class="n">_used_labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_used_labels</span>
+        <span class="n">lbl</span><span class="o">.</span><span class="n">_dirty_flag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dirty_flag</span>
+        <span class="k">return</span> <span class="n">lbl</span></div>
+
+    <span class="k">def</span> <span class="nf">_compute_bbox</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_label_img</span><span class="p">)</span>
+        <span class="n">top</span><span class="p">,</span> <span class="n">left</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">bottom</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bug_bbox</span> <span class="o">=</span> <span class="p">[</span><span class="n">left</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">bottom</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">region_props</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">RegionProperty</span><span class="p">]]:</span>
+        <span class="sd">&quot;&quot;&quot;Returns a dictionary of (label -&gt; (property_key -&gt; `RegionProperty`) pairs.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_region_props</span>
+
+    <span class="nd">@region_props</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">region_props</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">props</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">RegionProperty</span><span class="p">]]):</span>
+        <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">props</span> <span class="ow">in</span> <span class="n">props</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">label_props</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_region_props</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="nb">dict</span><span class="p">())</span>
+            <span class="k">for</span> <span class="n">prop_key</span><span class="p">,</span> <span class="n">prop</span> <span class="ow">in</span> <span class="n">props</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">label_props</span><span class="p">[</span><span class="n">prop_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">prop</span>
+                <span class="c1">#label_prop = label_props.setdefault(prop_key, RegionProperty())</span>
+                <span class="c1">#label_prop.label = prop.label</span>
+                <span class="c1">#label_prop.info = prop.info</span>
+                <span class="c1">#label_prop.value = prop.value</span>
+                <span class="c1">#label_prop.unit = prop.unit</span>
+                <span class="c1">#label_prop.prop_type = prop.prop_type</span>
+                <span class="c1">#label_prop.num_vals = prop.num_vals</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dirty_flag</span> <span class="o">=</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="LabelImg.clear_region_props"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_image.LabelImg.clear_region_props">[docs]</a>    <span class="k">def</span> <span class="nf">clear_region_props</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_region_props</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="LabelImg.set_region_prop"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_image.LabelImg.set_region_prop">[docs]</a>    <span class="k">def</span> <span class="nf">set_region_prop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region_label</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">prop</span><span class="p">:</span> <span class="n">RegionProperty</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">region_props</span> <span class="o">=</span> <span class="p">{</span><span class="n">region_label</span><span class="p">:</span> <span class="p">{</span><span class="n">prop</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">key</span><span class="p">:</span> <span class="n">prop</span><span class="p">}}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prop_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prop</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LabelImg.get_region_props"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_image.LabelImg.get_region_props">[docs]</a>    <span class="k">def</span> <span class="nf">get_region_props</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region_label</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">RegionProperty</span><span class="p">]]:</span>
+        <span class="sd">&quot;&quot;&quot;Returns (property_key -&gt; `RegionProperty) for `region_label`.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">region_label</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_region_props</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_region_props</span><span class="p">[</span><span class="n">region_label</span><span class="p">]</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">label_hierarchy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LabelHierarchy</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_hierarchy</span>
+
+    <span class="nd">@label_hierarchy</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">label_hierarchy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lab_hier</span><span class="p">:</span> <span class="n">LabelHierarchy</span><span class="p">):</span>
+        <span class="c1"># TODO handle possible changes to the label image</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_label_hierarchy</span> <span class="o">=</span> <span class="n">lab_hier</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Returns a label image generated from this one, where all the labels are from the level `level` of `label_hierarchy`.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_hierarchy</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_image</span>
+        <span class="k">if</span> <span class="n">level</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_label_hierarchy</span><span class="o">.</span><span class="n">masks</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">level_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_hierarchy</span><span class="o">.</span><span class="n">level_mask</span><span class="p">(</span><span class="n">level</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">bitwise_and</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label_image</span><span class="p">,</span> <span class="n">level_mask</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">used_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the set of labels that are present in this label image.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dirty_flag</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_used_labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_used_labels</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label_image</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dirty_flag</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_used_labels</span>
+
+<div class="viewcode-block" id="LabelImg.set_dirty"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_image.LabelImg.set_dirty">[docs]</a>    <span class="k">def</span> <span class="nf">set_dirty</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dirty_flag</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">_load_measurements</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">path</span> <span class="o">:=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">)</span><span class="si">}</span><span class="s1">_measurements.json&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">props</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">code</span> <span class="ow">in</span> <span class="n">props</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">prop_dict</span> <span class="ow">in</span> <span class="n">props</span><span class="p">[</span><span class="n">code</span><span class="p">][</span><span class="s1">&#39;measurements&#39;</span><span class="p">]:</span>
+                    <span class="n">reg_prop</span> <span class="o">=</span> <span class="n">RegionProperty</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">prop_dict</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">set_region_prop</span><span class="p">(</span><span class="n">reg_prop</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">reg_prop</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dirty_flag</span> <span class="o">=</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="LabelImg.rotate"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_image.LabelImg.rotate">[docs]</a>    <span class="k">def</span> <span class="nf">rotate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ccw</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="n">unload</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_img</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_img</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reload</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_label_img</span> <span class="o">=</span> <span class="n">ndimage</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_label_img</span><span class="p">,</span> <span class="mi">90</span> <span class="k">if</span> <span class="n">ccw</span> <span class="k">else</span> <span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">prefilter</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dirty_flag</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">unload</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">unload</span><span class="p">()</span></div>
+
+    <span class="c1">#def save(self):</span>
+    <span class="c1">#    if self._dirty_flag:</span>
+    <span class="c1">#        self.unload()</span>
+    <span class="c1">#        self._dirty_flag = False</span>
+
+<div class="viewcode-block" id="LabelImg.resize"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_image.LabelImg.resize">[docs]</a>    <span class="k">def</span> <span class="nf">resize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">factor</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="n">unload</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_img</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_img</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reload</span><span class="p">()</span>
+        <span class="n">im</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_label_img</span><span class="p">)</span>
+        <span class="n">sz</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">])),</span>
+              <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">])))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="n">sz</span>
+        <span class="n">im</span> <span class="o">=</span> <span class="n">im</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">sz</span><span class="p">,</span> <span class="n">resample</span><span class="o">=</span><span class="n">Image</span><span class="o">.</span><span class="n">NEAREST</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_label_img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint32</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dirty_flag</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">unload</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">unload</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="LabelImg.mask_for"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_image.LabelImg.mask_for">[docs]</a>    <span class="k">def</span> <span class="nf">mask_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns a binary (np.bool) image where `True` values mark pixels whose value is `label` or are descendants of `label`.&quot;&quot;&quot;</span>
+        <span class="n">level</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_hierarchy</span><span class="o">.</span><span class="n">get_level</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+        <span class="n">level_img</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">level</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">level_img</span> <span class="o">==</span> <span class="n">label</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">has_unsaved_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dirty_flag</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, CBIA @ FI MUNI.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

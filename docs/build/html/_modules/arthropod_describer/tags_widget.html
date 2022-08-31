@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arthropod_describer.tags_widget &mdash; MAPHIS 0.1 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> MAPHIS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">arthropod_describer</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">MAPHIS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>arthropod_describer.tags_widget</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for arthropod_describer.tags_widget</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">bisect</span>
+<span class="kn">import</span> <span class="nn">typing</span>
+
+<span class="kn">import</span> <span class="nn">PySide2</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtCore</span> <span class="kn">import</span> <span class="n">Qt</span><span class="p">,</span> <span class="n">Signal</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtWidgets</span> <span class="kn">import</span> <span class="n">QWidget</span><span class="p">,</span> <span class="n">QHBoxLayout</span><span class="p">,</span> <span class="n">QCheckBox</span><span class="p">,</span> <span class="n">QPushButton</span><span class="p">,</span> <span class="n">QVBoxLayout</span><span class="p">,</span> <span class="n">QScrollArea</span><span class="p">,</span> <span class="n">QSizePolicy</span><span class="p">,</span> \
+    <span class="n">QDialog</span><span class="p">,</span> <span class="n">QLineEdit</span><span class="p">,</span> <span class="n">QLabel</span><span class="p">,</span> <span class="n">QToolButton</span><span class="p">,</span> <span class="n">QTableWidget</span><span class="p">,</span> <span class="n">QTableWidgetItem</span><span class="p">,</span> <span class="n">QGridLayout</span><span class="p">,</span> <span class="n">QGroupBox</span>
+
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.photo</span> <span class="kn">import</span> <span class="n">Photo</span><span class="p">,</span> <span class="n">UpdateContext</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.state</span> <span class="kn">import</span> <span class="n">State</span>
+
+
+<div class="viewcode-block" id="TagLine"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.tags_widget.TagLine">[docs]</a><span class="k">class</span> <span class="nc">TagLine</span><span class="p">(</span><span class="n">QWidget</span><span class="p">):</span>
+    <span class="n">tag_delete_request</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+    <span class="n">tag_toggled</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">([</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">])</span>
+    <span class="n">tag_assign_global</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">PySide2</span><span class="o">.</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QWidget</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">f</span><span class="p">:</span> <span class="n">PySide2</span><span class="o">.</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">WindowFlags</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">WindowFlags</span><span class="p">()):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tag</span> <span class="o">=</span> <span class="n">tag</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_layout</span> <span class="o">=</span> <span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_checkbox</span> <span class="o">=</span> <span class="n">QCheckBox</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">tag</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_checkbox</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="n">enabled</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_checkbox</span><span class="o">.</span><span class="n">toggled</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span> <span class="n">b</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag_toggled</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="n">b</span><span class="p">))</span>
+        <span class="c1"># self._checkbox.toggled.connect(lambda b: self.photo.toggle_tag(self.tag, b))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_btn_delete</span> <span class="o">=</span> <span class="n">QToolButton</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_btn_delete</span><span class="o">.</span><span class="n">setToolTip</span><span class="p">(</span><span class="s2">&quot;Delete tag from the project.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_btn_delete</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag_delete_request</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_btn_assign_global</span> <span class="o">=</span> <span class="n">QToolButton</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_btn_assign_global</span><span class="o">.</span><span class="n">setToolTip</span><span class="p">(</span><span class="s2">&quot;Assign tag to all photos.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_btn_assign_global</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag_assign_global</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_checkbox</span><span class="p">)</span>
+        <span class="c1"># self._layout.addWidget(self._btn_assign_global)</span>
+        <span class="c1"># self._layout.addWidget(self._btn_delete)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_layout</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TagsWidget"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.tags_widget.TagsWidget">[docs]</a><span class="k">class</span> <span class="nc">TagsWidget</span><span class="p">(</span><span class="n">QDialog</span><span class="p">):</span>
+    <span class="n">widget_left</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">State</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;Photo tags&#39;</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">PySide2</span><span class="o">.</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QWidget</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">f</span><span class="p">:</span> <span class="n">PySide2</span><span class="o">.</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">WindowFlags</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">WindowFlags</span><span class="p">()):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">Qt</span><span class="o">.</span><span class="n">Window</span>
+            <span class="o">|</span> <span class="n">Qt</span><span class="o">.</span><span class="n">X11BypassWindowManagerHint</span>
+            <span class="o">|</span> <span class="n">Qt</span><span class="o">.</span><span class="n">FramelessWindowHint</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="o">=</span> <span class="n">state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">storage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state</span><span class="o">.</span><span class="n">storage</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="c1"># self.tags = self.storage.used_tags</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tag_lines</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">TagLine</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_layout</span> <span class="o">=</span> <span class="n">QVBoxLayout</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tags_grid_layout</span> <span class="o">=</span> <span class="n">QGridLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tags_widget</span> <span class="o">=</span> <span class="n">QGroupBox</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tags_widget</span><span class="o">.</span><span class="n">setTitle</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tags_widget</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tags_grid_layout</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tags_widget</span><span class="o">.</span><span class="n">setSizePolicy</span><span class="p">(</span><span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Expanding</span><span class="p">,</span> <span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Expanding</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tags_sorted</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tags_widget</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">main_layout</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setMaximumHeight</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_hovered</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lblNoTags</span> <span class="o">=</span> <span class="n">QLabel</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;no tags&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tags_grid_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lblNoTags</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_add_tag_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TagLine</span><span class="p">:</span>
+        <span class="n">tag_widget</span> <span class="o">=</span> <span class="n">TagLine</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">enabled</span><span class="p">)</span>
+        <span class="c1"># tag_widget.tag_toggled.connect(self._state.toggle_filtering_tag)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tag_lines</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_lblNoTags</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_tags_grid_layout</span><span class="o">.</span><span class="n">removeWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lblNoTags</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">tag_widget</span>
+
+    <span class="c1"># def _handle_assign_tag_global(self, tag: str):</span>
+    <span class="c1">#     for photo in self.storage.images:</span>
+    <span class="c1">#         photo.add_tag(tag)</span>
+    <span class="c1">#</span>
+    <span class="c1"># def _handle_delete_tag_global(self, tag: str):</span>
+    <span class="c1">#     for photo in self.storage.images:</span>
+    <span class="c1">#         photo.remove_tag(tag)</span>
+    <span class="c1">#</span>
+    <span class="k">def</span> <span class="nf">_connect_tag_line_signals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag_line</span><span class="p">:</span> <span class="n">TagLine</span><span class="p">):</span>
+        <span class="n">tag_line</span><span class="o">.</span><span class="n">tag_toggled</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_state</span><span class="o">.</span><span class="n">toggle_filtering_tag</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TagsWidget.clear_tags"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.tags_widget.TagsWidget.clear_tags">[docs]</a>    <span class="k">def</span> <span class="nf">clear_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag_lines</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_tags_grid_layout</span><span class="o">.</span><span class="n">removeWidget</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
+            <span class="n">tag</span><span class="o">.</span><span class="n">deleteLater</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tag_lines</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tags_sorted</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="TagsWidget.populate"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.tags_widget.TagsWidget.populate">[docs]</a>    <span class="k">def</span> <span class="nf">populate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clear_tags</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tags_sorted</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">used_tags</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tags_sorted</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_tags_grid_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lblNoTags</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_lblNoTags</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_lblNoTags</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_tags_grid_layout</span><span class="o">.</span><span class="n">removeWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lblNoTags</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">row</span><span class="p">,</span> <span class="n">tag</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tags_sorted</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">tag</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag_lines</span><span class="p">:</span>
+                <span class="n">tag_widget</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_add_tag_line</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_connect_tag_line_signals</span><span class="p">(</span><span class="n">tag_widget</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tag_lines</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span> <span class="o">=</span> <span class="n">tag_widget</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_tags_grid_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">tag_widget</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TagsWidget.update_tag_states"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.tags_widget.TagsWidget.update_tag_states">[docs]</a>    <span class="k">def</span> <span class="nf">update_tag_states</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">tag</span><span class="p">,</span> <span class="n">tag_line</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag_lines</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">tag_line</span><span class="o">.</span><span class="n">blockSignals</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">tag_line</span><span class="o">.</span><span class="n">_checkbox</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="n">tag</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state</span><span class="o">.</span><span class="n">active_tags_filter</span><span class="p">)</span>
+            <span class="n">tag_line</span><span class="o">.</span><span class="n">blockSignals</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TagsWidget.leaveEvent"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.tags_widget.TagsWidget.leaveEvent">[docs]</a>    <span class="k">def</span> <span class="nf">leaveEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span><span class="n">PySide2</span><span class="o">.</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QEvent</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_hovered</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget_left</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="TagsWidget.enterEvent"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.tags_widget.TagsWidget.enterEvent">[docs]</a>    <span class="k">def</span> <span class="nf">enterEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span><span class="n">PySide2</span><span class="o">.</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QEvent</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_hovered</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="TagsWidget.show"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.tags_widget.TagsWidget.show">[docs]</a>    <span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TagsWidget</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">adjustSize</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="PhotoTagsWidget"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.tags_widget.PhotoTagsWidget">[docs]</a><span class="k">class</span> <span class="nc">PhotoTagsWidget</span><span class="p">(</span><span class="n">TagsWidget</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">photo</span><span class="p">:</span> <span class="n">Photo</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">State</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">PySide2</span><span class="o">.</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QWidget</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">f</span><span class="p">:</span> <span class="n">PySide2</span><span class="o">.</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">WindowFlags</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">WindowFlags</span><span class="p">()):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">parent</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">photo</span> <span class="o">=</span> <span class="n">photo</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tags</span> <span class="o">=</span> <span class="n">photo</span><span class="o">.</span><span class="n">tags</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">populate</span><span class="p">()</span>
+
+        <span class="n">lay</span> <span class="o">=</span> <span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lblNewTag</span> <span class="o">=</span> <span class="n">QLabel</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;New tag: &quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">txtNewTag</span> <span class="o">=</span> <span class="n">QLineEdit</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">txtNewTag</span><span class="o">.</span><span class="n">setPlaceholderText</span><span class="p">(</span><span class="s1">&#39;enter a new tag and confirm with &lt;Enter&gt;&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">txtNewTag</span><span class="o">.</span><span class="n">returnPressed</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_handle_confirm_new_tag</span><span class="p">)</span>
+
+        <span class="n">lay</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lblNewTag</span><span class="p">)</span>
+        <span class="n">lay</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">txtNewTag</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_layout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">lay</span><span class="p">)</span>
+
+        <span class="n">state</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">update_photo</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handle_photo_update</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_handle_confirm_new_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">txtNewTag</span><span class="o">.</span><span class="n">text</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">txtNewTag</span><span class="o">.</span><span class="n">text</span><span class="p">()</span><span class="o">.</span><span class="n">isspace</span><span class="p">():</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">photo</span><span class="o">.</span><span class="n">add_tag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">txtNewTag</span><span class="o">.</span><span class="n">text</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">txtNewTag</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_add_tag_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TagLine</span><span class="p">:</span>
+        <span class="n">tag_widget</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">PhotoTagsWidget</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_add_tag_line</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">enabled</span><span class="p">)</span>
+        <span class="c1"># tag_widget.tag_toggled.connect(self.photo.toggle_tag)</span>
+        <span class="k">return</span> <span class="n">tag_widget</span>
+
+<div class="viewcode-block" id="PhotoTagsWidget.handle_photo_update"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.tags_widget.PhotoTagsWidget.handle_photo_update">[docs]</a>    <span class="k">def</span> <span class="nf">handle_photo_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ctx</span><span class="p">:</span> <span class="n">UpdateContext</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="n">image_name</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">photo</span><span class="o">.</span><span class="n">image_name</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="s1">&#39;tags&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;tags&#39;</span><span class="p">][</span><span class="s1">&#39;added&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">tag</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag_lines</span><span class="p">:</span>
+                <span class="n">tag_widget</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_add_tag_line</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_connect_tag_line_signals</span><span class="p">(</span><span class="n">tag_widget</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tag_lines</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span> <span class="o">=</span> <span class="n">tag_widget</span>
+                <span class="c1"># self._enabled_tags_lay.addWidget(tag_widget)</span>
+                <span class="n">position</span> <span class="o">=</span> <span class="n">bisect</span><span class="o">.</span><span class="n">bisect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tags_sorted</span><span class="p">,</span> <span class="n">tag</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tags_sorted</span><span class="p">)):</span>
+                    <span class="n">tag_to_move</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tags_sorted</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                    <span class="n">tag_widget_to_move</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag_lines</span><span class="p">[</span><span class="n">tag_to_move</span><span class="p">]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_tags_grid_layout</span><span class="o">.</span><span class="n">removeWidget</span><span class="p">(</span><span class="n">tag_widget_to_move</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tags_sorted</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">tag</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tags_sorted</span><span class="p">)):</span>
+                    <span class="n">tag_to_insert</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tags_sorted</span><span class="p">[</span><span class="n">row</span><span class="p">]</span>
+                    <span class="n">tag_widget_to_insert</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag_lines</span><span class="p">[</span><span class="n">tag_to_insert</span><span class="p">]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_tags_grid_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">tag_widget_to_insert</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tag_lines</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span><span class="o">.</span><span class="n">blockSignals</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tag_lines</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span><span class="o">.</span><span class="n">_checkbox</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tag_lines</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span><span class="o">.</span><span class="n">blockSignals</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_connect_tag_line_signals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag_line</span><span class="p">:</span> <span class="n">TagLine</span><span class="p">):</span>
+        <span class="n">tag_line</span><span class="o">.</span><span class="n">tag_toggled</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">photo</span><span class="o">.</span><span class="n">toggle_tag</span><span class="p">)</span>
+
+<div class="viewcode-block" id="PhotoTagsWidget.populate"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.tags_widget.PhotoTagsWidget.populate">[docs]</a>    <span class="k">def</span> <span class="nf">populate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">populate</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">photo</span><span class="o">.</span><span class="n">tags</span><span class="p">:</span>
+            <span class="n">tag_widget</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag_lines</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span>
+            <span class="n">tag_widget</span><span class="o">.</span><span class="n">blockSignals</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">tag_widget</span><span class="o">.</span><span class="n">_checkbox</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">tag_widget</span><span class="o">.</span><span class="n">blockSignals</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span></div></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, CBIA @ FI MUNI.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

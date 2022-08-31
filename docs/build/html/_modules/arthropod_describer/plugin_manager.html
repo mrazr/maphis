@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arthropod_describer.plugin_manager &mdash; MAPHIS 0.1 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> MAPHIS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">arthropod_describer</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">MAPHIS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>arthropod_describer.plugin_manager</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for arthropod_describer.plugin_manager</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">importlib.resources</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">typing</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">IntEnum</span>
+<span class="kn">from</span> <span class="nn">importlib</span> <span class="kn">import</span> <span class="n">import_module</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Dict</span>
+
+<span class="kn">from</span> <span class="nn">PySide2.QtCore</span> <span class="kn">import</span> <span class="n">QAbstractItemModel</span><span class="p">,</span> <span class="n">QObject</span><span class="p">,</span> <span class="n">QModelIndex</span><span class="p">,</span> <span class="n">Qt</span><span class="p">,</span> <span class="n">Signal</span><span class="p">,</span> <span class="n">QSortFilterProxyModel</span><span class="p">,</span> <span class="n">QItemSelection</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtWidgets</span> <span class="kn">import</span> <span class="n">QWidget</span><span class="p">,</span> <span class="n">QVBoxLayout</span>
+
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.plugin</span> <span class="kn">import</span> <span class="n">RegionComputation</span><span class="p">,</span> <span class="n">Plugin</span><span class="p">,</span> <span class="n">PropertyComputation</span><span class="p">,</span> <span class="n">GeneralAction</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.state</span> <span class="kn">import</span> <span class="n">State</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.user_params</span> <span class="kn">import</span> <span class="n">create_params_widget</span><span class="p">,</span> <span class="n">UserParamWidgetBinding</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.ui_plugins_widget</span> <span class="kn">import</span> <span class="n">Ui_PluginsWidget</span>
+
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;PluginManager&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="PluginListModel"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.plugin_manager.PluginListModel">[docs]</a><span class="k">class</span> <span class="nc">PluginListModel</span><span class="p">(</span><span class="n">QAbstractItemModel</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">QObject</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">QAbstractItemModel</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_plugin_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Plugin</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">plugin_list</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Plugin</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_plugin_list</span>
+
+    <span class="nd">@plugin_list</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">plugin_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plugins</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Plugin</span><span class="p">]):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_plugin_list</span> <span class="o">=</span> <span class="n">plugins</span>
+
+<div class="viewcode-block" id="PluginListModel.rowCount"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.plugin_manager.PluginListModel.rowCount">[docs]</a>    <span class="k">def</span> <span class="nf">rowCount</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">QModelIndex</span> <span class="o">=</span> <span class="o">...</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_plugin_list</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PluginListModel.columnCount"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.plugin_manager.PluginListModel.columnCount">[docs]</a>    <span class="k">def</span> <span class="nf">columnCount</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">QModelIndex</span> <span class="o">=</span> <span class="o">...</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="PluginListModel.index"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.plugin_manager.PluginListModel.index">[docs]</a>    <span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">QModelIndex</span> <span class="o">=</span> <span class="o">...</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QModelIndex</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">createIndex</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PluginListModel.data"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.plugin_manager.PluginListModel.data">[docs]</a>    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="n">QModelIndex</span><span class="p">,</span> <span class="n">role</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">...</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">role</span> <span class="o">==</span> <span class="n">Qt</span><span class="o">.</span><span class="n">DisplayRole</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_plugin_list</span><span class="p">[</span><span class="n">index</span><span class="o">.</span><span class="n">row</span><span class="p">()]</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">elif</span> <span class="n">role</span> <span class="o">==</span> <span class="n">Qt</span><span class="o">.</span><span class="n">UserRole</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_plugin_list</span><span class="p">[</span><span class="n">index</span><span class="o">.</span><span class="n">row</span><span class="p">()]</span><span class="o">.</span><span class="n">plugin_id</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="PluginListModel.parent"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.plugin_manager.PluginListModel.parent">[docs]</a>    <span class="k">def</span> <span class="nf">parent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="n">QModelIndex</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QModelIndex</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">QModelIndex</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="RegionCompsListModel"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.plugin_manager.RegionCompsListModel">[docs]</a><span class="k">class</span> <span class="nc">RegionCompsListModel</span><span class="p">(</span><span class="n">QAbstractItemModel</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">QObject</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">QAbstractItemModel</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">region_comps</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">RegionComputation</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">PropertyComputation</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">computations_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="n">RegionComputation</span><span class="p">,</span> <span class="n">PropertyComputation</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span><span class="n">comp</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">key</span><span class="p">:</span> <span class="n">comp</span> <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">region_comps</span><span class="p">}</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">comps_list</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">RegionComputation</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">PropertyComputation</span><span class="p">]]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">region_comps</span>
+
+    <span class="nd">@comps_list</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">comps_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comps</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">RegionComputation</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">PropertyComputation</span><span class="p">]]):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">region_comps</span> <span class="o">=</span> <span class="n">comps</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataChanged</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">createIndex</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                              <span class="bp">self</span><span class="o">.</span><span class="n">createIndex</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">region_comps</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+
+<div class="viewcode-block" id="RegionCompsListModel.rowCount"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.plugin_manager.RegionCompsListModel.rowCount">[docs]</a>    <span class="k">def</span> <span class="nf">rowCount</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">QModelIndex</span> <span class="o">=</span> <span class="o">...</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">region_comps</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RegionCompsListModel.columnCount"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.plugin_manager.RegionCompsListModel.columnCount">[docs]</a>    <span class="k">def</span> <span class="nf">columnCount</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">QModelIndex</span> <span class="o">=</span> <span class="o">...</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="RegionCompsListModel.index"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.plugin_manager.RegionCompsListModel.index">[docs]</a>    <span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">QModelIndex</span> <span class="o">=</span> <span class="o">...</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QModelIndex</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">createIndex</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RegionCompsListModel.data"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.plugin_manager.RegionCompsListModel.data">[docs]</a>    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="n">QModelIndex</span><span class="p">,</span> <span class="n">role</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">...</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">index</span><span class="o">.</span><span class="n">row</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">region_comps</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">role</span> <span class="o">==</span> <span class="n">Qt</span><span class="o">.</span><span class="n">DisplayRole</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">region_comps</span><span class="p">[</span><span class="n">index</span><span class="o">.</span><span class="n">row</span><span class="p">()]</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">elif</span> <span class="n">role</span> <span class="o">==</span> <span class="n">Qt</span><span class="o">.</span><span class="n">UserRole</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">region_comps</span><span class="p">[</span><span class="n">index</span><span class="o">.</span><span class="n">row</span><span class="p">()]</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="RegionCompsListModel.parent"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.plugin_manager.RegionCompsListModel.parent">[docs]</a>    <span class="k">def</span> <span class="nf">parent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="n">QModelIndex</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QModelIndex</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">QModelIndex</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="RegionCompsListModel.add_computation"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.plugin_manager.RegionCompsListModel.add_computation">[docs]</a>    <span class="k">def</span> <span class="nf">add_computation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comp</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">RegionComputation</span><span class="p">,</span> <span class="n">PropertyComputation</span><span class="p">]):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">region_comps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">comp</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">computations_dict</span><span class="p">[</span><span class="n">comp</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">comp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataChanged</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                              <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">region_comps</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span></div></div>
+
+
+<div class="viewcode-block" id="ProcessType"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.plugin_manager.ProcessType">[docs]</a><span class="k">class</span> <span class="nc">ProcessType</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+    <span class="n">SELECTED_PHOTOS</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">ALL_PHOTOS</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">ALL_UNSEGMENTED</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span></div>
+
+
+<div class="viewcode-block" id="PluginManager"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.plugin_manager.PluginManager">[docs]</a><span class="k">class</span> <span class="nc">PluginManager</span><span class="p">(</span><span class="n">QWidget</span><span class="p">):</span>
+    <span class="n">apply_region_computation</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">([</span><span class="n">RegionComputation</span><span class="p">,</span> <span class="n">ProcessType</span><span class="p">])</span>
+    <span class="n">apply_property_computation</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">([</span><span class="n">PropertyComputation</span><span class="p">,</span> <span class="n">ProcessType</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">State</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">QWidget</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">QWidget</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span> <span class="o">=</span> <span class="n">Ui_PluginsWidget</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">setupUi</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_region_computations</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">RegionComputation</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_measurement_computations</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">PropertyComputation</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">plugins</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Plugin</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_plugins</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">state</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_plugin</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Plugin</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">plugin_list_model</span> <span class="o">=</span> <span class="n">PluginListModel</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plugin_list_model</span><span class="o">.</span><span class="n">plugin_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plugins</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">cmbPlugins</span><span class="o">.</span><span class="n">setModel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plugin_list_model</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">cmbPlugins</span><span class="o">.</span><span class="n">currentIndexChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_handle_current_plugin_changed</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">cmbRegComps</span><span class="o">.</span><span class="n">currentIndexChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_handle_reg_comp_changed</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">cmbPropComps</span><span class="o">.</span><span class="n">currentIndexChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_handle_prop_comp_changed</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">region_comps_list_model</span> <span class="o">=</span> <span class="n">RegionCompsListModel</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">grpRegionSettings</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">QVBoxLayout</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reg_comp_param_widget</span><span class="p">:</span> <span class="n">QWidget</span> <span class="o">=</span> <span class="n">QWidget</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_reg_comp</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RegionComputation</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_param_binding</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">UserParamWidgetBinding</span><span class="p">]</span> <span class="o">=</span> <span class="n">UserParamWidgetBinding</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">btnRegApply</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handle_apply_clicked</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">btnRegApplyAll</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handle_apply_all_clicked</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">region_restrict_model</span> <span class="o">=</span> <span class="n">QSortFilterProxyModel</span><span class="p">()</span>
+        <span class="c1"># TODO replace with correct colormap model</span>
+        <span class="c1">#self.region_restrict_model.setSourceModel(self.state.colormap)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">regRestrictView</span><span class="o">.</span><span class="n">setModel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">region_restrict_model</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">region_restrict_model</span><span class="o">.</span><span class="n">setFilterRole</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">UserRole</span> <span class="o">+</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">region_restrict_model</span><span class="o">.</span><span class="n">setFilterFixedString</span><span class="p">(</span><span class="s1">&#39;used&#39;</span><span class="p">)</span>
+        <span class="c1">#self.ui.btnReset.clicked.connect(self.handle_reset_clicked)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">reg_selected_regions</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">reg_label_sel_model</span><span class="p">:</span> <span class="n">QItemSelection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">regRestrictView</span><span class="o">.</span><span class="n">selectionModel</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reg_label_sel_model</span><span class="o">.</span><span class="n">selectionChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_handle_label_selection_changed</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">prop_comps_list_model</span> <span class="o">=</span> <span class="n">RegionCompsListModel</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">grpPropSettings</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">QVBoxLayout</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prop_comp_param_widget</span><span class="p">:</span> <span class="n">QWidget</span> <span class="o">=</span> <span class="n">QWidget</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_prop_comp</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PropertyComputation</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prop_param_binding</span> <span class="o">=</span> <span class="n">UserParamWidgetBinding</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">prop_region_restrict_model</span> <span class="o">=</span> <span class="n">QSortFilterProxyModel</span><span class="p">()</span>
+        <span class="c1"># TODO replace with correct colormap model</span>
+        <span class="c1">#self.prop_region_restrict_model.setSourceModel(self.state.colormap)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">propRestrictView</span><span class="o">.</span><span class="n">setModel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prop_region_restrict_model</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prop_region_restrict_model</span><span class="o">.</span><span class="n">setFilterRole</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">UserRole</span> <span class="o">+</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prop_region_restrict_model</span><span class="o">.</span><span class="n">setFilterFixedString</span><span class="p">(</span><span class="s1">&#39;used&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">prop_label_sel_model</span><span class="p">:</span> <span class="n">QItemSelection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">propRestrictView</span><span class="o">.</span><span class="n">selectionModel</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prop_label_sel_model</span><span class="o">.</span><span class="n">selectionChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_handle_label_selection_changed</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">prop_selected_regions</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_computation</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;region&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_reg_comp</span><span class="p">,</span>
+            <span class="s1">&#39;property&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_prop_comp</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">comp_desc</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;region&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">lblRegDesc</span><span class="p">,</span>
+            <span class="s1">&#39;property&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">lblPropDesc</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">comp_param_widget</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;region&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reg_comp_param_widget</span><span class="p">,</span>
+            <span class="s1">&#39;property&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prop_comp_param_widget</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">grp_settings</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;region&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">grpRegionSettings</span><span class="p">,</span>
+            <span class="s1">&#39;property&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">grpPropSettings</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">param_binding</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;region&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_param_binding</span><span class="p">,</span>
+            <span class="s1">&#39;property&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prop_param_binding</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">grp_restrict</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;region&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">grpRegRestrict</span><span class="p">,</span>
+            <span class="s1">&#39;property&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">grpPropRestrict</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">restrict_model</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;region&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">region_restrict_model</span><span class="p">,</span>
+            <span class="s1">&#39;property&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">prop_region_restrict_model</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">restrict_view</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;region&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">regRestrictView</span><span class="p">,</span>
+            <span class="s1">&#39;property&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">propRestrictView</span>
+        <span class="p">}</span>
+
+        <span class="c1"># if len(self.plugins) &gt; 0:</span>
+        <span class="c1">#     self._handle_current_plugin_changed(0)</span>
+
+<div class="viewcode-block" id="PluginManager.set_show_region_computation"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.plugin_manager.PluginManager.set_show_region_computation">[docs]</a>    <span class="k">def</span> <span class="nf">set_show_region_computation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reg_comp</span><span class="p">:</span> <span class="n">RegionComputation</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">lblRegDesc</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">reg_comp</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">description</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PluginManager.set_show_prop_computation"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.plugin_manager.PluginManager.set_show_prop_computation">[docs]</a>    <span class="k">def</span> <span class="nf">set_show_prop_computation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prop_comp</span><span class="p">:</span> <span class="n">PropertyComputation</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">lblPropDesc</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">prop_comp</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">description</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PluginManager.handle_apply_clicked"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.plugin_manager.PluginManager.handle_apply_clicked">[docs]</a>    <span class="k">def</span> <span class="nf">handle_apply_clicked</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chkd</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">apply_region_computation</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_computation</span><span class="p">[</span><span class="s1">&#39;region&#39;</span><span class="p">],</span> <span class="n">ProcessType</span><span class="o">.</span><span class="n">SELECTED_PHOTOS</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PluginManager.handle_apply_all_clicked"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.plugin_manager.PluginManager.handle_apply_all_clicked">[docs]</a>    <span class="k">def</span> <span class="nf">handle_apply_all_clicked</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chkd</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">apply_region_computation</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_computation</span><span class="p">[</span><span class="s1">&#39;region&#39;</span><span class="p">],</span> <span class="n">ProcessType</span><span class="o">.</span><span class="n">ALL_PHOTOS</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_handle_label_selection_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selection</span><span class="p">:</span> <span class="n">QItemSelection</span><span class="p">):</span>
+        <span class="n">curr_widget</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">pluginTabWidget</span><span class="o">.</span><span class="n">currentWidget</span><span class="p">()</span>
+        <span class="n">widg_name</span> <span class="o">=</span> <span class="n">curr_widget</span><span class="o">.</span><span class="n">objectName</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">widg_name</span> <span class="o">==</span> <span class="s1">&#39;tabRegionComps&#39;</span><span class="p">:</span>
+            <span class="n">indexes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reg_label_sel_model</span><span class="o">.</span><span class="n">selectedIndexes</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reg_selected_regions</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+            <span class="n">labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reg_selected_regions</span>
+            <span class="n">restrict_model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">region_restrict_model</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">indexes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prop_label_sel_model</span><span class="o">.</span><span class="n">selectedIndexes</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prop_selected_regions</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+            <span class="n">labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prop_selected_regions</span>
+            <span class="n">restrict_model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prop_region_restrict_model</span>
+
+        <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">indexes</span><span class="p">:</span>
+            <span class="n">labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">restrict_model</span><span class="o">.</span><span class="n">data</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">Qt</span><span class="o">.</span><span class="n">UserRole</span><span class="p">))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">current_plugin</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Plugin</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_plugin</span>
+
+    <span class="nd">@current_plugin</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">current_plugin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plg</span><span class="p">:</span> <span class="n">Plugin</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_plugin</span> <span class="o">=</span> <span class="n">plg</span>
+
+    <span class="k">def</span> <span class="nf">_handle_current_plugin_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="n">plugin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plugins</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_plugin</span> <span class="o">=</span> <span class="n">plugin</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;activated plugin </span><span class="si">{</span><span class="n">plugin</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">region_comps_list_model</span><span class="o">.</span><span class="n">comps_list</span> <span class="o">=</span> <span class="n">plugin</span><span class="o">.</span><span class="n">region_computations</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">cmbRegComps</span><span class="o">.</span><span class="n">setModel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">region_comps_list_model</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">cmbRegComps</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">prop_comps_list_model</span><span class="o">.</span><span class="n">comps_list</span> <span class="o">=</span> <span class="n">plugin</span><span class="o">.</span><span class="n">property_computations</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prop_comps_list_model</span><span class="o">.</span><span class="n">comps_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">cmbPropComps</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">cmbPropComps</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">cmbPropComps</span><span class="o">.</span><span class="n">setModel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prop_comps_list_model</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">cmbPropComps</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_handle_current_reg_comp_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;REG COMP&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_reg_comp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_plugin</span><span class="o">.</span><span class="n">region_computations</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">lblRegDesc</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_reg_comp</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">description</span><span class="p">)</span>
+        <span class="c1">#widg = create_params_widget(reg_comp.user_params)</span>
+        <span class="c1">#self.ui.grpRegionSettings.setLayout(widg.layout())</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reg_comp_param_widget</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">grpRegionSettings</span><span class="o">.</span><span class="n">layout</span><span class="p">()</span><span class="o">.</span><span class="n">removeWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_reg_comp_param_widget</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_param_binding</span><span class="o">.</span><span class="n">param_widget</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_param_binding</span><span class="o">.</span><span class="n">user_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_reg_comp_param_widget</span><span class="o">.</span><span class="n">deleteLater</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_reg_comp_param_widget</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_reg_comp</span><span class="o">.</span><span class="n">user_params</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_reg_comp_param_widget</span> <span class="o">=</span> <span class="n">create_params_widget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_reg_comp</span><span class="o">.</span><span class="n">user_params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_param_binding</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_reg_comp</span><span class="o">.</span><span class="n">user_params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reg_comp_param_widget</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">grpRegionSettings</span><span class="o">.</span><span class="n">layout</span><span class="p">()</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_reg_comp_param_widget</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">grpRegionSettings</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">grpRegionSettings</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">grpRegRestrict</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_reg_comp</span><span class="o">.</span><span class="n">region_restricted</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">grpRegionSettings</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_reg_comp</span><span class="o">.</span><span class="n">region_restricted</span><span class="p">:</span>
+            <span class="c1">#self.region_restrict_model.setSourceModel(self._current_colormap_model)</span>
+            <span class="c1">#self.state.colormap.used_labels = np.unique(self.state.label_img.label_img)</span>
+            <span class="c1">#self.state.colormap.set_used_labels(set(list(np.unique(self.state.label_img.label_img))))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">region_restrict_model</span><span class="o">.</span><span class="n">setFilterFixedString</span><span class="p">(</span><span class="s1">&#39;used&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">regRestrictView</span><span class="o">.</span><span class="n">setModel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">region_restrict_model</span><span class="p">)</span>
+            <span class="c1">#self.ui.regRestrictView.dataChanged(self.region_restrict_model.createIndex(0, 0),</span>
+            <span class="c1">#                                    self.region_restrict_model.createIndex(len(self.state.colormap.used_labels)-1,</span>
+            <span class="c1">#                                                                          0))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">region_restrict_model</span><span class="o">.</span><span class="n">setFilterFixedString</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">regRestrictView</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_reg_comp</span><span class="o">.</span><span class="n">region_restricted</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_handle_reg_comp_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_handle_current_comp_changed</span><span class="p">(</span><span class="s1">&#39;region&#39;</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_handle_prop_comp_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_handle_current_comp_changed</span><span class="p">(</span><span class="s1">&#39;property&#39;</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_handle_current_comp_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comp_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="c1">#self._current_reg_comp = self.current_plugin.region_computations[index]</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_computation</span><span class="p">[</span><span class="n">comp_str</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_plugin</span><span class="o">.</span><span class="n">region_computations</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="k">if</span> <span class="n">comp_str</span> <span class="o">==</span> <span class="s1">&#39;region&#39;</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_plugin</span><span class="o">.</span><span class="n">property_computations</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">comp_desc</span><span class="p">[</span><span class="n">comp_str</span><span class="p">]</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_computation</span><span class="p">[</span><span class="n">comp_str</span><span class="p">]</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">description</span><span class="p">)</span>
+        <span class="c1">#self.ui.lblRegDesc.setText(self._current_reg_comp.info.description)</span>
+        <span class="c1">#widg = create_params_widget(reg_comp.user_params)</span>
+        <span class="c1">#self.ui.grpRegionSettings.setLayout(widg.layout())</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comp_param_widget</span><span class="p">[</span><span class="n">comp_str</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1">#self.ui.grpRegionSettings.layout().removeWidget(self._reg_comp_param_widget)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">grp_settings</span><span class="p">[</span><span class="n">comp_str</span><span class="p">]</span><span class="o">.</span><span class="n">layout</span><span class="p">()</span><span class="o">.</span><span class="n">removeWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">comp_param_widget</span><span class="p">[</span><span class="n">comp_str</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">param_binding</span><span class="p">[</span><span class="n">comp_str</span><span class="p">]</span><span class="o">.</span><span class="n">param_widget</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">param_binding</span><span class="p">[</span><span class="n">comp_str</span><span class="p">]</span><span class="o">.</span><span class="n">user_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">comp_param_widget</span><span class="p">[</span><span class="n">comp_str</span><span class="p">]</span><span class="o">.</span><span class="n">deleteLater</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">comp_param_widget</span><span class="p">[</span><span class="n">comp_str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_computation</span><span class="p">[</span><span class="n">comp_str</span><span class="p">]</span><span class="o">.</span><span class="n">user_params</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">comp_param_widget</span><span class="p">[</span><span class="n">comp_str</span><span class="p">]</span> <span class="o">=</span> <span class="n">create_params_widget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_computation</span><span class="p">[</span><span class="n">comp_str</span><span class="p">]</span><span class="o">.</span><span class="n">user_params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">param_binding</span><span class="p">[</span><span class="n">comp_str</span><span class="p">]</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_computation</span><span class="p">[</span><span class="n">comp_str</span><span class="p">]</span><span class="o">.</span><span class="n">user_params</span><span class="p">,</span>
+                                               <span class="bp">self</span><span class="o">.</span><span class="n">comp_param_widget</span><span class="p">[</span><span class="n">comp_str</span><span class="p">])</span>
+            <span class="c1">#self.ui.grpRegionSettings.layout().addWidget(self._reg_comp_param_widget)</span>
+            <span class="c1">#self.ui.grpRegionSettings.setVisible(True)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">grp_settings</span><span class="p">[</span><span class="n">comp_str</span><span class="p">]</span><span class="o">.</span><span class="n">layout</span><span class="p">()</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">comp_param_widget</span><span class="p">[</span><span class="n">comp_str</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">grp_settings</span><span class="p">[</span><span class="n">comp_str</span><span class="p">]</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">grp_settings</span><span class="p">[</span><span class="n">comp_str</span><span class="p">]</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="c1">#self.ui.grpRegRestrict.setVisible(self._current_reg_comp.region_restricted)</span>
+        <span class="c1">#self.ui.grpRegionSettings.update()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">grp_restrict</span><span class="p">[</span><span class="n">comp_str</span><span class="p">]</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_computation</span><span class="p">[</span><span class="n">comp_str</span><span class="p">]</span><span class="o">.</span><span class="n">region_restricted</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">grp_restrict</span><span class="p">[</span><span class="n">comp_str</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_computation</span><span class="p">[</span><span class="n">comp_str</span><span class="p">]</span><span class="o">.</span><span class="n">region_restricted</span><span class="p">:</span>
+            <span class="c1">#self.region_restrict_model.setSourceModel(self.state.colormap)</span>
+            <span class="c1"># self.restrict_model[comp_str].setSourceModel(self._current_colormap_model)</span>
+            <span class="c1">#self.state.colormap.used_labels = np.unique(self.state.label_img.label_img)</span>
+            <span class="c1">#self.state.colormap.set_used_labels(set(list(np.unique(self.state.label_img.label_img))))</span>
+            <span class="c1">#self.region_restrict_model.setFilterFixedString(&#39;used&#39;)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">restrict_model</span><span class="p">[</span><span class="n">comp_str</span><span class="p">]</span><span class="o">.</span><span class="n">setFilterFixedString</span><span class="p">(</span><span class="s1">&#39;used&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">restrict_view</span><span class="p">[</span><span class="n">comp_str</span><span class="p">]</span><span class="o">.</span><span class="n">setModel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">restrict_model</span><span class="p">[</span><span class="n">comp_str</span><span class="p">])</span>
+            <span class="c1">#self.ui.regRestrictView.setModel(self.region_restrict_model)</span>
+            <span class="c1">#self.ui.regRestrictView.dataChanged(self.region_restrict_model.createIndex(0, 0),</span>
+            <span class="c1">#                                    self.region_restrict_model.createIndex(len(self.state.colormap.used_labels)-1,</span>
+            <span class="c1">#                                                                          0))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1">#self.region_restrict_model.setFilterFixedString(&#39;&#39;)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">restrict_model</span><span class="p">[</span><span class="n">comp_str</span><span class="p">]</span><span class="o">.</span><span class="n">setFilterFixedString</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="c1">#self.ui.regRestrictView.setVisible(self._current_reg_comp.region_restricted)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">restrict_view</span><span class="p">[</span><span class="n">comp_str</span><span class="p">]</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_computation</span><span class="p">[</span><span class="n">comp_str</span><span class="p">]</span><span class="o">.</span><span class="n">region_restricted</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_load_plugins</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Plugin</span><span class="p">]:</span>
+        <span class="n">plugs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">plugin_path</span> <span class="ow">in</span> <span class="n">get_plugin_folder_paths</span><span class="p">():</span>
+            <span class="n">plugin</span> <span class="o">=</span> <span class="n">load_plugin</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">plugin_path</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;loading </span><span class="si">{</span><span class="n">plugin_path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">plugin</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">all_region_computations</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">plugin</span><span class="o">.</span><span class="n">region_computations</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">all_measurement_computations</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">plugin</span><span class="o">.</span><span class="n">property_computations</span><span class="p">)</span>
+            <span class="n">plugs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">plugin</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">plugs</span></div>
+
+
+<div class="viewcode-block" id="load_plugin"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.plugin_manager.load_plugin">[docs]</a><span class="k">def</span> <span class="nf">load_plugin</span><span class="p">(</span><span class="n">plugin_folder</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Plugin</span><span class="p">]:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">module</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;arthropod_describer.plugins.</span><span class="si">{</span><span class="n">plugin_folder</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">.plugin&#39;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ModuleNotFoundError</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Cannot load </span><span class="si">{</span><span class="n">plugin_folder</span><span class="si">}</span><span class="s1"> plugin.&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="n">plug_cls</span> <span class="o">=</span> <span class="p">[</span><span class="n">member</span> <span class="k">for</span> <span class="n">member</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">o</span><span class="p">:</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">Plugin</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">member</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">Plugin</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">plug_cls</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span>
+    <span class="n">name</span><span class="p">,</span> <span class="bp">cls</span> <span class="o">=</span> <span class="n">plug_cls</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">plug_inst</span><span class="p">:</span> <span class="n">Plugin</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">regions_path</span> <span class="o">:=</span> <span class="n">plugin_folder</span> <span class="o">/</span> <span class="s1">&#39;regions&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="n">reg_comps</span> <span class="o">=</span> <span class="n">load_computations</span><span class="p">(</span><span class="n">regions_path</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">comp_name</span><span class="p">,</span> <span class="n">comp_cls</span> <span class="ow">in</span> <span class="n">reg_comps</span><span class="p">:</span>
+            <span class="n">plug_inst</span><span class="o">.</span><span class="n">register_computation</span><span class="p">(</span><span class="n">comp_cls</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">props_path</span> <span class="o">:=</span> <span class="n">plugin_folder</span> <span class="o">/</span> <span class="s1">&#39;properties&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="n">prop_comps</span> <span class="o">=</span> <span class="n">load_computations</span><span class="p">(</span><span class="n">props_path</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">comp_name</span><span class="p">,</span> <span class="n">comp_cls</span> <span class="ow">in</span> <span class="n">prop_comps</span><span class="p">:</span>
+            <span class="n">plug_inst</span><span class="o">.</span><span class="n">register_computation</span><span class="p">(</span><span class="n">comp_cls</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">actions_path</span> <span class="o">:=</span> <span class="n">plugin_folder</span> <span class="o">/</span> <span class="s1">&#39;general&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="n">general_actions</span> <span class="o">=</span> <span class="n">load_computations</span><span class="p">(</span><span class="n">actions_path</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">action_name</span><span class="p">,</span> <span class="n">action_cls</span> <span class="ow">in</span> <span class="n">general_actions</span><span class="p">:</span>
+            <span class="n">plug_inst</span><span class="o">.</span><span class="n">register_computation</span><span class="p">(</span><span class="n">action_cls</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">plug_inst</span></div>
+
+
+<div class="viewcode-block" id="get_plugin_folder_paths"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.plugin_manager.get_plugin_folder_paths">[docs]</a><span class="k">def</span> <span class="nf">get_plugin_folder_paths</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;__file__ is </span><span class="si">{</span><span class="vm">__file__</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">py_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">file</span><span class="o">.</span><span class="n">path</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">scandir</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s1">&#39;plugins&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">file</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;__&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">file</span><span class="o">.</span><span class="n">is_dir</span><span class="p">()]</span>
+    <span class="n">dbg_str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">py_files</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;returning plugin paths </span><span class="si">{</span><span class="n">dbg_str</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">py_files</span></div>
+
+
+<div class="viewcode-block" id="is_computation"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.plugin_manager.is_computation">[docs]</a><span class="k">def</span> <span class="nf">is_computation</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">and</span> <span class="n">obj</span> <span class="o">!=</span> <span class="n">RegionComputation</span> <span class="ow">and</span> <span class="n">obj</span> <span class="o">!=</span> <span class="n">PropertyComputation</span> <span class="ow">and</span> <span class="n">obj</span> <span class="o">!=</span> <span class="n">GeneralAction</span> <span class="ow">and</span>
+            <span class="p">(</span><span class="nb">issubclass</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">RegionComputation</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">PropertyComputation</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">GeneralAction</span><span class="p">)))</span></div>
+
+
+<div class="viewcode-block" id="load_computations"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.plugin_manager.load_computations">[docs]</a><span class="k">def</span> <span class="nf">load_computations</span><span class="p">(</span><span class="n">comp_folder</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">RegionComputation</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">PropertyComputation</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">GeneralAction</span><span class="p">]]:</span>
+    <span class="n">comp_type</span> <span class="o">=</span> <span class="n">comp_folder</span><span class="o">.</span><span class="n">name</span>
+    <span class="n">computations</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">RegionComputation</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">PropertyComputation</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">scandir</span><span class="p">(</span><span class="n">comp_folder</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">file</span><span class="o">.</span><span class="n">is_dir</span><span class="p">()</span> <span class="ow">or</span> <span class="n">file</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">file</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.py&#39;</span><span class="p">):</span>
+            <span class="k">continue</span>
+        <span class="n">module_name</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">module</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;arthropod_describer.plugins.</span><span class="si">{</span><span class="n">comp_folder</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">.</span><span class="si">{</span><span class="n">comp_type</span><span class="si">}</span><span class="s1">.</span><span class="si">{</span><span class="n">module_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">comp_cls</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">is_computation</span><span class="p">)</span>
+        <span class="n">computations</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">comp_cls</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">computations</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, CBIA @ FI MUNI.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

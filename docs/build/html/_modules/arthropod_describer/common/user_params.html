@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arthropod_describer.common.user_params &mdash; MAPHIS 0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> MAPHIS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">arthropod_describer</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">MAPHIS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>arthropod_describer.common.user_params</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for arthropod_describer.common.user_params</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">enum</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">typing</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">abc</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Any</span>
+
+<span class="kn">from</span> <span class="nn">PySide2.QtCore</span> <span class="kn">import</span> <span class="n">QObject</span><span class="p">,</span> <span class="n">Signal</span><span class="p">,</span> <span class="n">Qt</span><span class="p">,</span> <span class="n">QItemSelection</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtWidgets</span> <span class="kn">import</span> <span class="n">QWidget</span><span class="p">,</span> <span class="n">QGridLayout</span><span class="p">,</span> <span class="n">QLabel</span><span class="p">,</span> <span class="n">QSpinBox</span><span class="p">,</span> <span class="n">QLineEdit</span><span class="p">,</span> <span class="n">QCheckBox</span><span class="p">,</span> <span class="n">QSizePolicy</span><span class="p">,</span> \
+    <span class="n">QDialogButtonBox</span><span class="p">,</span> <span class="n">QPushButton</span><span class="p">,</span> <span class="n">QListWidget</span><span class="p">,</span> <span class="n">QListWidgetItem</span><span class="p">,</span> <span class="n">QHBoxLayout</span><span class="p">,</span> <span class="n">QComboBox</span><span class="p">,</span> <span class="n">QVBoxLayout</span><span class="p">,</span> <span class="n">QToolButton</span>
+
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.state</span> <span class="kn">import</span> <span class="n">State</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.storage</span> <span class="kn">import</span> <span class="n">_Storage</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.utils</span> <span class="kn">import</span> <span class="n">get_dict_from_doc_str</span>
+
+
+<div class="viewcode-block" id="ParamSource"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.user_params.ParamSource">[docs]</a><span class="k">class</span> <span class="nc">ParamSource</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">IntEnum</span><span class="p">):</span>
+    <span class="n">User</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">Photo</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">Storage</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span></div>
+
+
+<div class="viewcode-block" id="ParamValueCardinality"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.user_params.ParamValueCardinality">[docs]</a><span class="k">class</span> <span class="nc">ParamValueCardinality</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">IntEnum</span><span class="p">):</span>
+    <span class="n">SingleValue</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">MultiValue</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span></div>
+
+
+<div class="viewcode-block" id="ParamType"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.user_params.ParamType">[docs]</a><span class="k">class</span> <span class="nc">ParamType</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">IntEnum</span><span class="p">):</span>
+    <span class="n">INT</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">STR</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">BOOL</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+
+<div class="viewcode-block" id="ParamType.from_str"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.user_params.ParamType.from_str">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_str</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">type_str</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="s1">&#39;INT&#39;</span><span class="p">,</span> <span class="s1">&#39;STR&#39;</span><span class="p">,</span> <span class="s1">&#39;BOOL&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s1">&#39;ParamType&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">type_str</span> <span class="o">==</span> <span class="s1">&#39;INT&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ParamType</span><span class="o">.</span><span class="n">INT</span>
+        <span class="k">elif</span> <span class="n">type_str</span> <span class="o">==</span> <span class="s1">&#39;STR&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ParamType</span><span class="o">.</span><span class="n">STR</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ParamType</span><span class="o">.</span><span class="n">BOOL</span></div></div>
+
+
+<span class="n">enums</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;PARAM_SOURCE&#39;</span><span class="p">:</span> <span class="n">ParamSource</span><span class="p">,</span>
+    <span class="s1">&#39;PARAM_VALUE_CARDINALITY&#39;</span><span class="p">:</span> <span class="n">ParamValueCardinality</span><span class="p">,</span>
+    <span class="s1">&#39;PARAM_TYPE&#39;</span><span class="p">:</span> <span class="n">ParamType</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="convert_to_bool"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.user_params.convert_to_bool">[docs]</a><span class="k">def</span> <span class="nf">convert_to_bool</span><span class="p">(</span><span class="n">string_or_bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">string_or_bool</span> <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">string_or_bool</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">bool</span> <span class="k">else</span> <span class="n">string_or_bool</span> <span class="o">==</span> <span class="s1">&#39;True&#39;</span></div>
+
+
+<div class="viewcode-block" id="UserParamInstance"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.user_params.UserParamInstance">[docs]</a><span class="k">class</span> <span class="nc">UserParamInstance</span><span class="p">(</span><span class="n">QObject</span><span class="p">):</span>
+    <span class="n">value_changed</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">([</span><span class="n">QObject</span><span class="p">])</span>
+
+    <span class="n">converters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">ParamType</span><span class="o">.</span><span class="n">INT</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">ParamType</span><span class="o">.</span><span class="n">BOOL</span><span class="p">:</span> <span class="n">convert_to_bool</span><span class="p">,</span> <span class="c1">#lambda value_in_bool_or_str: value_in_bool_or_str,</span>
+        <span class="n">ParamType</span><span class="o">.</span><span class="n">STR</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">param_type</span><span class="p">:</span> <span class="n">ParamType</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">,</span> <span class="n">data_is_collection</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+                 <span class="n">min_value</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">max_value</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">UserParamInstance</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">param_key</span> <span class="o">=</span> <span class="n">param_key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">param_type</span> <span class="o">=</span> <span class="n">param_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_is_collection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">data_is_collection</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">idx</span> <span class="o">=</span> <span class="n">idx</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_value</span> <span class="o">=</span> <span class="n">min_value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_value</span> <span class="o">=</span> <span class="n">max_value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">value</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span>
+
+    <span class="nd">@value</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="s1">&#39;_value&#39;</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+
+<div class="viewcode-block" id="UserParamInstance.set_attr"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.user_params.UserParamInstance.set_attr">[docs]</a>    <span class="k">def</span> <span class="nf">set_attr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
+        <span class="n">value_</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">if</span> <span class="n">attr_name</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;_value&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_is_collection</span><span class="p">:</span>
+            <span class="n">value_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">converters</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">param_type</span><span class="p">](</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">attr_name</span> <span class="o">==</span> <span class="s1">&#39;default_value&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="s1">&#39;_value&#39;</span><span class="p">,</span> <span class="n">value_</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_type</span> <span class="o">==</span> <span class="n">ParamType</span><span class="o">.</span><span class="n">INT</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">value_</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">min_value</span><span class="p">,</span> <span class="n">value_</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">value_</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_value</span><span class="p">,</span> <span class="n">value_</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="s1">&#39;_value&#39;</span><span class="p">,</span> <span class="n">value_</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">attr_name</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;min_value&#39;</span><span class="p">,</span> <span class="s1">&#39;max_value&#39;</span><span class="p">]:</span>
+            <span class="n">value_</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>  <span class="c1"># TODO what about float?</span>
+            <span class="bp">self</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="n">attr_name</span><span class="p">,</span> <span class="n">value_</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="n">attr_name</span><span class="p">,</span> <span class="n">value_</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value_changed</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="UserParam"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.user_params.UserParam">[docs]</a><span class="k">class</span> <span class="nc">UserParam</span><span class="p">(</span><span class="n">QObject</span><span class="p">):</span>
+    <span class="n">converters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">ParamType</span><span class="o">.</span><span class="n">INT</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">ParamType</span><span class="o">.</span><span class="n">BOOL</span><span class="p">:</span> <span class="n">convert_to_bool</span><span class="p">,</span> <span class="c1">#lambda value_in_bool_or_str: value_in_bool_or_str,</span>
+        <span class="n">ParamType</span><span class="o">.</span><span class="n">STR</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="n">value_changed</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">([</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">])</span>
+    <span class="n">param_instance_added</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">([</span><span class="n">QObject</span><span class="p">,</span> <span class="n">UserParamInstance</span><span class="p">])</span>
+    <span class="n">param_instance_removed</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">([</span><span class="n">QObject</span><span class="p">,</span> <span class="nb">int</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">param_type</span><span class="p">:</span> <span class="n">ParamType</span> <span class="o">=</span> <span class="n">ParamType</span><span class="o">.</span><span class="n">STR</span><span class="p">,</span> <span class="n">default_value</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+                 <span class="n">min_val</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">max_val</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">step</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+                 <span class="n">key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">desc</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">param_source</span><span class="p">:</span> <span class="n">ParamSource</span> <span class="o">=</span> <span class="n">ParamSource</span><span class="o">.</span><span class="n">User</span><span class="p">,</span>
+                 <span class="n">param_value_cardinality</span><span class="p">:</span> <span class="n">ParamValueCardinality</span> <span class="o">=</span> <span class="n">ParamValueCardinality</span><span class="o">.</span><span class="n">SingleValue</span><span class="p">,</span> <span class="n">count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+                 <span class="n">min_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">max_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">param_dict</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">QObject</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">QObject</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">param_name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">param_key</span> <span class="o">=</span> <span class="n">key</span> <span class="k">if</span> <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">param_desc</span> <span class="o">=</span> <span class="n">desc</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">param_type</span> <span class="o">=</span> <span class="n">param_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">param_source</span> <span class="o">=</span> <span class="n">param_source</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">param_source_field</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">param_value_cardinality</span> <span class="o">=</span> <span class="n">param_value_cardinality</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_is_collection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">=</span> <span class="n">count</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_count</span> <span class="o">=</span> <span class="n">min_count</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_count</span> <span class="o">=</span> <span class="n">max_count</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deletable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_count</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">param_instances</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">UserParamInstance</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">used_idxs</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vacant_idxs</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_value</span> <span class="o">=</span> <span class="n">default_value</span>
+        <span class="c1"># self._value = self.default_value</span>
+        <span class="c1"># if self.param_type == ParamType.INT:</span>
+        <span class="c1">#     assert min_val &gt;= 0</span>
+        <span class="c1">#     assert max_val &gt;= 0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_value</span> <span class="o">=</span> <span class="n">min_val</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_value</span> <span class="o">=</span> <span class="n">max_val</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value_step</span> <span class="o">=</span> <span class="n">step</span>
+
+        <span class="k">if</span> <span class="n">param_dict</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">attr_name</span><span class="p">,</span> <span class="n">attr_val_str</span> <span class="ow">in</span> <span class="n">param_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">attr_name</span> <span class="ow">in</span> <span class="n">enums</span><span class="p">:</span>
+                    <span class="n">attr_val_str</span> <span class="o">=</span> <span class="n">enums</span><span class="p">[</span><span class="n">attr_name</span><span class="p">][</span><span class="n">attr_val_str</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">attr_val_str</span> <span class="o">=</span> <span class="n">attr_val_str</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="n">attr_name</span> <span class="o">=</span> <span class="n">attr_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">attr_name</span><span class="p">,</span> <span class="n">attr_val_str</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_value</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_type</span> <span class="o">==</span> <span class="n">ParamType</span><span class="o">.</span><span class="n">INT</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">default_value</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_type</span> <span class="o">==</span> <span class="n">ParamType</span><span class="o">.</span><span class="n">BOOL</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">default_value</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_source</span> <span class="o">!=</span> <span class="n">ParamSource</span><span class="o">.</span><span class="n">User</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_is_collection</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_Storage</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">param_source_field</span><span class="p">),</span> <span class="n">abc</span><span class="o">.</span><span class="n">Collection</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">count</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_instance</span><span class="p">()</span>
+
+<div class="viewcode-block" id="UserParam.set_attr"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.user_params.UserParam.set_attr">[docs]</a>    <span class="k">def</span> <span class="nf">set_attr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
+        <span class="n">value_</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">if</span> <span class="n">attr_name</span> <span class="o">==</span> <span class="s1">&#39;default_value&#39;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_is_collection</span><span class="p">:</span>
+            <span class="n">value_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">converters</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">param_type</span><span class="p">](</span><span class="n">value</span><span class="p">)</span>
+            <span class="c1"># if attr_name == &#39;default_value&#39;:</span>
+            <span class="c1">#     self.__setattr__(&#39;default_value&#39;, value_)</span>
+            <span class="c1"># else:</span>
+            <span class="c1">#     if self.param_type == ParamType.INT:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">value_</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">min_value</span><span class="p">,</span> <span class="n">value_</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">value_</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_value</span><span class="p">,</span> <span class="n">value_</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="s1">&#39;default_value&#39;</span><span class="p">,</span> <span class="n">value_</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">attr_name</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;min_value&#39;</span><span class="p">,</span> <span class="s1">&#39;max_value&#39;</span><span class="p">,</span> <span class="s1">&#39;min_count&#39;</span><span class="p">,</span> <span class="s1">&#39;max_count&#39;</span><span class="p">,</span> <span class="s1">&#39;count&#39;</span><span class="p">]:</span>
+            <span class="c1"># TODO if min_value or max_value then propagate to all instances</span>
+            <span class="c1"># value_ = self.converters[self.param_type](value)</span>
+            <span class="n">value_</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>  <span class="c1"># TODO what about float?</span>
+            <span class="bp">self</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="n">attr_name</span><span class="p">,</span> <span class="n">value_</span><span class="p">)</span>
+        <span class="c1"># elif attr_name == &#39;param_type&#39;:</span>
+        <span class="c1">#     value_ = ParamType.from_str(value)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="n">attr_name</span><span class="p">,</span> <span class="n">value_</span><span class="p">)</span></div>
+        <span class="c1"># self.value_changed.emit(self.param_key, value_)</span>
+
+    <span class="c1"># @property</span>
+    <span class="c1"># def value(self) -&gt; typing.Any:</span>
+    <span class="c1">#     return self._value</span>
+    <span class="c1">#</span>
+    <span class="c1"># @value.setter</span>
+    <span class="c1"># def value(self, val: typing.Any):</span>
+    <span class="c1">#     self.set_attr(&#39;_value&#39;, val)</span>
+    <span class="c1">#     # self.value_changed.emit(self.param_key, self._value)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">default_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">UserParamInstance</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="kc">None</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">param_instances</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">param_instances</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">value</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]:</span>
+        <span class="n">inst</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_instance</span>
+        <span class="k">return</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">inst</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">inst</span><span class="o">.</span><span class="n">value</span>
+
+    <span class="nd">@value</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">):</span>
+        <span class="n">inst</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_instance</span>
+        <span class="k">if</span> <span class="n">inst</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">inst</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">val</span>
+
+<div class="viewcode-block" id="UserParam.add_instance"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.user_params.UserParam.add_instance">[docs]</a>    <span class="k">def</span> <span class="nf">add_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">param_instances</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_count</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vacant_idxs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vacant_idxs</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">param_instances</span><span class="p">)</span>
+        <span class="n">param</span> <span class="o">=</span> <span class="n">UserParamInstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">param_key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_type</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_is_collection</span><span class="p">,</span>
+                                  <span class="bp">self</span><span class="o">.</span><span class="n">min_value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">used_idxs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">param_instances</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">param_instance_added</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UserParam.remove_instance"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.user_params.UserParam.remove_instance">[docs]</a>    <span class="k">def</span> <span class="nf">remove_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">idx</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_instances</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_instances</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">used_idxs</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vacant_idxs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">param_instance_removed</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UserParam.load_params_from_doc_str"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.user_params.UserParam.load_params_from_doc_str">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">load_params_from_doc_str</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">doc_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;UserParam&#39;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">doc_str</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">doc_str</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{}</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">doc_str</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()]</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">dropwhile</span><span class="p">(</span><span class="k">lambda</span> <span class="n">line</span><span class="p">:</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;USER_PARAMS&#39;</span><span class="p">),</span> <span class="n">lines</span><span class="p">))[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="n">params</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">UserParam</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">_param</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">lines</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">dropwhile</span><span class="p">(</span><span class="k">lambda</span> <span class="n">line</span><span class="p">:</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;PARAM_NAME&#39;</span><span class="p">),</span> <span class="n">lines</span><span class="p">))</span>
+
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">next_i</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span> <span class="ow">and</span> <span class="n">next_i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">):</span>
+            <span class="k">while</span> <span class="n">next_i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">lines</span><span class="p">[</span><span class="n">next_i</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;PARAM_NAME&#39;</span><span class="p">):</span>
+                <span class="n">next_i</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">param_str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">next_i</span><span class="p">])</span>
+            <span class="n">param_dict</span> <span class="o">=</span> <span class="n">get_dict_from_doc_str</span><span class="p">(</span><span class="n">param_str</span><span class="p">)</span>
+            <span class="n">param</span> <span class="o">=</span> <span class="n">UserParam</span><span class="o">.</span><span class="n">create_from_dict</span><span class="p">(</span><span class="n">param_dict</span><span class="p">)</span>
+            <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">next_i</span>
+            <span class="n">next_i</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="n">param</span><span class="o">.</span><span class="n">param_key</span><span class="p">:</span> <span class="n">param</span> <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">params</span><span class="p">}</span></div>
+
+        <span class="c1">#while i &lt; len(lines):</span>
+        <span class="c1">#    if lines[i].startswith(&#39;NAME&#39;):</span>
+        <span class="c1">#        next_i = i + 1</span>
+        <span class="c1">#        while not lines[next_i].startswith(&#39;NAME&#39;) and next_i &lt; len(lines):</span>
+        <span class="c1">#            i += 1</span>
+        <span class="c1">#        param_str = &#39;\n&#39;.join(lines[i:next_i])</span>
+        <span class="c1">#        param = ToolUserParam.create_from_str(param_str)</span>
+        <span class="c1">#        params.append(param)</span>
+        <span class="c1">#        i = next_i</span>
+        <span class="c1">#    i += 1</span>
+
+    <span class="c1">#@classmethod</span>
+    <span class="c1">#def from_str(cls, param_str: str) -&gt; &#39;ToolUserParam&#39;:</span>
+    <span class="c1">#    lines = param_str.splitlines()</span>
+
+<div class="viewcode-block" id="UserParam.create_from_str"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.user_params.UserParam.create_from_str">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">create_from_str</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">param_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;UserParam&#39;</span><span class="p">:</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">param_str</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+        <span class="n">param_dict</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+            <span class="n">attr_name</span><span class="p">,</span> <span class="n">attr_val_str</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+            <span class="n">attr_name</span> <span class="o">=</span> <span class="n">attr_name</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="n">attr_val_str</span> <span class="o">=</span> <span class="n">attr_val_str</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">param_dict</span><span class="p">[</span><span class="n">attr_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">attr_val_str</span>
+        <span class="k">return</span> <span class="n">UserParam</span><span class="o">.</span><span class="n">create_from_dict</span><span class="p">(</span><span class="n">param_dict</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UserParam.create_from_dict"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.user_params.UserParam.create_from_dict">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">create_from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">param_dict</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s1">&#39;UserParam&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">param_dict</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;PARAM_SOURCE&#39;</span><span class="p">,</span> <span class="s1">&#39;User&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="s1">&#39;User&#39;</span> <span class="ow">and</span> <span class="n">param_dict</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;PARAM_SOURCE_FIELD&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Missing a field specification.&#39;</span><span class="p">)</span>
+        <span class="n">param_dict</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;PARAM_VALUE_CARDINALITY&#39;</span><span class="p">,</span> <span class="s1">&#39;SingleValue&#39;</span><span class="p">)</span>
+        <span class="n">param_data_is_collection</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">param_dict</span><span class="p">[</span><span class="s1">&#39;PARAM_SOURCE&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;User&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">param_dict</span><span class="p">[</span><span class="s1">&#39;PARAM_SOURCE&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;storage&#39;</span><span class="p">:</span>
+                <span class="n">param_data_is_collection</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_Storage</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">param_dict</span><span class="p">[</span><span class="s1">&#39;PARAM_SOURCE_FIELD&#39;</span><span class="p">]),</span> <span class="n">abc</span><span class="o">.</span><span class="n">Collection</span><span class="p">)</span>
+        <span class="n">param</span> <span class="o">=</span> <span class="n">UserParam</span><span class="p">(</span><span class="n">param_dict</span><span class="o">=</span><span class="n">param_dict</span><span class="p">)</span>
+        <span class="c1"># for attr_name, attr_val_str in param_dict.items():</span>
+        <span class="c1">#     if attr_name in enums:</span>
+        <span class="c1">#         attr_val_str = enums[attr_name][attr_val_str]</span>
+        <span class="c1">#     else:</span>
+        <span class="c1">#         attr_val_str = attr_val_str.lower().strip()</span>
+        <span class="c1">#     attr_name = attr_name.lower().strip()</span>
+        <span class="c1">#     param.set_attr(attr_name, attr_val_str)</span>
+        <span class="k">return</span> <span class="n">param</span></div></div>
+
+
+<span class="c1"># def get_val_setter(binding: &#39;UserParamWidgetBinding&#39;, param_key: str, idx: int):</span>
+<div class="viewcode-block" id="get_val_setter"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.user_params.get_val_setter">[docs]</a><span class="k">def</span> <span class="nf">get_val_setter</span><span class="p">(</span><span class="n">param_instance</span><span class="p">:</span> <span class="n">UserParamInstance</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">set_val</span><span class="p">(</span><span class="n">val</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
+        <span class="c1">#binding.user_params[param_name].value = val</span>
+        <span class="c1"># binding.user_params[param_key].set_attr(&#39;value&#39;, val)</span>
+        <span class="c1"># print(f&#39;setting {param_key} idx: {idx}&#39;)</span>
+        <span class="n">param_instance</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;setting </span><span class="si">{</span><span class="n">param_instance</span><span class="o">.</span><span class="n">param_key</span><span class="si">}</span><span class="s1"> idx: </span><span class="si">{</span><span class="n">param_instance</span><span class="o">.</span><span class="n">idx</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">set_val</span></div>
+
+
+<span class="c1"># def get_val_setter_qlistwidget(binding: &#39;UserParamWidgetBinding&#39;, param_key: str, idx: int):</span>
+<div class="viewcode-block" id="get_val_setter_qlistwidget"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.user_params.get_val_setter_qlistwidget">[docs]</a><span class="k">def</span> <span class="nf">get_val_setter_qlistwidget</span><span class="p">(</span><span class="n">binding</span><span class="p">:</span> <span class="s1">&#39;UserParamWidgetBinding&#39;</span><span class="p">,</span> <span class="n">param_instance</span><span class="p">:</span> <span class="n">UserParamInstance</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">set_val</span><span class="p">():</span>
+        <span class="n">listw</span><span class="p">:</span> <span class="n">QListWidget</span> <span class="o">=</span> <span class="n">binding</span><span class="o">.</span><span class="n">param_widget</span><span class="o">.</span><span class="n">findChild</span><span class="p">(</span><span class="n">QListWidget</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">param_instance</span><span class="o">.</span><span class="n">param_key</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">param_instance</span><span class="o">.</span><span class="n">idx</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">selection</span> <span class="o">=</span> <span class="n">listw</span><span class="o">.</span><span class="n">selectedItems</span><span class="p">()</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span><span class="o">.</span><span class="n">data</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">UserRole</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">selection</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">binding</span><span class="o">.</span><span class="n">user_params</span><span class="p">[</span><span class="n">param_instance</span><span class="o">.</span><span class="n">param_key</span><span class="p">]</span><span class="o">.</span><span class="n">param_value_cardinality</span> <span class="o">==</span> <span class="n">ParamValueCardinality</span><span class="o">.</span><span class="n">SingleValue</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;setting value for </span><span class="si">{</span><span class="n">param_instance</span><span class="o">.</span><span class="n">param_key</span><span class="si">}</span><span class="s1"> to </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;setting </span><span class="si">{</span><span class="n">param_instance</span><span class="o">.</span><span class="n">param_key</span><span class="si">}</span><span class="s1"> idx </span><span class="si">{</span><span class="n">param_instance</span><span class="o">.</span><span class="n">idx</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="c1"># binding.user_params[param_key].set_attr(&#39;value&#39;, data)</span>
+        <span class="n">param_instance</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">set_val</span></div>
+
+
+<div class="viewcode-block" id="get_val_setter_combobox"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.user_params.get_val_setter_combobox">[docs]</a><span class="k">def</span> <span class="nf">get_val_setter_combobox</span><span class="p">(</span><span class="n">binding</span><span class="p">:</span> <span class="s1">&#39;UserParamWidgetBinding&#39;</span><span class="p">,</span> <span class="n">param_instance</span><span class="p">:</span> <span class="n">UserParamInstance</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">set_val</span><span class="p">(</span><span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="n">combobox</span><span class="p">:</span> <span class="n">QComboBox</span> <span class="o">=</span> <span class="n">binding</span><span class="o">.</span><span class="n">param_widget</span><span class="o">.</span><span class="n">findChild</span><span class="p">(</span><span class="n">QComboBox</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">param_instance</span><span class="o">.</span><span class="n">param_key</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">param_instance</span><span class="o">.</span><span class="n">idx</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="c1"># binding.user_params[param_key].set_attr(&#39;value&#39;, combobox.currentData())</span>
+        <span class="n">param_instance</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="n">combobox</span><span class="o">.</span><span class="n">currentData</span><span class="p">())</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;setting </span><span class="si">{</span><span class="n">param_instance</span><span class="o">.</span><span class="n">param_key</span><span class="si">}</span><span class="s1"> idx </span><span class="si">{</span><span class="n">param_instance</span><span class="o">.</span><span class="n">idx</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">set_val</span></div>
+
+
+<div class="viewcode-block" id="get_instance_adder"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.user_params.get_instance_adder">[docs]</a><span class="k">def</span> <span class="nf">get_instance_adder</span><span class="p">(</span><span class="n">param</span><span class="p">:</span> <span class="n">UserParam</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">adder</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;should add an instance for </span><span class="si">{</span><span class="n">param</span><span class="o">.</span><span class="n">param_key</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="c1"># add_button: QPushButton = binding.param_widget.findChild(QPushButton, f&#39;{param.param_key}_add&#39;)</span>
+        <span class="c1"># setting_layout: QVBoxLayout = binding.param_widget.findChild(QVBoxLayout, f&#39;{param.param_key}_layout&#39;)</span>
+        <span class="c1"># setting_layout.removeWidget(add_button)</span>
+        <span class="c1"># widg = create_param_control(binding._state, param, param.count)</span>
+        <span class="c1"># # param.count += 1</span>
+        <span class="c1"># setting_layout.addWidget(widg)</span>
+        <span class="c1"># setting_layout.addWidget(add_button)</span>
+        <span class="c1"># param_inst_col = binding.param_instance_collections[param.param_key]</span>
+        <span class="c1"># param_inst_col.add_instance()</span>
+        <span class="n">param</span><span class="o">.</span><span class="n">add_instance</span><span class="p">()</span>
+        <span class="c1"># add_button.setEnabled(len(param_inst_col.instances) &lt; param.max_count)</span>
+    <span class="k">return</span> <span class="n">adder</span></div>
+
+
+<div class="viewcode-block" id="get_instance_remover"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.user_params.get_instance_remover">[docs]</a><span class="k">def</span> <span class="nf">get_instance_remover</span><span class="p">(</span><span class="n">param</span><span class="p">:</span> <span class="n">UserParam</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">remove</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;removing </span><span class="si">{</span><span class="n">param</span><span class="o">.</span><span class="n">param_key</span><span class="si">}</span><span class="s1"> idx </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">param</span><span class="o">.</span><span class="n">remove_instance</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">remove</span></div>
+
+
+<div class="viewcode-block" id="ParamInstanceCollection"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.user_params.ParamInstanceCollection">[docs]</a><span class="k">class</span> <span class="nc">ParamInstanceCollection</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">:</span> <span class="n">UserParam</span><span class="p">,</span> <span class="n">param_widget</span><span class="p">:</span> <span class="n">QWidget</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">State</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">param</span> <span class="o">=</span> <span class="n">param</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">param_widget</span> <span class="o">=</span> <span class="n">param_widget</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instances</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">QWidget</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">used_ids</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vacant_ids</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+<div class="viewcode-block" id="ParamInstanceCollection.remove_instance"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.user_params.ParamInstanceCollection.remove_instance">[docs]</a>    <span class="k">def</span> <span class="nf">remove_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;removing </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">param_key</span><span class="si">}</span><span class="s1"> idx </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">container</span><span class="p">:</span> <span class="n">QWidget</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_widget</span><span class="o">.</span><span class="n">findChild</span><span class="p">(</span><span class="n">QWidget</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">param_key</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s1">_container_widget&#39;</span><span class="p">)</span>
+        <span class="c1"># setting_layout: QVBoxLayout = self.param_widget.findChild(QVBoxLayout, f&#39;{self.param.param_key}_{idx}_layout&#39;)</span>
+        <span class="n">setting_widget</span><span class="p">:</span> <span class="n">QWidget</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_widget</span><span class="o">.</span><span class="n">findChild</span><span class="p">(</span><span class="n">QWidget</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">param_key</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">setting_layout</span><span class="p">:</span> <span class="n">QVBoxLayout</span> <span class="o">=</span> <span class="n">setting_widget</span><span class="o">.</span><span class="n">layout</span><span class="p">()</span>
+
+        <span class="n">container</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+        <span class="n">setting_layout</span><span class="o">.</span><span class="n">removeWidget</span><span class="p">(</span><span class="n">container</span><span class="p">)</span>
+        <span class="n">container</span><span class="o">.</span><span class="n">deleteLater</span><span class="p">()</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">instances</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">used_ids</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vacant_ids</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ParamInstanceCollection.add_instance"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.user_params.ParamInstanceCollection.add_instance">[docs]</a>    <span class="k">def</span> <span class="nf">add_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QWidget</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vacant_ids</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vacant_ids</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instances</span><span class="p">)</span>
+        <span class="n">instance_widget</span> <span class="o">=</span> <span class="n">create_param_control</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">param</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
+        <span class="n">remove_btn</span><span class="p">:</span> <span class="n">QToolButton</span> <span class="o">=</span> <span class="n">instance_widget</span><span class="o">.</span><span class="n">findChild</span><span class="p">(</span><span class="n">QToolButton</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">param_key</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s1">_remove&#39;</span><span class="p">)</span>
+        <span class="n">remove_btn</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_instance</span><span class="p">(</span><span class="n">idx</span><span class="p">))</span>
+
+        <span class="n">add_button</span><span class="p">:</span> <span class="n">QPushButton</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_widget</span><span class="o">.</span><span class="n">findChild</span><span class="p">(</span><span class="n">QPushButton</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">param_key</span><span class="si">}</span><span class="s1">_add&#39;</span><span class="p">)</span>
+
+        <span class="n">container</span><span class="p">:</span> <span class="n">QWidget</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_widget</span><span class="o">.</span><span class="n">findChild</span><span class="p">(</span><span class="n">QWidget</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">param_key</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">container</span><span class="o">.</span><span class="n">layout</span><span class="p">()</span><span class="o">.</span><span class="n">removeWidget</span><span class="p">(</span><span class="n">add_button</span><span class="p">)</span>
+        <span class="n">container</span><span class="o">.</span><span class="n">layout</span><span class="p">()</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">instance_widget</span><span class="p">)</span>
+        <span class="n">container</span><span class="o">.</span><span class="n">layout</span><span class="p">()</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">add_button</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instances</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">instance_widget</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">used_ids</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+        <span class="n">add_button</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instances</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">max_count</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">instance_widget</span></div></div>
+
+
+<div class="viewcode-block" id="UserParamWidgetBinding"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.user_params.UserParamWidgetBinding">[docs]</a><span class="k">class</span> <span class="nc">UserParamWidgetBinding</span><span class="p">(</span><span class="n">QObject</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">State</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">QObject</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">QObject</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">UserParam</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">param_widget</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">QWidget</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># self.param_instance_collections: typing.Dict[str, ParamInstanceCollection] = dict()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_state</span><span class="p">:</span> <span class="n">State</span> <span class="o">=</span> <span class="n">state</span>
+
+<div class="viewcode-block" id="UserParamWidgetBinding.bind"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.user_params.UserParamWidgetBinding.bind">[docs]</a>    <span class="k">def</span> <span class="nf">bind</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">UserParam</span><span class="p">],</span> <span class="n">param_widget</span><span class="p">:</span> <span class="n">QWidget</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_params</span> <span class="o">=</span> <span class="p">{</span><span class="n">param</span><span class="o">.</span><span class="n">param_key</span><span class="p">:</span> <span class="n">param</span> <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">params</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">param_widget</span> <span class="o">=</span> <span class="n">param_widget</span>
+        <span class="k">for</span> <span class="n">param_key</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">param</span><span class="p">:</span> <span class="n">UserParam</span> <span class="o">=</span> <span class="n">param</span>
+            <span class="c1"># param.value_changed.connect(self._handle_param_value_changed)</span>
+            <span class="c1"># self.param_instance_collections[param.param_key] = ParamInstanceCollection(param, self.param_widget,</span>
+            <span class="c1">#                                                                            self._state)</span>
+            <span class="c1"># for i in range(param.count):</span>
+            <span class="c1">#     self.param_instance_collections[param.param_key].add_instance()</span>
+            <span class="c1">#     self.bind_control(param, i)</span>
+            <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">param_instance</span> <span class="ow">in</span> <span class="n">param</span><span class="o">.</span><span class="n">param_instances</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">bind_param_instance</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="n">param_instance</span><span class="p">)</span>
+            <span class="n">add_button</span><span class="p">:</span> <span class="n">QPushButton</span> <span class="o">=</span> <span class="n">param_widget</span><span class="o">.</span><span class="n">findChild</span><span class="p">(</span><span class="n">QPushButton</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">param</span><span class="o">.</span><span class="n">param_key</span><span class="si">}</span><span class="s1">_add&#39;</span><span class="p">)</span>
+            <span class="n">add_button</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">get_instance_adder</span><span class="p">(</span><span class="n">param</span><span class="p">))</span>
+            <span class="n">param</span><span class="o">.</span><span class="n">param_instance_added</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bind_param_instance</span><span class="p">)</span>
+            <span class="n">param</span><span class="o">.</span><span class="n">param_instance_removed</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unbind_param_instance</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UserParamWidgetBinding.bind_control"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.user_params.UserParamWidgetBinding.bind_control">[docs]</a>    <span class="k">def</span> <span class="nf">bind_control</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">:</span> <span class="n">UserParam</span><span class="p">,</span> <span class="n">param_instance</span><span class="p">:</span> <span class="n">UserParamInstance</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">param_source</span> <span class="o">==</span> <span class="n">ParamSource</span><span class="o">.</span><span class="n">User</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">param_instance</span><span class="o">.</span><span class="n">param_type</span> <span class="o">==</span> <span class="n">ParamType</span><span class="o">.</span><span class="n">INT</span><span class="p">:</span>
+                <span class="n">spbox</span><span class="p">:</span> <span class="n">QSpinBox</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_widget</span><span class="o">.</span><span class="n">findChild</span><span class="p">(</span><span class="n">QSpinBox</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">param_instance</span><span class="o">.</span><span class="n">param_key</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">param_instance</span><span class="o">.</span><span class="n">idx</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">spbox</span><span class="o">.</span><span class="n">valueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">get_val_setter</span><span class="p">(</span><span class="n">param_instance</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">param_instance</span><span class="o">.</span><span class="n">param_type</span> <span class="o">==</span> <span class="n">ParamType</span><span class="o">.</span><span class="n">STR</span><span class="p">:</span>
+                <span class="n">line_edit</span><span class="p">:</span> <span class="n">QLineEdit</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_widget</span><span class="o">.</span><span class="n">findChild</span><span class="p">(</span><span class="n">QLineEdit</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">param_instance</span><span class="o">.</span><span class="n">param_key</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">param_instance</span><span class="o">.</span><span class="n">idx</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">line_edit</span><span class="o">.</span><span class="n">textChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">get_val_setter</span><span class="p">(</span><span class="n">param_instance</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">chkbox</span><span class="p">:</span> <span class="n">QCheckBox</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_widget</span><span class="o">.</span><span class="n">findChild</span><span class="p">(</span><span class="n">QCheckBox</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">param_instance</span><span class="o">.</span><span class="n">param_key</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">param_instance</span><span class="o">.</span><span class="n">idx</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">chkbox</span><span class="o">.</span><span class="n">toggled</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">get_val_setter</span><span class="p">(</span><span class="n">param_instance</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">param_value_cardinality</span> <span class="o">==</span> <span class="n">ParamValueCardinality</span><span class="o">.</span><span class="n">SingleValue</span><span class="p">:</span>
+                <span class="n">combobox</span><span class="p">:</span> <span class="n">QComboBox</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_widget</span><span class="o">.</span><span class="n">findChild</span><span class="p">(</span><span class="n">QComboBox</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">param_instance</span><span class="o">.</span><span class="n">param_key</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">param_instance</span><span class="o">.</span><span class="n">idx</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">combobox</span><span class="o">.</span><span class="n">currentIndexChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">get_val_setter_combobox</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param_instance</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">listw</span><span class="p">:</span> <span class="n">QListWidget</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_widget</span><span class="o">.</span><span class="n">findChild</span><span class="p">(</span><span class="n">QListWidget</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">param_instance</span><span class="o">.</span><span class="n">param_key</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">param_instance</span><span class="o">.</span><span class="n">idx</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">listw</span><span class="o">.</span><span class="n">itemSelectionChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">get_val_setter_qlistwidget</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param_instance</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="UserParamWidgetBinding.bind_param_instance"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.user_params.UserParamWidgetBinding.bind_param_instance">[docs]</a>    <span class="k">def</span> <span class="nf">bind_param_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">:</span> <span class="n">UserParam</span><span class="p">,</span> <span class="n">instance</span><span class="p">:</span> <span class="n">UserParamInstance</span><span class="p">):</span>
+        <span class="n">instance_widget</span> <span class="o">=</span> <span class="n">create_param_control</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_state</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">instance</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_add_control_widget</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">instance_widget</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bind_control</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="n">instance</span><span class="p">)</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">value_changed</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_handle_param_value_changed</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UserParamWidgetBinding.unbind_param_instance"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.user_params.UserParamWidgetBinding.unbind_param_instance">[docs]</a>    <span class="k">def</span> <span class="nf">unbind_param_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">:</span> <span class="n">UserParam</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;removing </span><span class="si">{</span><span class="n">param</span><span class="o">.</span><span class="n">param_key</span><span class="si">}</span><span class="s1"> idx </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">container</span><span class="p">:</span> <span class="n">QWidget</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_widget</span><span class="o">.</span><span class="n">findChild</span><span class="p">(</span><span class="n">QWidget</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">param</span><span class="o">.</span><span class="n">param_key</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s1">_container_widget&#39;</span><span class="p">)</span>
+        <span class="c1"># setting_layout: QVBoxLayout = self.param_widget.findChild(QVBoxLayout, f&#39;{self.param.param_key}_{idx}_layout&#39;)</span>
+        <span class="n">setting_widget</span><span class="p">:</span> <span class="n">QWidget</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_widget</span><span class="o">.</span><span class="n">findChild</span><span class="p">(</span><span class="n">QWidget</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">param</span><span class="o">.</span><span class="n">param_key</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">setting_layout</span><span class="p">:</span> <span class="n">QVBoxLayout</span> <span class="o">=</span> <span class="n">setting_widget</span><span class="o">.</span><span class="n">layout</span><span class="p">()</span>
+
+        <span class="n">container</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+        <span class="n">setting_layout</span><span class="o">.</span><span class="n">removeWidget</span><span class="p">(</span><span class="n">container</span><span class="p">)</span>
+        <span class="n">container</span><span class="o">.</span><span class="n">deleteLater</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_add_remove_buttons</span><span class="p">(</span><span class="n">param</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_update_add_remove_buttons</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">:</span> <span class="n">UserParam</span><span class="p">):</span>
+        <span class="n">add_button</span><span class="p">:</span> <span class="n">QPushButton</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_widget</span><span class="o">.</span><span class="n">findChild</span><span class="p">(</span><span class="n">QPushButton</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">param</span><span class="o">.</span><span class="n">param_key</span><span class="si">}</span><span class="s1">_add&#39;</span><span class="p">)</span>
+        <span class="n">add_button</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">param_instances</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">param</span><span class="o">.</span><span class="n">max_count</span> <span class="ow">or</span> <span class="n">param</span><span class="o">.</span><span class="n">max_count</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">used_idx</span> <span class="ow">in</span> <span class="n">param</span><span class="o">.</span><span class="n">used_idxs</span><span class="p">:</span>
+            <span class="n">remove_btn</span><span class="p">:</span> <span class="n">QToolButton</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_widget</span><span class="o">.</span><span class="n">findChild</span><span class="p">(</span><span class="n">QToolButton</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">param</span><span class="o">.</span><span class="n">param_key</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">used_idx</span><span class="si">}</span><span class="s1">_remove&#39;</span><span class="p">)</span>
+            <span class="n">remove_btn</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">param_instances</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">param</span><span class="o">.</span><span class="n">min_count</span><span class="p">)</span>
+            <span class="n">remove_btn</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">param_instances</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">param</span><span class="o">.</span><span class="n">min_count</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_add_control_widget</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">:</span> <span class="n">UserParam</span><span class="p">,</span> <span class="n">instance</span><span class="p">:</span> <span class="n">UserParamInstance</span><span class="p">,</span> <span class="n">instance_widget</span><span class="p">:</span> <span class="n">QWidget</span><span class="p">):</span>
+        <span class="n">remove_btn</span><span class="p">:</span> <span class="n">QToolButton</span> <span class="o">=</span> <span class="n">instance_widget</span><span class="o">.</span><span class="n">findChild</span><span class="p">(</span><span class="n">QToolButton</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">instance</span><span class="o">.</span><span class="n">param_key</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">instance</span><span class="o">.</span><span class="n">idx</span><span class="si">}</span><span class="s1">_remove&#39;</span><span class="p">)</span>
+        <span class="c1"># remove_btn.clicked.connect(lambda: self.remove_instance(instance.idx))</span>
+        <span class="n">remove_btn</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">get_instance_remover</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="n">instance</span><span class="o">.</span><span class="n">idx</span><span class="p">))</span>
+
+        <span class="n">add_button</span><span class="p">:</span> <span class="n">QPushButton</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_widget</span><span class="o">.</span><span class="n">findChild</span><span class="p">(</span><span class="n">QPushButton</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">instance</span><span class="o">.</span><span class="n">param_key</span><span class="si">}</span><span class="s1">_add&#39;</span><span class="p">)</span>
+
+        <span class="n">container</span><span class="p">:</span> <span class="n">QWidget</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_widget</span><span class="o">.</span><span class="n">findChild</span><span class="p">(</span><span class="n">QWidget</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">instance</span><span class="o">.</span><span class="n">param_key</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">container</span><span class="o">.</span><span class="n">layout</span><span class="p">()</span><span class="o">.</span><span class="n">removeWidget</span><span class="p">(</span><span class="n">add_button</span><span class="p">)</span>
+        <span class="n">container</span><span class="o">.</span><span class="n">layout</span><span class="p">()</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">instance_widget</span><span class="p">)</span>
+        <span class="n">container</span><span class="o">.</span><span class="n">layout</span><span class="p">()</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">add_button</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_add_remove_buttons</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_handle_param_value_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">:</span> <span class="n">UserParamInstance</span><span class="p">):</span>
+        <span class="c1"># param: UserParam = self.user_params[param_key]</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">instance</span><span class="o">.</span><span class="n">data_is_collection</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">instance</span><span class="o">.</span><span class="n">param_type</span> <span class="o">==</span> <span class="n">ParamType</span><span class="o">.</span><span class="n">INT</span><span class="p">:</span>
+                <span class="n">spbox</span><span class="p">:</span> <span class="n">QSpinBox</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_widget</span><span class="o">.</span><span class="n">findChild</span><span class="p">(</span><span class="n">QSpinBox</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">instance</span><span class="o">.</span><span class="n">param_key</span><span class="si">}</span><span class="s1">_0&#39;</span><span class="p">)</span>
+                <span class="n">spbox</span><span class="o">.</span><span class="n">blockSignals</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">spbox</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">instance</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+                <span class="n">spbox</span><span class="o">.</span><span class="n">blockSignals</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">instance</span><span class="o">.</span><span class="n">param_type</span> <span class="o">==</span> <span class="n">ParamType</span><span class="o">.</span><span class="n">STR</span><span class="p">:</span>
+                <span class="n">ledit</span><span class="p">:</span> <span class="n">QLineEdit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_widget</span><span class="o">.</span><span class="n">findChild</span><span class="p">(</span><span class="n">QLineEdit</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">instance</span><span class="o">.</span><span class="n">param_key</span><span class="si">}</span><span class="s1">_0&#39;</span><span class="p">)</span>
+                <span class="n">ledit</span><span class="o">.</span><span class="n">blockSignals</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">ledit</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">instance</span><span class="o">.</span><span class="n">param_key</span><span class="p">)</span>
+                <span class="n">ledit</span><span class="o">.</span><span class="n">blockSignals</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">chkbox</span><span class="p">:</span> <span class="n">QCheckBox</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_widget</span><span class="o">.</span><span class="n">findChild</span><span class="p">(</span><span class="n">QCheckBox</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">instance</span><span class="o">.</span><span class="n">param_key</span><span class="si">}</span><span class="s1">_0&#39;</span><span class="p">)</span>
+                <span class="n">chkbox</span><span class="o">.</span><span class="n">blockSignals</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">chkbox</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="n">instance</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+                <span class="n">chkbox</span><span class="o">.</span><span class="n">blockSignals</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="c1"># else:</span>
+        <span class="c1">#     listw: QListWidget = self.param_widget.findChild(QListWidget, param.param_key)</span>
+        <span class="c1">#     selection = listw.selectedItems()</span>
+        <span class="c1">#     data = [item.data(Qt.UserRole) for item in selection]</span>
+        <span class="c1">#     if param.param_value_cardinality == ParamValueCardinality.SingleValue:</span>
+        <span class="c1">#         param.value = data[0]</span>
+        <span class="c1">#     else:</span>
+        <span class="c1">#         param.value = data</span>
+        <span class="c1">#     print(&quot;success?&quot;)</span>
+
+    <span class="k">def</span> <span class="nf">_handle_int_value_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">param_name</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_params</span><span class="p">[</span><span class="n">param_name</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="k">def</span> <span class="nf">_handle_str_value_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">param_name</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_params</span><span class="p">[</span><span class="n">param_name</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="k">def</span> <span class="nf">_handle_bool_value_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">param_name</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_params</span><span class="p">[</span><span class="n">param_name</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span></div>
+
+
+<div class="viewcode-block" id="create_param_control"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.user_params.create_param_control">[docs]</a><span class="k">def</span> <span class="nf">create_param_control</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="n">State</span><span class="p">,</span> <span class="n">param</span><span class="p">:</span> <span class="n">UserParam</span><span class="p">,</span> <span class="n">param_instance</span><span class="p">:</span> <span class="n">UserParamInstance</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QWidget</span><span class="p">:</span>
+    <span class="n">control_widget_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">param_instance</span><span class="o">.</span><span class="n">param_key</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">param_instance</span><span class="o">.</span><span class="n">idx</span><span class="si">}</span><span class="s1">&#39;</span>
+    <span class="n">widg</span><span class="p">:</span> <span class="n">QWidget</span> <span class="o">=</span> <span class="n">QWidget</span><span class="p">()</span>
+    <span class="n">widg</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">param_instance</span><span class="o">.</span><span class="n">param_key</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">param_instance</span><span class="o">.</span><span class="n">idx</span><span class="si">}</span><span class="s1">_container_widget&#39;</span><span class="p">)</span>
+    <span class="n">layout</span> <span class="o">=</span> <span class="n">QHBoxLayout</span><span class="p">()</span>
+    <span class="n">layout</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">param_instance</span><span class="o">.</span><span class="n">param_key</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">param_instance</span><span class="o">.</span><span class="n">idx</span><span class="si">}</span><span class="s1">_layout&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">param_source</span> <span class="o">==</span> <span class="n">ParamSource</span><span class="o">.</span><span class="n">User</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">param_instance</span><span class="o">.</span><span class="n">param_type</span> <span class="o">==</span> <span class="n">ParamType</span><span class="o">.</span><span class="n">INT</span><span class="p">:</span>
+            <span class="n">spbox</span> <span class="o">=</span> <span class="n">QSpinBox</span><span class="p">()</span>
+            <span class="n">spbox</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="n">control_widget_name</span><span class="p">)</span>
+            <span class="n">spbox</span><span class="o">.</span><span class="n">setMinimum</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">min_value</span><span class="p">)</span>
+            <span class="n">spbox</span><span class="o">.</span><span class="n">setMaximum</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">max_value</span><span class="p">)</span>
+            <span class="n">spbox</span><span class="o">.</span><span class="n">setSingleStep</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">value_step</span><span class="p">)</span>
+            <span class="n">spbox</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">param_instance</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+            <span class="n">spbox</span><span class="o">.</span><span class="n">setMaximumWidth</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span>
+            <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">spbox</span><span class="p">)</span>
+            <span class="c1"># widg = spbox</span>
+            <span class="c1"># lay.addWidget(spbox, row, 1, alignment=Qt.AlignLeft)</span>
+            <span class="c1"># setting_widget_layout.addWidget(spbox)</span>
+            <span class="n">spbox</span><span class="o">.</span><span class="n">setSizePolicy</span><span class="p">(</span><span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Fixed</span><span class="p">,</span> <span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Fixed</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">param_instance</span><span class="o">.</span><span class="n">param_type</span> <span class="o">==</span> <span class="n">ParamType</span><span class="o">.</span><span class="n">STR</span><span class="p">:</span>
+            <span class="n">line_edit</span> <span class="o">=</span> <span class="n">QLineEdit</span><span class="p">()</span>
+            <span class="n">line_edit</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="n">control_widget_name</span><span class="p">)</span>
+            <span class="n">line_edit</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">param_instance</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+            <span class="c1"># lay.addWidget(line_edit, row, 1)</span>
+            <span class="c1"># setting_widget_layout.addWidget(line_edit)</span>
+            <span class="n">line_edit</span><span class="o">.</span><span class="n">setSizePolicy</span><span class="p">(</span><span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Minimum</span><span class="p">,</span> <span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Fixed</span><span class="p">)</span>
+            <span class="c1"># widg = line_edit</span>
+            <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">line_edit</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">chkbox</span> <span class="o">=</span> <span class="n">QCheckBox</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">param</span><span class="o">.</span><span class="n">param_name</span><span class="p">)</span>
+            <span class="n">chkbox</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="n">control_widget_name</span><span class="p">)</span>
+            <span class="n">chkbox</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="n">param_instance</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+            <span class="c1"># label.hide()</span>
+            <span class="c1"># label.deleteLater()</span>
+            <span class="c1"># lay.removeWidget(label)</span>
+            <span class="c1"># lay.addWidget(chkbox, row, 0)</span>
+            <span class="c1"># setting_widget_layout.addWidget(chkbox)</span>
+            <span class="c1"># widg = chkbox</span>
+            <span class="n">chkbox</span><span class="o">.</span><span class="n">setSizePolicy</span><span class="p">(</span><span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Fixed</span><span class="p">,</span> <span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Fixed</span><span class="p">)</span>
+            <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">chkbox</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">param_source_field</span><span class="p">))</span>
+        <span class="c1"># label.setText(param_instance.param_name)</span>
+        <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">param_value_cardinality</span> <span class="o">==</span> <span class="n">ParamValueCardinality</span><span class="o">.</span><span class="n">SingleValue</span><span class="p">:</span>
+            <span class="n">control_widget</span><span class="p">:</span> <span class="n">QComboBox</span> <span class="o">=</span> <span class="n">QComboBox</span><span class="p">()</span>
+            <span class="n">control_widget</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="n">control_widget_name</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">model</span><span class="p">:</span>
+                <span class="n">control_widget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">item</span><span class="p">),</span> <span class="n">item</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">control_widget</span><span class="p">:</span> <span class="n">QListWidget</span> <span class="o">=</span> <span class="n">QListWidget</span><span class="p">()</span>
+            <span class="n">control_widget</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="n">control_widget_name</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">model</span><span class="p">:</span>
+                <span class="n">item_widget</span> <span class="o">=</span> <span class="n">QListWidgetItem</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">item</span><span class="p">))</span>
+                <span class="n">item_widget</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">UserRole</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span>
+                <span class="n">control_widget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">item_widget</span><span class="p">)</span>
+            <span class="n">control_widget</span><span class="o">.</span><span class="n">setSelectionMode</span><span class="p">(</span><span class="n">QListWidget</span><span class="o">.</span><span class="n">MultiSelection</span><span class="p">)</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">control_widget</span><span class="p">)</span>
+    <span class="n">remove_btn</span> <span class="o">=</span> <span class="n">QToolButton</span><span class="p">()</span>
+    <span class="n">remove_btn</span><span class="o">.</span><span class="n">setStyleSheet</span><span class="p">(</span><span class="s1">&#39;color: red&#39;</span><span class="p">)</span>
+    <span class="n">remove_btn</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">)</span>
+    <span class="n">remove_btn</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">param_instance</span><span class="o">.</span><span class="n">param_key</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">param_instance</span><span class="o">.</span><span class="n">idx</span><span class="si">}</span><span class="s1">_remove&#39;</span><span class="p">)</span>
+    <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">remove_btn</span><span class="p">)</span>
+    <span class="n">widg</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">layout</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">widg</span></div>
+
+
+<div class="viewcode-block" id="create_params_widget"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.user_params.create_params_widget">[docs]</a><span class="k">def</span> <span class="nf">create_params_widget</span><span class="p">(</span><span class="n">params</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">UserParam</span><span class="p">],</span> <span class="n">state</span><span class="p">:</span> <span class="n">State</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QWidget</span><span class="p">:</span>
+    <span class="n">widget</span> <span class="o">=</span> <span class="n">QWidget</span><span class="p">()</span>
+    <span class="n">lay</span> <span class="o">=</span> <span class="n">QGridLayout</span><span class="p">()</span>
+    <span class="n">lay</span><span class="o">.</span><span class="n">setColumnStretch</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+    <span class="n">lay</span><span class="o">.</span><span class="n">setColumnStretch</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">widget</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">lay</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">row</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">params</span><span class="p">):</span>
+        <span class="n">param_name</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">param_name</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="n">QLabel</span><span class="p">()</span>
+        <span class="n">label</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">param_name</span><span class="p">)</span>
+        <span class="n">label</span><span class="o">.</span><span class="n">setSizePolicy</span><span class="p">(</span><span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Minimum</span><span class="p">,</span> <span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Preferred</span><span class="p">)</span>
+        <span class="n">label</span><span class="o">.</span><span class="n">setWordWrap</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">lay</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">setting_widget</span> <span class="o">=</span> <span class="n">QWidget</span><span class="p">()</span>
+        <span class="n">setting_widget</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">param_key</span><span class="p">)</span>
+        <span class="n">setting_widget_layout</span> <span class="o">=</span> <span class="n">QVBoxLayout</span><span class="p">()</span>
+        <span class="n">setting_widget_layout</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">param</span><span class="o">.</span><span class="n">param_key</span><span class="si">}</span><span class="s1">_layout&#39;</span><span class="p">)</span>
+        <span class="n">setting_widget</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">setting_widget_layout</span><span class="p">)</span>
+        <span class="c1"># for i in range(param.count):</span>
+        <span class="c1">#     widg = create_param_control(state, param, i)</span>
+        <span class="c1">#     if param.param_type == ParamType.BOOL:</span>
+        <span class="c1">#         label.hide()</span>
+        <span class="c1">#         lay.removeWidget(label)</span>
+        <span class="c1">#         label.deleteLater()</span>
+        <span class="c1">#     setting_widget_layout.addWidget(widg)</span>
+        <span class="n">add_button</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">()</span>
+        <span class="n">add_button</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s1">&#39;Add&#39;</span><span class="p">)</span>
+        <span class="n">add_button</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">param</span><span class="o">.</span><span class="n">param_key</span><span class="si">}</span><span class="s1">_add&#39;</span><span class="p">)</span>
+        <span class="n">setting_widget_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">add_button</span><span class="p">)</span>
+        <span class="n">add_button</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">count</span> <span class="o">&lt;</span> <span class="n">param</span><span class="o">.</span><span class="n">max_count</span> <span class="ow">or</span> <span class="n">param</span><span class="o">.</span><span class="n">max_count</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">lay</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">setting_widget</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">widget</span><span class="o">.</span><span class="n">setSizePolicy</span><span class="p">(</span><span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Minimum</span><span class="p">,</span> <span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Minimum</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">widget</span></div>
+
+
+<div class="viewcode-block" id="create_params_widget_with_buttons"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.user_params.create_params_widget_with_buttons">[docs]</a><span class="k">def</span> <span class="nf">create_params_widget_with_buttons</span><span class="p">(</span><span class="n">params</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">UserParam</span><span class="p">],</span> <span class="n">state</span><span class="p">:</span> <span class="n">State</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">QWidget</span><span class="p">,</span> <span class="n">QDialogButtonBox</span><span class="p">,</span> <span class="n">QPushButton</span><span class="p">]:</span>
+    <span class="n">widget</span> <span class="o">=</span> <span class="n">create_params_widget</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+    <span class="n">layout</span><span class="p">:</span> <span class="n">QGridLayout</span> <span class="o">=</span> <span class="n">widget</span><span class="o">.</span><span class="n">layout</span><span class="p">()</span>
+    <span class="n">rows</span> <span class="o">=</span> <span class="n">layout</span><span class="o">.</span><span class="n">rowCount</span><span class="p">()</span>
+
+    <span class="n">hbox</span> <span class="o">=</span> <span class="n">QHBoxLayout</span><span class="p">()</span>
+    <span class="n">button_box</span> <span class="o">=</span> <span class="n">QDialogButtonBox</span><span class="p">(</span><span class="n">QDialogButtonBox</span><span class="o">.</span><span class="n">Apply</span> <span class="o">|</span> <span class="n">QDialogButtonBox</span><span class="o">.</span><span class="n">Cancel</span><span class="p">)</span>
+    <span class="n">hbox</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">button_box</span><span class="p">)</span>
+    <span class="n">save_button</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s1">&#39;Save settings as default&#39;</span><span class="p">)</span>
+    <span class="n">save_button</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">hbox</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">save_button</span><span class="p">)</span>
+    <span class="n">layout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">hbox</span><span class="p">,</span> <span class="n">rows</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">widget</span><span class="p">,</span> <span class="n">button_box</span><span class="p">,</span> <span class="n">save_button</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, CBIA @ FI MUNI.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

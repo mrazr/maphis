@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1020</width>
+    <height>621</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QHBoxLayout" name="controlBar">
+     <item>
+      <widget class="QGroupBox" name="grpImageControls">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="title">
+        <string>Image controls</string>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+         <widget class="QToolButton" name="tbtnRotateCCW">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>24</width>
+            <height>24</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="tbtnRotateCW">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>24</width>
+            <height>24</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnResetZoom">
+          <property name="text">
+           <string>Reset zoom</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnZoomBug">
+          <property name="text">
+           <string>Zoom on bug</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="cbxZoom">
+          <property name="editable">
+           <bool>true</bool>
+          </property>
+          <property name="currentIndex">
+           <number>0</number>
+          </property>
+          <property name="insertPolicy">
+           <enum>QComboBox::NoInsert</enum>
+          </property>
+          <item>
+           <property name="text">
+            <string>Fit photo</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Fit specimen</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>10%</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>25%</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>50%</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>100%</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>200%</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>300%</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>400%</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QFrame" name="viewFrame">
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

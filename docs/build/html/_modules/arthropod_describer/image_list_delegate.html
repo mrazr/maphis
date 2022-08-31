@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arthropod_describer.image_list_delegate &mdash; MAPHIS 0.1 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> MAPHIS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">arthropod_describer</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">MAPHIS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>arthropod_describer.image_list_delegate</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for arthropod_describer.image_list_delegate</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">typing</span>
+<span class="kn">import</span> <span class="nn">importlib.resources</span>
+<span class="kn">import</span> <span class="nn">typing</span>
+
+<span class="kn">import</span> <span class="nn">PySide2</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtCore</span> <span class="kn">import</span> <span class="n">Qt</span><span class="p">,</span> <span class="n">QRect</span><span class="p">,</span> <span class="n">QSize</span><span class="p">,</span> <span class="n">QPoint</span><span class="p">,</span> <span class="n">Signal</span><span class="p">,</span> <span class="n">QRectF</span><span class="p">,</span> <span class="n">QMarginsF</span><span class="p">,</span> <span class="n">QModelIndex</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtGui</span> <span class="kn">import</span> <span class="n">QImage</span><span class="p">,</span> <span class="n">QIcon</span><span class="p">,</span> <span class="n">QPixmap</span><span class="p">,</span> <span class="n">QBrush</span><span class="p">,</span> <span class="n">QColor</span><span class="p">,</span> <span class="n">QFont</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtWidgets</span> <span class="kn">import</span> <span class="n">QStyledItemDelegate</span><span class="p">,</span> <span class="n">QApplication</span><span class="p">,</span> <span class="n">QStyleOptionButton</span><span class="p">,</span> <span class="n">QStyle</span><span class="p">,</span> <span class="n">QListView</span><span class="p">,</span> \
+    <span class="n">QStyleOptionViewItem</span><span class="p">,</span> <span class="n">QAbstractItemView</span><span class="p">,</span> <span class="n">QStyleOptionFrame</span>
+
+<span class="kn">from</span> <span class="nn">arthropod_describer.thumbnail_storage</span> <span class="kn">import</span> <span class="n">ThumbnailDelegate</span><span class="p">,</span> <span class="n">ThumbnailStorage_</span>
+
+
+<div class="viewcode-block" id="ImageListDelegate"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.image_list_delegate.ImageListDelegate">[docs]</a><span class="k">class</span> <span class="nc">ImageListDelegate</span><span class="p">(</span><span class="n">ThumbnailDelegate</span><span class="p">):</span>
+    <span class="n">tags_rect</span><span class="p">:</span> <span class="n">QRect</span> <span class="o">=</span> <span class="n">QRect</span><span class="p">()</span>
+    <span class="n">tag_rects</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">QRect</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thumbnail_storage</span><span class="p">:</span> <span class="n">ThumbnailStorage_</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">PySide2</span><span class="o">.</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QObject</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">thumbnail_storage</span><span class="p">,</span> <span class="n">parent</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mouse_pos</span><span class="p">:</span> <span class="n">QPoint</span> <span class="o">=</span> <span class="n">QPoint</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">icon_size</span> <span class="o">=</span> <span class="n">QSize</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">importlib</span><span class="o">.</span><span class="n">resources</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="s1">&#39;resources&#39;</span><span class="p">,</span> <span class="s1">&#39;refresh.png&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">path</span><span class="p">:</span>
+            <span class="n">cw</span> <span class="o">=</span> <span class="n">QImage</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span><span class="o">.</span><span class="n">scaledToWidth</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">icon_size</span><span class="o">.</span><span class="n">width</span><span class="p">(),</span> <span class="n">Qt</span><span class="o">.</span><span class="n">TransformationMode</span><span class="o">.</span><span class="n">SmoothTransformation</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cw_icon</span> <span class="o">=</span> <span class="n">QIcon</span><span class="p">(</span><span class="n">QPixmap</span><span class="o">.</span><span class="n">fromImage</span><span class="p">(</span><span class="n">cw</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ccw_icon</span> <span class="o">=</span> <span class="n">QIcon</span><span class="p">(</span><span class="n">QPixmap</span><span class="o">.</span><span class="n">fromImage</span><span class="p">(</span><span class="n">cw</span><span class="o">.</span><span class="n">mirrored</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">)))</span>
+        <span class="k">with</span> <span class="n">importlib</span><span class="o">.</span><span class="n">resources</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="s1">&#39;resources&#39;</span><span class="p">,</span> <span class="s1">&#39;resize.png&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">path</span><span class="p">:</span>
+            <span class="n">rs</span> <span class="o">=</span> <span class="n">QImage</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span><span class="o">.</span><span class="n">scaledToWidth</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">icon_size</span><span class="o">.</span><span class="n">width</span><span class="p">(),</span> <span class="n">Qt</span><span class="o">.</span><span class="n">SmoothTransformation</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">resize_icon</span> <span class="o">=</span> <span class="n">QIcon</span><span class="p">(</span><span class="n">QPixmap</span><span class="o">.</span><span class="n">fromImage</span><span class="p">(</span><span class="n">rs</span><span class="p">))</span>
+
+        <span class="k">with</span> <span class="n">importlib</span><span class="o">.</span><span class="n">resources</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="s1">&#39;resources&#39;</span><span class="p">,</span> <span class="s1">&#39;floppy-disk.png&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">path</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">save_img</span> <span class="o">=</span> <span class="n">QImage</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span><span class="o">.</span><span class="n">scaledToWidth</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">icon_size</span><span class="o">.</span><span class="n">width</span><span class="p">(),</span> <span class="n">Qt</span><span class="o">.</span><span class="n">SmoothTransformation</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">save_icon</span> <span class="o">=</span> <span class="n">QIcon</span><span class="p">(</span><span class="n">QPixmap</span><span class="o">.</span><span class="n">fromImage</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">save_img</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_paint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">painter</span><span class="p">:</span> <span class="n">PySide2</span><span class="o">.</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPainter</span><span class="p">,</span> <span class="n">option</span><span class="p">:</span> <span class="n">QStyleOptionViewItem</span><span class="p">,</span>
+               <span class="n">index</span><span class="p">:</span> <span class="n">PySide2</span><span class="o">.</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QModelIndex</span><span class="p">):</span>
+        <span class="n">painter</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">font_metrics</span> <span class="o">=</span> <span class="n">painter</span><span class="o">.</span><span class="n">fontMetrics</span><span class="p">()</span>
+        <span class="n">img_name</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">data</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">DisplayRole</span><span class="p">)</span>
+        <span class="n">quality_color</span> <span class="o">=</span> <span class="n">QColor</span><span class="p">(</span><span class="mi">220</span><span class="p">,</span> <span class="mi">220</span><span class="p">,</span> <span class="mi">220</span><span class="p">)</span>
+
+        <span class="n">rect</span> <span class="o">=</span> <span class="n">option</span><span class="o">.</span><span class="n">rect</span>
+        <span class="n">bottom_bar</span> <span class="o">=</span> <span class="n">QRectF</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">rect</span><span class="o">.</span><span class="n">bottom</span><span class="p">()</span> <span class="o">-</span> <span class="mi">32</span><span class="p">,</span>
+                            <span class="n">rect</span><span class="o">.</span><span class="n">width</span><span class="p">(),</span> <span class="mi">32</span><span class="p">)</span>
+
+        <span class="n">tags</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">data</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">UserRole</span> <span class="o">+</span> <span class="mi">9</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tags</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">tags</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;no tags&#39;</span><span class="p">}</span>
+            <span class="n">tag_style</span> <span class="o">=</span> <span class="n">QFont</span><span class="o">.</span><span class="n">StyleItalic</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tag_style</span> <span class="o">=</span> <span class="n">QFont</span><span class="o">.</span><span class="n">StyleNormal</span>
+
+        <span class="n">tags_str</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">tags</span><span class="p">)))</span>
+        <span class="n">tags_str_bbox</span> <span class="o">=</span> <span class="n">font_metrics</span><span class="o">.</span><span class="n">boundingRect</span><span class="p">(</span><span class="n">tags_str</span><span class="p">)</span>
+        <span class="n">tags_str_width</span> <span class="o">=</span> <span class="n">tags_str_bbox</span><span class="o">.</span><span class="n">width</span><span class="p">()</span>
+
+        <span class="n">text_rect</span> <span class="o">=</span> <span class="n">QRectF</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">rect</span><span class="o">.</span><span class="n">bottom</span><span class="p">()</span> <span class="o">-</span> <span class="mi">32</span><span class="p">,</span>
+                           <span class="n">rect</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">*</span> <span class="mf">0.45</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span>
+        <span class="n">img_name_elided</span> <span class="o">=</span> <span class="n">font_metrics</span><span class="o">.</span><span class="n">elidedText</span><span class="p">(</span><span class="n">img_name</span><span class="p">,</span> <span class="n">Qt</span><span class="o">.</span><span class="n">ElideRight</span><span class="p">,</span> <span class="n">text_rect</span><span class="o">.</span><span class="n">width</span><span class="p">())</span>
+        <span class="n">text_bbox</span> <span class="o">=</span> <span class="n">font_metrics</span><span class="o">.</span><span class="n">boundingRect</span><span class="p">(</span><span class="n">img_name_elided</span><span class="p">)</span>
+        <span class="n">tags_rect_width</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">rect</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">*</span> <span class="mf">0.45</span><span class="p">,</span> <span class="n">tags_str_width</span> <span class="o">*</span> <span class="mf">1.2</span><span class="p">)</span>
+        <span class="n">tags_rect</span> <span class="o">=</span> <span class="n">QRectF</span><span class="p">(</span><span class="n">rect</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">-</span> <span class="n">tags_rect_width</span><span class="p">,</span> <span class="n">rect</span><span class="o">.</span><span class="n">bottom</span><span class="p">()</span> <span class="o">-</span> <span class="mi">32</span><span class="p">,</span>
+                           <span class="n">tags_rect_width</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span>
+
+        <span class="n">image_name_width</span> <span class="o">=</span> <span class="n">text_bbox</span><span class="o">.</span><span class="n">width</span><span class="p">()</span>
+
+        <span class="n">painter</span><span class="o">.</span><span class="n">setRenderHint</span><span class="p">(</span><span class="n">painter</span><span class="o">.</span><span class="n">SmoothPixmapTransform</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">quality_color</span> <span class="o">=</span> <span class="n">QColor</span><span class="p">(</span><span class="mi">00</span><span class="p">,</span> <span class="mi">00</span><span class="p">,</span> <span class="mi">00</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span> <span class="k">if</span> <span class="n">quality_color</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">quality_color</span>
+        <span class="n">painter</span><span class="o">.</span><span class="n">fillRect</span><span class="p">(</span><span class="n">bottom_bar</span><span class="p">,</span> <span class="n">quality_color</span><span class="p">)</span>
+        <span class="n">painter</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QColor</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">))</span>
+        <span class="n">painter</span><span class="o">.</span><span class="n">drawText</span><span class="p">(</span><span class="n">text_rect</span><span class="p">,</span> <span class="n">Qt</span><span class="o">.</span><span class="n">AlignLeft</span> <span class="o">|</span> <span class="n">Qt</span><span class="o">.</span><span class="n">AlignVCenter</span><span class="p">,</span> <span class="n">img_name_elided</span><span class="p">)</span>
+        <span class="n">painter</span><span class="o">.</span><span class="n">drawLine</span><span class="p">(</span><span class="n">rect</span><span class="o">.</span><span class="n">bottomLeft</span><span class="p">(),</span> <span class="n">rect</span><span class="o">.</span><span class="n">bottomRight</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">option</span><span class="o">.</span><span class="n">state</span> <span class="o">&amp;</span> <span class="n">QStyle</span><span class="o">.</span><span class="n">State_Selected</span><span class="p">:</span>
+            <span class="n">color</span> <span class="o">=</span> <span class="n">option</span><span class="o">.</span><span class="n">palette</span><span class="o">.</span><span class="n">highlight</span><span class="p">()</span><span class="o">.</span><span class="n">color</span><span class="p">()</span>
+            <span class="n">color</span><span class="o">.</span><span class="n">setAlpha</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+            <span class="n">painter</span><span class="o">.</span><span class="n">fillRect</span><span class="p">(</span><span class="n">rect</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span>
+
+        <span class="n">tags_str_elided</span> <span class="o">=</span> <span class="n">font_metrics</span><span class="o">.</span><span class="n">elidedText</span><span class="p">(</span><span class="n">tags_str</span><span class="p">,</span> <span class="n">Qt</span><span class="o">.</span><span class="n">ElideRight</span><span class="p">,</span> <span class="n">tags_rect</span><span class="o">.</span><span class="n">width</span><span class="p">())</span>
+        <span class="n">painter</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QColor</span><span class="p">(</span><span class="mi">80</span><span class="p">,</span> <span class="mi">80</span><span class="p">,</span> <span class="mi">80</span><span class="p">,</span> <span class="mi">255</span><span class="p">))</span>
+        <span class="n">left_margin_shift</span> <span class="o">=</span> <span class="o">-</span><span class="mi">3</span>
+        <span class="n">right_margin_shift</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span>
+        <span class="n">tags_rect_frame</span> <span class="o">=</span> <span class="n">tags_rect</span><span class="o">.</span><span class="n">marginsRemoved</span><span class="p">(</span><span class="n">QMarginsF</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="o">-</span><span class="n">right_margin_shift</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="n">tags_rect_frame</span> <span class="o">=</span> <span class="n">tags_rect_frame</span><span class="o">.</span><span class="n">marginsAdded</span><span class="p">(</span><span class="n">QMarginsF</span><span class="p">(</span><span class="o">-</span><span class="n">left_margin_shift</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tag_rects</span><span class="p">[</span><span class="n">index</span><span class="o">.</span><span class="n">row</span><span class="p">()]</span> <span class="o">=</span> <span class="n">tags_rect_frame</span><span class="o">.</span><span class="n">toRect</span><span class="p">()</span>
+
+        <span class="n">painter</span><span class="o">.</span><span class="n">drawRect</span><span class="p">(</span><span class="n">tags_rect_frame</span><span class="p">)</span>
+        <span class="n">font</span> <span class="o">=</span> <span class="n">painter</span><span class="o">.</span><span class="n">font</span><span class="p">()</span>
+        <span class="n">font</span><span class="o">.</span><span class="n">setStyle</span><span class="p">(</span><span class="n">tag_style</span><span class="p">)</span>
+        <span class="n">painter</span><span class="o">.</span><span class="n">setFont</span><span class="p">(</span><span class="n">font</span><span class="p">)</span>
+        <span class="n">painter</span><span class="o">.</span><span class="n">drawText</span><span class="p">(</span><span class="n">tags_rect_frame</span><span class="p">,</span> <span class="n">Qt</span><span class="o">.</span><span class="n">AlignCenter</span><span class="p">,</span> <span class="n">tags_str_elided</span><span class="p">)</span>
+
+        <span class="n">opt</span> <span class="o">=</span> <span class="n">QStyleOptionFrame</span><span class="p">()</span>
+        <span class="n">opt</span><span class="o">.</span><span class="n">rect</span> <span class="o">=</span> <span class="n">QRect</span><span class="p">(</span><span class="n">text_rect</span><span class="o">.</span><span class="n">toRect</span><span class="p">())</span>
+        <span class="n">opt</span><span class="o">.</span><span class="n">rect</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">opt</span><span class="o">.</span><span class="n">rect</span><span class="o">.</span><span class="n">x</span><span class="p">()</span> <span class="o">+</span> <span class="n">text_rect</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">*</span> <span class="mf">0.5</span>
+        <span class="n">opt</span><span class="o">.</span><span class="n">features</span> <span class="o">=</span> <span class="n">QStyleOptionFrame</span><span class="o">.</span><span class="n">None_</span>
+
+        <span class="n">opt</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">QStyle</span><span class="o">.</span><span class="n">State_Enabled</span> <span class="o">|</span> <span class="n">QStyle</span><span class="o">.</span><span class="n">State_HasFocus</span>
+
+        <span class="n">style</span> <span class="o">=</span> <span class="n">QApplication</span><span class="o">.</span><span class="n">style</span><span class="p">()</span>
+        <span class="n">style</span><span class="o">.</span><span class="n">drawControl</span><span class="p">(</span><span class="n">QStyle</span><span class="o">.</span><span class="n">CE_ShapedFrame</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">painter</span><span class="p">)</span>
+
+        <span class="n">painter</span><span class="o">.</span><span class="n">restore</span><span class="p">()</span>
+
+<div class="viewcode-block" id="ImageListDelegate.paint"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.image_list_delegate.ImageListDelegate.paint">[docs]</a>    <span class="k">def</span> <span class="nf">paint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">painter</span><span class="p">:</span> <span class="n">PySide2</span><span class="o">.</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPainter</span><span class="p">,</span> <span class="n">option</span><span class="p">:</span> <span class="n">QStyleOptionViewItem</span><span class="p">,</span>
+              <span class="n">index</span><span class="p">:</span> <span class="n">PySide2</span><span class="o">.</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QModelIndex</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">paint</span><span class="p">(</span><span class="n">painter</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+        <span class="n">approval_count</span><span class="p">,</span> <span class="n">out_of</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">data</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">UserRole</span> <span class="o">+</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_paint</span><span class="p">(</span><span class="n">painter</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+        <span class="n">painter</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">painter</span><span class="o">.</span><span class="n">setBrush</span><span class="p">(</span><span class="n">QBrush</span><span class="p">(</span><span class="n">QColor</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">150</span><span class="p">,</span> <span class="mi">0</span><span class="p">)))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">approval_count</span><span class="p">):</span>
+            <span class="n">painter</span><span class="o">.</span><span class="n">drawEllipse</span><span class="p">(</span><span class="n">QPoint</span><span class="p">(</span><span class="n">i</span> <span class="o">*</span> <span class="mi">12</span> <span class="o">+</span> <span class="mi">10</span><span class="p">,</span> <span class="n">option</span><span class="o">.</span><span class="n">rect</span><span class="o">.</span><span class="n">y</span><span class="p">()</span> <span class="o">+</span> <span class="mi">10</span><span class="p">),</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+        <span class="n">painter</span><span class="o">.</span><span class="n">setBrush</span><span class="p">(</span><span class="n">QBrush</span><span class="p">(</span><span class="n">QColor</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="mi">150</span><span class="p">,</span> <span class="mi">0</span><span class="p">)))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">approval_count</span><span class="p">,</span> <span class="n">out_of</span><span class="p">):</span>
+            <span class="n">painter</span><span class="o">.</span><span class="n">drawEllipse</span><span class="p">(</span><span class="n">QPoint</span><span class="p">(</span><span class="n">i</span> <span class="o">*</span> <span class="mi">12</span> <span class="o">+</span> <span class="mi">10</span><span class="p">,</span> <span class="n">option</span><span class="o">.</span><span class="n">rect</span><span class="o">.</span><span class="n">y</span><span class="p">()</span> <span class="o">+</span> <span class="mi">10</span><span class="p">),</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">index</span><span class="o">.</span><span class="n">data</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">UserRole</span> <span class="o">+</span> <span class="mi">5</span><span class="p">):</span>
+            <span class="n">painter</span><span class="o">.</span><span class="n">fillRect</span><span class="p">(</span><span class="n">option</span><span class="o">.</span><span class="n">rect</span><span class="p">,</span> <span class="n">QBrush</span><span class="p">(</span><span class="n">QColor</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">150</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="n">index</span><span class="o">.</span><span class="n">data</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">UserRole</span> <span class="o">+</span> <span class="mi">6</span><span class="p">):</span>
+            <span class="n">painter</span><span class="o">.</span><span class="n">restore</span><span class="p">()</span>
+            <span class="n">painter</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="n">rect</span> <span class="o">=</span> <span class="n">QRect</span><span class="p">(</span><span class="n">option</span><span class="o">.</span><span class="n">rect</span><span class="o">.</span><span class="n">bottomLeft</span><span class="p">()</span> <span class="o">-</span> <span class="n">QPoint</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">icon_size</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">+</span> <span class="mi">32</span> <span class="o">+</span> <span class="mi">2</span><span class="p">),</span>
+                         <span class="bp">self</span><span class="o">.</span><span class="n">icon_size</span><span class="p">)</span>
+            <span class="c1">#painter.drawImage(rect, self.save_img)</span>
+            <span class="n">style</span> <span class="o">=</span> <span class="n">QApplication</span><span class="o">.</span><span class="n">style</span><span class="p">()</span>
+
+            <span class="n">opt</span> <span class="o">=</span> <span class="n">QStyleOptionButton</span><span class="p">()</span>
+            <span class="c1">#opt.rect = QRect(option.rect.topRight(), QSize(self.icon_size.width() + 12, self.icon_size.height() + 12))</span>
+            <span class="n">opt</span><span class="o">.</span><span class="n">rect</span> <span class="o">=</span> <span class="n">QRect</span><span class="p">(</span><span class="n">QPoint</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">option</span><span class="o">.</span><span class="n">rect</span><span class="o">.</span><span class="n">top</span><span class="p">()</span> <span class="o">+</span> <span class="mi">160</span> <span class="o">-</span> <span class="mi">28</span> <span class="o">-</span> <span class="mi">32</span> <span class="o">-</span> <span class="mi">2</span><span class="p">),</span> <span class="n">QSize</span><span class="p">(</span><span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">))</span>
+
+            <span class="n">opt</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">QStyle</span><span class="o">.</span><span class="n">State_Active</span> <span class="o">|</span> <span class="n">QStyle</span><span class="o">.</span><span class="n">State_Enabled</span>
+            <span class="c1">#if opt.rect.contains(self.mouse_pos):</span>
+            <span class="c1">#    opt.state = opt.state | QStyle.State_MouseOver</span>
+
+            <span class="n">opt</span><span class="o">.</span><span class="n">icon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_icon</span>
+            <span class="n">opt</span><span class="o">.</span><span class="n">iconSize</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">icon_size</span>
+
+            <span class="n">style</span><span class="o">.</span><span class="n">drawControl</span><span class="p">(</span><span class="n">QStyle</span><span class="o">.</span><span class="n">CE_PushButton</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">painter</span><span class="p">)</span>
+        <span class="n">painter</span><span class="o">.</span><span class="n">restore</span><span class="p">()</span></div></div>
+        <span class="c1">#if False and option.state &amp; QStyle.State_MouseOver &gt; 0:</span>
+        <span class="c1">#    style = QApplication.style()</span>
+        <span class="c1">#    opt = QStyleOptionButton()</span>
+        <span class="c1">#    opt.rect = QRect(option.rect.topRight(), QSize(self.icon_size.width() + 12, self.icon_size.height() + 12))</span>
+        <span class="c1">#    opt.rect = opt.rect.translated(-3 * opt.rect.width(), 4)</span>
+
+        <span class="c1">#    opt.state = QStyle.State_Active | QStyle.State_Enabled</span>
+        <span class="c1">#    if opt.rect.contains(self.mouse_pos):</span>
+        <span class="c1">#        opt.state = opt.state | QStyle.State_MouseOver</span>
+
+        <span class="c1">#    opt.icon = self.cw_icon</span>
+        <span class="c1">#    opt.iconSize = self.icon_size</span>
+
+        <span class="c1">#    style.drawControl(QStyle.CE_PushButton, opt, painter)</span>
+
+        <span class="c1">#    opt.rect = opt.rect.translated(self.icon_size.width() + 11, 0)</span>
+        <span class="c1">#    opt.state = QStyle.State_Active | QStyle.State_Enabled</span>
+        <span class="c1">#    if opt.rect.contains(self.mouse_pos):</span>
+        <span class="c1">#        opt.state = opt.state | QStyle.State_MouseOver</span>
+
+        <span class="c1">#    opt.icon = self.ccw_icon</span>
+
+        <span class="c1">#    style.drawControl(QStyle.CE_PushButton, opt, painter)</span>
+
+        <span class="c1">#    opt.rect = opt.rect.translated(self.icon_size.width() + 11, 0)</span>
+        <span class="c1">#    opt.state = QStyle.State_Active | QStyle.State_Enabled</span>
+        <span class="c1">#    if opt.rect.contains(self.mouse_pos):</span>
+        <span class="c1">#        opt.state = opt.state | QStyle.State_MouseOver</span>
+        <span class="c1">#    opt.icon = self.resize_icon</span>
+        <span class="c1">#    style.drawControl(QStyle.CE_PushButton, opt, painter)</span>
+
+
+<div class="viewcode-block" id="ImageListView"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.image_list_delegate.ImageListView">[docs]</a><span class="k">class</span> <span class="nc">ImageListView</span><span class="p">(</span><span class="n">QListView</span><span class="p">):</span>
+    <span class="n">view_left</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">()</span>
+    <span class="n">show_tag_ui</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">(</span><span class="n">QModelIndex</span><span class="p">)</span>
+    <span class="n">hide_tag_ui</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">(</span><span class="n">QModelIndex</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">PySide2</span><span class="o">.</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QWidget</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delegate</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">ImageListDelegate</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="ImageListView.initialize"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.image_list_delegate.ImageListView.initialize">[docs]</a>    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delegate</span><span class="p">:</span> <span class="n">ImageListDelegate</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setMouseTracking</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delegate</span> <span class="o">=</span> <span class="n">delegate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setItemDelegate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">delegate</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ImageListView.leaveEvent"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.image_list_delegate.ImageListView.leaveEvent">[docs]</a>    <span class="k">def</span> <span class="nf">leaveEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span><span class="n">PySide2</span><span class="o">.</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QEvent</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">view_left</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ImageListView.mousePressEvent"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.image_list_delegate.ImageListView.mousePressEvent">[docs]</a>    <span class="k">def</span> <span class="nf">mousePressEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">PySide2</span><span class="o">.</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QMouseEvent</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">modifiers</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">Qt</span><span class="o">.</span><span class="n">ControlModifier</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setSelectionMode</span><span class="p">(</span><span class="n">QAbstractItemView</span><span class="o">.</span><span class="n">ExtendedSelection</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setSelectionMode</span><span class="p">(</span><span class="n">QAbstractItemView</span><span class="o">.</span><span class="n">SingleSelection</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">mousePressEvent</span><span class="p">(</span><span class="n">event</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ImageListView.mouseMoveEvent"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.image_list_delegate.ImageListView.mouseMoveEvent">[docs]</a>    <span class="k">def</span> <span class="nf">mouseMoveEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span> <span class="n">PySide2</span><span class="o">.</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QMouseEvent</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ImageListView</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">mouseMoveEvent</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">indexAt</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">pos</span><span class="p">())</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">index</span><span class="o">.</span><span class="n">isValid</span><span class="p">():</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">delegate</span><span class="o">.</span><span class="n">tag_rects</span><span class="p">[</span><span class="n">index</span><span class="o">.</span><span class="n">row</span><span class="p">()]</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">pos</span><span class="p">()):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">show_tag_ui</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hide_tag_ui</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">index</span><span class="p">)</span></div></div>
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, CBIA @ FI MUNI.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

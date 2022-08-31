@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arthropod_describer.common.edit_command_executor &mdash; MAPHIS 0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> MAPHIS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">arthropod_describer</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">MAPHIS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>arthropod_describer.common.edit_command_executor</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for arthropod_describer.common.edit_command_executor</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">typing</span>
+
+<span class="kn">from</span> <span class="nn">PySide2.QtCore</span> <span class="kn">import</span> <span class="n">Signal</span><span class="p">,</span> <span class="n">QObject</span>
+
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.label_change</span> <span class="kn">import</span> <span class="n">LabelChange</span><span class="p">,</span> <span class="n">CommandEntry</span><span class="p">,</span> <span class="n">DoType</span><span class="p">,</span> <span class="n">CommandKind</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.photo</span> <span class="kn">import</span> <span class="n">Photo</span><span class="p">,</span> <span class="n">UpdateContext</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.state</span> <span class="kn">import</span> <span class="n">State</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.storage</span> <span class="kn">import</span> <span class="n">Storage</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.undo_manager</span> <span class="kn">import</span> <span class="n">UndoManager</span>
+
+<span class="n">ImageName</span> <span class="o">=</span> <span class="nb">str</span>
+<span class="n">LabelName</span> <span class="o">=</span> <span class="nb">str</span>
+<span class="n">LabelApproval</span> <span class="o">=</span> <span class="nb">str</span>
+<span class="n">DependentLabelName</span> <span class="o">=</span> <span class="nb">str</span>
+<span class="n">LastObservedTime</span> <span class="o">=</span> <span class="nb">int</span>
+
+
+<div class="viewcode-block" id="EditCommandExecutor"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.edit_command_executor.EditCommandExecutor">[docs]</a><span class="k">class</span> <span class="nc">EditCommandExecutor</span><span class="p">(</span><span class="n">QObject</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Executes edit commands (`CommandEntry`) and handles undo/redo stacks.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">label_image_modified</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">([</span><span class="n">ImageName</span><span class="p">,</span> <span class="n">LabelName</span><span class="p">])</span>
+    <span class="n">label_approval_changed</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">([</span><span class="n">ImageName</span><span class="p">,</span> <span class="n">LabelName</span><span class="p">,</span> <span class="n">LabelApproval</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">State</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">QObject</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">:</span> <span class="n">State</span> <span class="o">=</span> <span class="n">state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dependencies</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">ImageName</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="n">DependentLabelName</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">LabelName</span><span class="p">,</span> <span class="n">LastObservedTime</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">undo_manager</span><span class="p">:</span> <span class="n">UndoManager</span> <span class="o">=</span> <span class="n">UndoManager</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Storage</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="EditCommandExecutor.initialize"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.edit_command_executor.EditCommandExecutor.initialize">[docs]</a>    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">State</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="o">.</span><span class="n">update_photo</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_handle_update_photo</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">storage</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="o">.</span><span class="n">update_photo</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_handle_update_photo</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dependencies</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">undo_manager</span><span class="o">.</span><span class="n">initialize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">storage</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_dependencies</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">_handle_update_photo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ctx</span><span class="p">:</span> <span class="n">UpdateContext</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]]):</span>
+        <span class="k">if</span> <span class="n">ctx</span> <span class="o">==</span> <span class="n">UpdateContext</span><span class="o">.</span><span class="n">Photo</span><span class="p">:</span>
+            <span class="c1"># if data is None or &#39;operation&#39; not in data:</span>
+            <span class="c1">#     return</span>
+            <span class="c1"># if not data[&#39;operation&#39;].startswith(&#39;rot&#39;):</span>
+            <span class="c1">#     return</span>
+            <span class="c1"># rot_type = CommandKind.Rot_90_CW if data[&#39;operation&#39;] == &#39;rot_90_ccw&#39; else CommandKind.Rot_90_CCW</span>
+            <span class="c1"># cmd = CommandEntry([], do_type=DoType.Undo, image_name=img_name, command_kind=rot_type)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">undo_manager</span><span class="o">.</span><span class="n">undo_redo_store</span><span class="p">[</span><span class="n">img_name</span><span class="p">]</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+            <span class="c1"># self.undo_manager.undo_redo_store[img_name].undo_stack.append([cmd])</span>
+
+<div class="viewcode-block" id="EditCommandExecutor.update"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.edit_command_executor.EditCommandExecutor.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_dependencies</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">undo_manager</span><span class="o">.</span><span class="n">load</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="EditCommandExecutor.update_dependencies"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.edit_command_executor.EditCommandExecutor.update_dependencies">[docs]</a>    <span class="k">def</span> <span class="nf">update_dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">image_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">image_names</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dependencies</span><span class="p">[</span><span class="n">image_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">photo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">get_photo_by_name</span><span class="p">(</span><span class="n">image_name</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">label_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">label_image_names</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">depends_on</span> <span class="o">:=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">label_img_info</span><span class="p">[</span><span class="n">label_name</span><span class="p">]</span><span class="o">.</span><span class="n">constrain_to</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">dependencies</span><span class="p">[</span><span class="n">image_name</span><span class="p">][</span><span class="n">label_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">depends_on</span><span class="p">,</span> <span class="n">photo</span><span class="p">[</span><span class="n">depends_on</span><span class="p">]</span><span class="o">.</span><span class="n">timestamp</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="EditCommandExecutor.change_labels"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.edit_command_executor.EditCommandExecutor.change_labels">[docs]</a>    <span class="k">def</span> <span class="nf">change_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label_img</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">change</span><span class="p">:</span> <span class="n">LabelChange</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Change the values in `label_img` according to `change`&quot;&quot;&quot;</span>
+        <span class="n">label_img</span><span class="p">[</span><span class="n">change</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">change</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">change</span><span class="o">.</span><span class="n">new_label</span></div>
+
+    <span class="k">def</span> <span class="nf">_filter_against_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">change</span><span class="p">:</span> <span class="n">LabelChange</span><span class="p">,</span> <span class="n">image_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">label_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">lab_img</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">get_photo_by_name</span><span class="p">(</span><span class="n">image_name</span><span class="p">)[</span><span class="n">label_name</span><span class="p">]</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">lab_img</span><span class="o">.</span><span class="n">mask_for</span><span class="p">(</span><span class="n">lab_img</span><span class="o">.</span><span class="n">label_hierarchy</span><span class="o">.</span><span class="n">mask_label</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
+        <span class="c1"># TODO handle `change.bbox` == None</span>
+        <span class="n">mask_roi</span> <span class="o">=</span> <span class="n">mask</span><span class="p">[</span><span class="n">change</span><span class="o">.</span><span class="n">bbox</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">change</span><span class="o">.</span><span class="n">bbox</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span>
+                   <span class="n">change</span><span class="o">.</span><span class="n">bbox</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span><span class="n">change</span><span class="o">.</span><span class="n">bbox</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">pixels</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([(</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">change</span><span class="o">.</span><span class="n">bbox</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">change</span><span class="o">.</span><span class="n">bbox</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">mask_roi</span><span class="p">)])</span>
+        <span class="n">change_pixels</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">change</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">change</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+        <span class="n">valid_pixels</span> <span class="o">=</span> <span class="n">pixels</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">change_pixels</span><span class="p">)</span>
+        <span class="n">change</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="p">[</span><span class="n">pixel</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">pixel</span> <span class="ow">in</span> <span class="n">valid_pixels</span><span class="p">],</span> <span class="p">[</span><span class="n">pixel</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">pixel</span> <span class="ow">in</span> <span class="n">valid_pixels</span><span class="p">]</span>
+
+<div class="viewcode-block" id="EditCommandExecutor.do_command"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.edit_command_executor.EditCommandExecutor.do_command">[docs]</a>    <span class="k">def</span> <span class="nf">do_command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">:</span> <span class="n">CommandEntry</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">CommandEntry</span><span class="p">]:</span>
+        <span class="n">reverse_command</span> <span class="o">=</span> <span class="n">CommandEntry</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">command</span><span class="o">.</span><span class="n">source</span><span class="p">,</span> <span class="n">image_name</span><span class="o">=</span><span class="n">command</span><span class="o">.</span><span class="n">image_name</span><span class="p">,</span>
+                                       <span class="n">label_name</span><span class="o">=</span><span class="n">command</span><span class="o">.</span><span class="n">label_name</span><span class="p">,</span>
+                                       <span class="n">old_approval</span><span class="o">=</span><span class="n">command</span><span class="o">.</span><span class="n">new_approval</span><span class="p">,</span>
+                                       <span class="n">new_approval</span><span class="o">=</span><span class="n">command</span><span class="o">.</span><span class="n">old_approval</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">command</span><span class="o">.</span><span class="n">command_kind</span> <span class="o">==</span> <span class="n">CommandKind</span><span class="o">.</span><span class="n">LabelImgChange</span><span class="p">:</span>
+            <span class="n">labels_changed</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">change</span> <span class="ow">in</span> <span class="n">command</span><span class="o">.</span><span class="n">change_chain</span><span class="p">:</span>
+                <span class="c1"># label_img = self.state.current_photo[change.label_name].label_image</span>
+                <span class="n">photo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">get_photo_by_name</span><span class="p">(</span><span class="n">command</span><span class="o">.</span><span class="n">image_name</span><span class="p">)</span>
+                <span class="n">label_img</span> <span class="o">=</span> <span class="n">photo</span><span class="p">[</span><span class="n">command</span><span class="o">.</span><span class="n">label_name</span><span class="p">]</span>
+                <span class="n">leave_loaded</span> <span class="o">=</span> <span class="n">label_img</span><span class="o">.</span><span class="n">is_set</span>
+                <span class="n">label_img_nd</span> <span class="o">=</span> <span class="n">label_img</span><span class="o">.</span><span class="n">label_image</span>
+                <span class="k">if</span> <span class="n">label_img</span><span class="o">.</span><span class="n">label_info</span><span class="o">.</span><span class="n">constrain_to</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_filter_against_mask</span><span class="p">(</span><span class="n">change</span><span class="p">,</span> <span class="n">photo</span><span class="o">.</span><span class="n">image_name</span><span class="p">,</span> <span class="n">label_img</span><span class="o">.</span><span class="n">label_info</span><span class="o">.</span><span class="n">constrain_to</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">change</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">change_labels</span><span class="p">(</span><span class="n">label_img_nd</span><span class="p">,</span> <span class="n">change</span><span class="p">)</span>
+                <span class="n">label_img</span><span class="o">.</span><span class="n">label_image</span> <span class="o">=</span> <span class="n">label_img_nd</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">current_photo</span><span class="p">[</span><span class="n">change</span><span class="o">.</span><span class="n">label_name</span><span class="p">]</span><span class="o">.</span><span class="n">set_dirty</span><span class="p">()</span>
+                <span class="c1"># label_img.save()</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">leave_loaded</span><span class="p">:</span>
+                    <span class="n">label_img</span><span class="o">.</span><span class="n">unload</span><span class="p">()</span>
+                <span class="n">reverse_command</span><span class="o">.</span><span class="n">add_label_change</span><span class="p">(</span><span class="n">change</span><span class="o">.</span><span class="n">swap_labels</span><span class="p">())</span>
+                <span class="n">labels_changed</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">change</span><span class="o">.</span><span class="n">label_name</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">photo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">get_photo_by_name</span><span class="p">(</span><span class="n">command</span><span class="o">.</span><span class="n">image_name</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="n">photo</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">command</span><span class="o">.</span><span class="n">command_kind</span> <span class="o">==</span> <span class="n">CommandKind</span><span class="o">.</span><span class="n">Rot_90_CCW</span><span class="p">)</span>
+        <span class="n">reverse_command</span><span class="o">.</span><span class="n">do_type</span> <span class="o">=</span> <span class="n">DoType</span><span class="o">.</span><span class="n">Undo</span> <span class="k">if</span> <span class="n">command</span><span class="o">.</span><span class="n">do_type</span> <span class="o">==</span> <span class="n">DoType</span><span class="o">.</span><span class="n">Do</span> <span class="k">else</span> <span class="n">DoType</span><span class="o">.</span><span class="n">Do</span>
+        <span class="n">reverse_command</span><span class="o">.</span><span class="n">command_kind</span> <span class="o">=</span> <span class="n">reverse_command</span><span class="o">.</span><span class="n">command_kind</span><span class="o">.</span><span class="n">invert</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_approval_changed</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">reverse_command</span><span class="o">.</span><span class="n">image_name</span><span class="p">,</span> <span class="n">reverse_command</span><span class="o">.</span><span class="n">label_name</span><span class="p">,</span> <span class="n">command</span><span class="o">.</span><span class="n">new_approval</span><span class="p">)</span>
+
+        <span class="c1"># for label_name in labels_changed:</span>
+        <span class="c1">#     self.label_image_modified.emit(command.image_name, label_name)</span>
+
+        <span class="k">return</span> <span class="n">reverse_command</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">reverse_command</span><span class="o">.</span><span class="n">change_chain</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="EditCommandExecutor.do_commands"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.edit_command_executor.EditCommandExecutor.do_commands">[docs]</a>    <span class="k">def</span> <span class="nf">do_commands</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">commands</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">CommandEntry</span><span class="p">],</span> <span class="n">img_name</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">reverse_commands</span> <span class="o">=</span> <span class="p">[</span><span class="n">rev_cmd</span> <span class="k">for</span> <span class="n">command</span> <span class="ow">in</span> <span class="n">commands</span> <span class="k">if</span> <span class="p">(</span><span class="n">rev_cmd</span> <span class="o">:=</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_command</span><span class="p">(</span><span class="n">command</span><span class="p">))</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">reverse_commands</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">do_type</span> <span class="o">=</span> <span class="n">reverse_commands</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">do_type</span>
+
+        <span class="n">undo_redo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">undo_manager</span><span class="o">.</span><span class="n">current_undo_redo</span> <span class="k">if</span> <span class="n">img_name</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">undo_manager</span><span class="o">.</span><span class="n">undo_redo_store</span><span class="p">[</span><span class="n">img_name</span><span class="p">]</span>
+
+        <span class="n">undo_redo</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="n">do_type</span><span class="p">,</span> <span class="n">reverse_commands</span><span class="p">)</span>
+        <span class="n">labels_to_update</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([(</span><span class="n">cmd</span><span class="o">.</span><span class="n">image_name</span><span class="p">,</span> <span class="n">cmd</span><span class="o">.</span><span class="n">label_name</span><span class="p">)</span> <span class="k">for</span> <span class="n">cmd</span> <span class="ow">in</span> <span class="n">commands</span><span class="p">])</span>
+
+        <span class="k">for</span> <span class="n">image_name</span><span class="p">,</span> <span class="n">label_name</span> <span class="ow">in</span> <span class="n">labels_to_update</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">label_image_modified</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">image_name</span><span class="p">,</span> <span class="n">label_name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="EditCommandExecutor.enforce_within_mask"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.edit_command_executor.EditCommandExecutor.enforce_within_mask">[docs]</a>    <span class="k">def</span> <span class="nf">enforce_within_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">photo</span><span class="p">:</span> <span class="n">Photo</span><span class="p">,</span> <span class="n">label_name</span><span class="p">:</span> <span class="n">LabelName</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">label_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependencies</span><span class="p">[</span><span class="n">photo</span><span class="o">.</span><span class="n">image_name</span><span class="p">]:</span>
+            <span class="k">return</span>
+        <span class="n">mask_label_name</span><span class="p">,</span> <span class="n">last_timestamp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependencies</span><span class="p">[</span><span class="n">photo</span><span class="o">.</span><span class="n">image_name</span><span class="p">][</span><span class="n">label_name</span><span class="p">]</span>
+        <span class="n">mask_label_img</span> <span class="o">=</span> <span class="n">photo</span><span class="p">[</span><span class="n">mask_label_name</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">last_timestamp</span> <span class="o">&gt;=</span> <span class="n">mask_label_img</span><span class="o">.</span><span class="n">timestamp</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">label_img</span> <span class="o">=</span> <span class="n">photo</span><span class="p">[</span><span class="n">label_name</span><span class="p">]</span>
+        <span class="n">keep_loaded</span> <span class="o">=</span> <span class="n">label_img</span><span class="o">.</span><span class="n">is_set</span>
+
+        <span class="n">lab_hier</span> <span class="o">=</span> <span class="n">mask_label_img</span><span class="o">.</span><span class="n">label_hierarchy</span>
+
+        <span class="n">mask_label</span> <span class="o">=</span> <span class="n">lab_hier</span><span class="o">.</span><span class="n">mask_label</span><span class="o">.</span><span class="n">label</span>
+        <span class="n">mask_level</span> <span class="o">=</span> <span class="n">lab_hier</span><span class="o">.</span><span class="n">get_level</span><span class="p">(</span><span class="n">mask_label</span><span class="p">)</span>
+
+        <span class="n">level_mask</span> <span class="o">=</span> <span class="n">mask_label_img</span><span class="p">[</span><span class="n">mask_level</span><span class="p">]</span> <span class="o">==</span> <span class="n">mask_label</span>
+
+        <span class="n">label_img</span><span class="o">.</span><span class="n">label_image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">level_mask</span><span class="p">,</span> <span class="n">label_img</span><span class="o">.</span><span class="n">label_image</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint32</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">keep_loaded</span><span class="p">:</span>
+            <span class="n">label_img</span><span class="o">.</span><span class="n">unload</span><span class="p">()</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, CBIA @ FI MUNI.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

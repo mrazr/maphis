@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arthropod_describer.plugins.test_plugin.properties.mean_hsv &mdash; MAPHIS 0.1 documentation</title>
+      <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
+        <script src="../../../../../_static/jquery.js"></script>
+        <script src="../../../../../_static/underscore.js"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../../../_static/doctools.js"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../../../index.html" class="icon icon-home"> MAPHIS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../modules.html">arthropod_describer</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">MAPHIS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../../../index.html">Module code</a> &raquo;</li>
+      <li>arthropod_describer.plugins.test_plugin.properties.mean_hsv</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for arthropod_describer.plugins.test_plugin.properties.mean_hsv</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">typing</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">skimage.color</span> <span class="kn">import</span> <span class="n">rgb2hsv</span>
+
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.common</span> <span class="kn">import</span> <span class="n">Info</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.label_image</span> <span class="kn">import</span> <span class="n">RegionProperty</span><span class="p">,</span> <span class="n">PropertyType</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.photo</span> <span class="kn">import</span> <span class="n">Photo</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.plugin</span> <span class="kn">import</span> <span class="n">PropertyComputation</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.regions_cache</span> <span class="kn">import</span> <span class="n">RegionsCache</span><span class="p">,</span> <span class="n">Region</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.user_params</span> <span class="kn">import</span> <span class="n">UserParam</span>
+
+
+<div class="viewcode-block" id="MeanHSV"><a class="viewcode-back" href="../../../../../arthropod_describer.plugins.test_plugin.properties.html#arthropod_describer.plugins.test_plugin.properties.mean_hsv.MeanHSV">[docs]</a><span class="k">class</span> <span class="nc">MeanHSV</span><span class="p">(</span><span class="n">PropertyComputation</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    GROUP: Basic properties</span>
+<span class="sd">    NAME: Mean HSV</span>
+<span class="sd">    DESCRIPTION: Mean HSV of a region</span>
+<span class="sd">    KEY: mean_hsv</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">info</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Info</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">photo</span><span class="p">:</span> <span class="n">Photo</span><span class="p">,</span> <span class="n">region_labels</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">regions_cache</span><span class="p">:</span> <span class="n">RegionsCache</span><span class="p">)</span> <span class="o">-&gt;</span> \
+            <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">RegionProperty</span><span class="p">]:</span>
+
+        <span class="n">props</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">RegionProperty</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">lab_img</span> <span class="o">=</span> <span class="n">photo</span><span class="p">[</span><span class="s1">&#39;Labels&#39;</span><span class="p">]</span>
+        <span class="n">hsv_img</span> <span class="o">=</span> <span class="n">rgb2hsv</span><span class="p">(</span><span class="n">photo</span><span class="o">.</span><span class="n">image</span><span class="p">)</span>
+        <span class="n">hsv_img</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">360</span> <span class="o">*</span> <span class="n">hsv_img</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">reflection</span> <span class="o">=</span> <span class="n">photo</span><span class="p">[</span><span class="s1">&#39;Reflections&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">label_image</span>
+
+        <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">region_labels</span><span class="p">:</span>
+            <span class="n">region_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">lab_img</span><span class="o">.</span><span class="n">mask_for</span><span class="p">(</span><span class="n">label</span><span class="p">),</span> <span class="n">reflection</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">ys</span><span class="p">,</span> <span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">region_mask</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ys</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">hues</span> <span class="o">=</span> <span class="n">hsv_img</span><span class="p">[</span><span class="n">ys</span><span class="p">,</span> <span class="n">xs</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+
+            <span class="n">hue_radians</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">hues</span> <span class="o">/</span> <span class="mf">180.0</span>
+
+            <span class="n">avg_sin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">hue_radians</span><span class="p">))</span>
+            <span class="n">avg_cos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">hue_radians</span><span class="p">))</span>
+
+            <span class="n">average_vector_angle</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">avg_sin</span><span class="p">,</span> <span class="n">avg_cos</span><span class="p">)</span>
+
+            <span class="n">average_vector_degrees</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mod</span><span class="p">((</span><span class="mf">180.0</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">*</span> <span class="n">average_vector_angle</span><span class="p">,</span> <span class="mi">360</span><span class="p">)</span>
+
+            <span class="n">average_vector_length</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">avg_sin</span> <span class="o">*</span> <span class="n">avg_sin</span> <span class="o">+</span> <span class="n">avg_cos</span> <span class="o">*</span> <span class="n">avg_cos</span><span class="p">)</span>
+
+            <span class="n">mean_sat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">hsv_img</span><span class="p">[</span><span class="n">ys</span><span class="p">,</span> <span class="n">xs</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+            <span class="n">mean_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">hsv_img</span><span class="p">[</span><span class="n">ys</span><span class="p">,</span> <span class="n">xs</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+
+            <span class="n">prop</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">example</span><span class="p">(</span><span class="s1">&#39;mean_hsv&#39;</span><span class="p">))</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="p">([</span><span class="nb">float</span><span class="p">(</span><span class="n">average_vector_degrees</span><span class="p">),</span>
+                           <span class="mi">100</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">mean_sat</span> <span class="o">*</span> <span class="n">average_vector_length</span><span class="p">),</span>
+                           <span class="mi">100</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">mean_val</span><span class="p">)],</span>
+                          <span class="bp">self</span><span class="o">.</span><span class="n">_no_unit</span><span class="p">)</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">label</span>
+            <span class="n">props</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prop</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">props</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">user_params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">UserParam</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">user_params</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">region_restricted</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">region_restricted</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">computes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Info</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">key</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">}</span>
+
+<div class="viewcode-block" id="MeanHSV.example"><a class="viewcode-back" href="../../../../../arthropod_describer.plugins.test_plugin.properties.html#arthropod_describer.plugins.test_plugin.properties.mean_hsv.MeanHSV.example">[docs]</a>    <span class="k">def</span> <span class="nf">example</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prop_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RegionProperty</span><span class="p">:</span>
+        <span class="n">prop</span> <span class="o">=</span> <span class="n">RegionProperty</span><span class="p">()</span>
+        <span class="n">prop</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">prop</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">)</span>
+        <span class="n">prop</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">prop</span><span class="o">.</span><span class="n">num_vals</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="n">prop</span><span class="o">.</span><span class="n">prop_type</span> <span class="o">=</span> <span class="n">PropertyType</span><span class="o">.</span><span class="n">IntensityHSV</span>
+        <span class="n">prop</span><span class="o">.</span><span class="n">val_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;H&#39;</span><span class="p">,</span> <span class="s1">&#39;S&#39;</span><span class="p">,</span> <span class="s1">&#39;V&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">prop</span></div>
+
+<div class="viewcode-block" id="MeanHSV.target_worksheet"><a class="viewcode-back" href="../../../../../arthropod_describer.plugins.test_plugin.properties.html#arthropod_describer.plugins.test_plugin.properties.mean_hsv.MeanHSV.target_worksheet">[docs]</a>    <span class="k">def</span> <span class="nf">target_worksheet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prop_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">MeanHSV</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">target_worksheet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">key</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">group</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">group</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, CBIA @ FI MUNI.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

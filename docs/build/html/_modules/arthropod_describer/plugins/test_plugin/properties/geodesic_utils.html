@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arthropod_describer.plugins.test_plugin.properties.geodesic_utils &mdash; MAPHIS 0.1 documentation</title>
+      <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
+        <script src="../../../../../_static/jquery.js"></script>
+        <script src="../../../../../_static/underscore.js"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../../../_static/doctools.js"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../../../index.html" class="icon icon-home"> MAPHIS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../modules.html">arthropod_describer</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">MAPHIS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../../../index.html">Module code</a> &raquo;</li>
+      <li>arthropod_describer.plugins.test_plugin.properties.geodesic_utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for arthropod_describer.plugins.test_plugin.properties.geodesic_utils</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">queue</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">import</span> <span class="nn">numba</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">import</span> <span class="nn">typing</span>
+
+<span class="kn">import</span> <span class="nn">skimage</span>
+<span class="kn">from</span> <span class="nn">skimage</span> <span class="kn">import</span> <span class="n">io</span>
+<span class="kn">from</span> <span class="nn">skimage.morphology</span> <span class="kn">import</span> <span class="n">skeletonize</span>
+<span class="kn">from</span> <span class="nn">skimage.measure</span> <span class="kn">import</span> <span class="n">regionprops_table</span>
+<span class="kn">from</span> <span class="nn">scipy.ndimage</span> <span class="kn">import</span> <span class="n">binary_fill_holes</span>
+<span class="kn">import</span> <span class="nn">networkx</span>
+
+
+<span class="n">golay_e</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">]</span>
+    <span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">),</span>
+
+    <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">]</span>
+    <span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">),</span>
+
+    <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">),</span>
+
+    <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">)</span>
+<span class="p">]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span>
+        <span class="n">golay_e</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">rot90</span><span class="p">(</span><span class="n">golay_e</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">k</span><span class="o">=</span><span class="n">j</span><span class="p">))</span>
+
+<span class="n">idx</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">golay_e</span><span class="p">)</span>
+
+<span class="n">golay_e</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>  <span class="mi">1</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">]</span>
+    <span class="p">]),</span>
+<span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span>
+    <span class="n">golay_e</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">rot90</span><span class="p">(</span><span class="n">golay_e</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">k</span><span class="o">=</span><span class="n">i</span><span class="p">))</span>
+
+<span class="n">e_codes</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">e_letter</span> <span class="ow">in</span> <span class="n">golay_e</span><span class="p">:</span>
+    <span class="n">code</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+            <span class="n">code</span> <span class="o">+=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">e_letter</span><span class="p">[</span><span class="n">r</span><span class="p">,</span> <span class="n">c</span><span class="p">])</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="n">i</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">e_codes</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
+
+<div class="viewcode-block" id="encode_bin_img"><a class="viewcode-back" href="../../../../../arthropod_describer.plugins.test_plugin.properties.html#arthropod_describer.plugins.test_plugin.properties.geodesic_utils.encode_bin_img">[docs]</a><span class="nd">@numba</span><span class="o">.</span><span class="n">jit</span>
+<span class="k">def</span> <span class="nf">encode_bin_img</span><span class="p">(</span><span class="n">bin_img</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="c1"># bin_img_ = bin_img # np.pad(bin_img, pad_width=((1, 1), (1, 1)), constant_values=(0, 0))</span>
+    <span class="n">bin_img_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">bin_img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="n">bin_img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">2</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">bin_img</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">bin_img_</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">bin_img</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">bin_img_</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint16</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">bin_img_</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">bin_img_</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">code</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
+                    <span class="n">code</span> <span class="o">+=</span> <span class="n">bin_img_</span><span class="p">[</span><span class="n">r</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="o">+</span> <span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="n">x</span>
+                    <span class="n">x</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">r</span><span class="p">,</span> <span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">code</span>
+    <span class="k">return</span> <span class="n">result</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="find_e"><a class="viewcode-back" href="../../../../../arthropod_describer.plugins.test_plugin.properties.html#arthropod_describer.plugins.test_plugin.properties.geodesic_utils.find_e">[docs]</a><span class="k">def</span> <span class="nf">find_e</span><span class="p">(</span><span class="n">encoded_bin_img</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">e_letter_code</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">encoded_bin_img</span> <span class="o">==</span> <span class="n">e_letter_code</span></div>
+
+
+<div class="viewcode-block" id="find_skeleton_endpoints"><a class="viewcode-back" href="../../../../../arthropod_describer.plugins.test_plugin.properties.html#arthropod_describer.plugins.test_plugin.properties.geodesic_utils.find_skeleton_endpoints">[docs]</a><span class="k">def</span> <span class="nf">find_skeleton_endpoints</span><span class="p">(</span><span class="n">skeleton</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">e_letter_codes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
+    <span class="n">encoded</span> <span class="o">=</span> <span class="n">encode_bin_img</span><span class="p">(</span><span class="n">skeleton</span><span class="p">)</span>
+    <span class="n">endpoints</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">skeleton</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">e_letter_code</span> <span class="ow">in</span> <span class="n">e_letter_codes</span><span class="p">:</span>
+        <span class="n">endpoints</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span><span class="n">endpoints</span><span class="p">,</span> <span class="n">encoded</span> <span class="o">==</span> <span class="n">e_letter_code</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">endpoints</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)[:,</span> <span class="p">::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="geodesic_distance_for_skeleton"><a class="viewcode-back" href="../../../../../arthropod_describer.plugins.test_plugin.properties.html#arthropod_describer.plugins.test_plugin.properties.geodesic_utils.geodesic_distance_for_skeleton">[docs]</a><span class="k">def</span> <span class="nf">geodesic_distance_for_skeleton</span><span class="p">(</span><span class="n">sk</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">src</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="n">pixels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">sk</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)[:,</span> <span class="p">::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">queue</span><span class="o">.</span><span class="n">PriorityQueue</span><span class="p">()</span>
+    <span class="n">unvisited</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+    <span class="n">dst_f</span> <span class="o">=</span> <span class="mi">99999999</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">sk</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">pixel</span> <span class="ow">in</span> <span class="n">pixels</span><span class="p">:</span>
+        <span class="n">priority</span> <span class="o">=</span> <span class="mi">99999999</span>
+        <span class="k">if</span> <span class="n">pixel</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">src</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="n">pixel</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">src</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">priority</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">dst_f</span><span class="p">[</span><span class="n">pixel</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">pixel</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">pixel</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">pixel</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">q</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">priority</span><span class="p">,</span> <span class="n">node</span><span class="p">))</span>
+        <span class="n">unvisited</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+
+    <span class="k">while</span> <span class="ow">not</span> <span class="n">q</span><span class="o">.</span><span class="n">empty</span><span class="p">():</span>
+        <span class="n">node_dst</span><span class="p">,</span> <span class="n">node</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">node</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unvisited</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">dst_f</span><span class="p">[</span><span class="n">node</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">node</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">node_dst</span>
+        <span class="n">unvisited</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+
+        <span class="n">neighs</span> <span class="o">=</span> <span class="n">neighbors</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">neigh</span> <span class="ow">in</span> <span class="n">neighs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">neigh</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unvisited</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">dst</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">neigh</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">node</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">neigh</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">node</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span>
+                            <span class="p">(</span><span class="n">neigh</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">node</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">neigh</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">node</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">upd_dst</span> <span class="o">:=</span> <span class="n">dst_f</span><span class="p">[</span><span class="n">node</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">node</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">+</span> <span class="n">dst</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">dst_f</span><span class="p">[</span><span class="n">neigh</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">neigh</span><span class="p">[</span><span class="mi">0</span><span class="p">]]:</span>
+                <span class="n">dst_f</span><span class="p">[</span><span class="n">neigh</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">neigh</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">upd_dst</span>
+                <span class="n">q</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">upd_dst</span><span class="p">,</span> <span class="n">neigh</span><span class="p">))</span>
+
+    <span class="n">dst_f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">dst_f</span> <span class="o">&gt;=</span> <span class="mi">99999</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">dst_f</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">dst_f</span></div>
+
+
+<div class="viewcode-block" id="find_shortest_path"><a class="viewcode-back" href="../../../../../arthropod_describer.plugins.test_plugin.properties.html#arthropod_describer.plugins.test_plugin.properties.geodesic_utils.find_shortest_path">[docs]</a><span class="k">def</span> <span class="nf">find_shortest_path</span><span class="p">(</span><span class="n">bin_img</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">src</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">dst</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
+    <span class="n">pixels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">bin_img</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)[:,</span> <span class="p">::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">queue</span><span class="o">.</span><span class="n">PriorityQueue</span><span class="p">()</span>
+    <span class="n">unvisited</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+    <span class="n">dst_f</span> <span class="o">=</span> <span class="mi">99999999</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">bin_img</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">pixel</span> <span class="ow">in</span> <span class="n">pixels</span><span class="p">:</span>
+        <span class="n">priority</span> <span class="o">=</span> <span class="mi">99999999</span>
+        <span class="k">if</span> <span class="n">pixel</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">src</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="n">pixel</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">src</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">priority</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">dst_f</span><span class="p">[</span><span class="n">pixel</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">pixel</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">pixel</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">pixel</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">q</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">priority</span><span class="p">,</span> <span class="n">node</span><span class="p">))</span>
+        <span class="n">unvisited</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+
+    <span class="n">parents</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span><span class="n">src</span><span class="p">:</span> <span class="n">src</span><span class="p">}</span>
+
+    <span class="k">while</span> <span class="ow">not</span> <span class="n">q</span><span class="o">.</span><span class="n">empty</span><span class="p">():</span>
+        <span class="n">node_dst</span><span class="p">,</span> <span class="n">node</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">node</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unvisited</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">dst_f</span><span class="p">[</span><span class="n">node</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">node</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">node_dst</span>
+        <span class="n">unvisited</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">node</span> <span class="o">==</span> <span class="n">dst</span><span class="p">:</span>
+            <span class="k">break</span>
+
+        <span class="n">neighs</span> <span class="o">=</span> <span class="n">neighbors</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">neigh</span> <span class="ow">in</span> <span class="n">neighs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">neigh</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unvisited</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">dist</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">neigh</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">node</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">neigh</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">node</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span>
+                            <span class="p">(</span><span class="n">neigh</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">node</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">neigh</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">node</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">upd_dst</span> <span class="o">:=</span> <span class="n">dst_f</span><span class="p">[</span><span class="n">node</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">node</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">+</span> <span class="n">dist</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">dst_f</span><span class="p">[</span><span class="n">neigh</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">neigh</span><span class="p">[</span><span class="mi">0</span><span class="p">]]:</span>
+                <span class="n">dst_f</span><span class="p">[</span><span class="n">neigh</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">neigh</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">upd_dst</span>
+                <span class="n">q</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">upd_dst</span><span class="p">,</span> <span class="n">neigh</span><span class="p">))</span>
+                <span class="n">parents</span><span class="p">[</span><span class="n">neigh</span><span class="p">]</span> <span class="o">=</span> <span class="n">node</span>
+
+    <span class="c1"># dst_f = np.where(dst_f &gt;= 99999, -1, dst_f)</span>
+
+    <span class="n">px_path</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">curr_px</span> <span class="o">=</span> <span class="n">dst</span>
+
+    <span class="k">while</span> <span class="n">curr_px</span> <span class="o">!=</span> <span class="n">src</span><span class="p">:</span>
+        <span class="n">px_path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">curr_px</span><span class="p">)</span>
+        <span class="n">curr_px</span> <span class="o">=</span> <span class="n">parents</span><span class="p">[</span><span class="n">curr_px</span><span class="p">]</span>
+    <span class="n">px_path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">src</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">px_path</span></div>
+
+
+<div class="viewcode-block" id="get_graph"><a class="viewcode-back" href="../../../../../arthropod_describer.plugins.test_plugin.properties.html#arthropod_describer.plugins.test_plugin.properties.geodesic_utils.get_graph">[docs]</a><span class="k">def</span> <span class="nf">get_graph</span><span class="p">(</span><span class="n">bin_region</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">networkx</span><span class="o">.</span><span class="n">Graph</span><span class="p">:</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">yy</span><span class="p">,</span> <span class="n">xx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">bin_region</span><span class="p">)</span>
+
+    <span class="n">G</span> <span class="o">=</span> <span class="n">networkx</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+    <span class="n">start2</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">py</span><span class="p">,</span> <span class="n">px</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">yy</span><span class="p">,</span> <span class="n">xx</span><span class="p">):</span>
+        <span class="n">G</span><span class="o">.</span><span class="n">add_node</span><span class="p">((</span><span class="n">px</span><span class="p">,</span> <span class="n">py</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;adding nodes took </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start2</span><span class="si">}</span><span class="s1"> secs&#39;</span><span class="p">)</span>
+    <span class="n">start3</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">py</span><span class="p">,</span> <span class="n">px</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">yy</span><span class="p">,</span> <span class="n">xx</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">j</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">px</span> <span class="o">+</span> <span class="n">j</span><span class="p">,</span> <span class="n">py</span> <span class="o">+</span> <span class="n">i</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">G</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="nb">abs</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">((</span><span class="n">px</span><span class="p">,</span> <span class="n">py</span><span class="p">),</span> <span class="p">(</span><span class="n">px</span> <span class="o">+</span> <span class="n">j</span><span class="p">,</span> <span class="n">py</span> <span class="o">+</span> <span class="n">i</span><span class="p">),</span> <span class="n">weight</span><span class="o">=</span><span class="mf">1.41</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">((</span><span class="n">px</span><span class="p">,</span> <span class="n">py</span><span class="p">),</span> <span class="p">(</span><span class="n">px</span> <span class="o">+</span> <span class="n">j</span><span class="p">,</span> <span class="n">py</span> <span class="o">+</span> <span class="n">i</span><span class="p">),</span> <span class="n">weight</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;adding edges took </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start3</span><span class="si">}</span><span class="s1"> secs&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;graph generation took </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="si">}</span><span class="s1"> secs&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">G</span></div>
+
+
+<div class="viewcode-block" id="get_graph2"><a class="viewcode-back" href="../../../../../arthropod_describer.plugins.test_plugin.properties.html#arthropod_describer.plugins.test_plugin.properties.geodesic_utils.get_graph2">[docs]</a><span class="k">def</span> <span class="nf">get_graph2</span><span class="p">(</span><span class="n">bin_region</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">networkx</span><span class="o">.</span><span class="n">Graph</span><span class="p">:</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="n">G</span> <span class="o">=</span> <span class="n">networkx</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+
+    <span class="n">nodes</span><span class="p">,</span> <span class="n">edges</span> <span class="o">=</span> <span class="n">generate_nodes_edges</span><span class="p">(</span><span class="n">bin_region</span><span class="p">)</span>
+    <span class="n">G</span><span class="o">.</span><span class="n">add_nodes_from</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span>
+    <span class="n">G</span><span class="o">.</span><span class="n">add_edges_from</span><span class="p">(</span><span class="n">edges</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;graph generation took </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="si">}</span><span class="s1"> secs&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">G</span></div>
+
+
+<div class="viewcode-block" id="generate_nodes_edges"><a class="viewcode-back" href="../../../../../arthropod_describer.plugins.test_plugin.properties.html#arthropod_describer.plugins.test_plugin.properties.geodesic_utils.generate_nodes_edges">[docs]</a><span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span>
+<span class="k">def</span> <span class="nf">generate_nodes_edges</span><span class="p">(</span><span class="n">bin_region</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+    <span class="n">yy</span><span class="p">,</span> <span class="n">xx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">bin_region</span><span class="p">)</span>
+
+    <span class="n">nodes</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">edges</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">yy</span><span class="p">)):</span>
+        <span class="n">nodes</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">xx</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">yy</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">yy</span><span class="p">)):</span>
+        <span class="n">px</span><span class="p">,</span> <span class="n">py</span> <span class="o">=</span> <span class="n">xx</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">yy</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">j</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">px</span> <span class="o">+</span> <span class="n">j</span><span class="p">,</span> <span class="n">py</span> <span class="o">+</span> <span class="n">i</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">nodes</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="nb">abs</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="n">edges</span><span class="o">.</span><span class="n">add</span><span class="p">(((</span><span class="n">px</span><span class="p">,</span> <span class="n">py</span><span class="p">),</span> <span class="p">(</span><span class="n">px</span> <span class="o">+</span> <span class="n">j</span><span class="p">,</span> <span class="n">py</span> <span class="o">+</span> <span class="n">i</span><span class="p">),</span> <span class="p">{</span><span class="s1">&#39;weight&#39;</span><span class="p">:</span> <span class="mf">1.41</span><span class="p">}))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">edges</span><span class="o">.</span><span class="n">add</span><span class="p">(((</span><span class="n">px</span><span class="p">,</span> <span class="n">py</span><span class="p">),</span> <span class="p">(</span><span class="n">px</span> <span class="o">+</span> <span class="n">j</span><span class="p">,</span> <span class="n">py</span> <span class="o">+</span> <span class="n">i</span><span class="p">),</span> <span class="p">{</span><span class="s1">&#39;weight&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">}))</span>
+
+    <span class="k">return</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">edges</span></div>
+
+
+<div class="viewcode-block" id="neighbors"><a class="viewcode-back" href="../../../../../arthropod_describer.plugins.test_plugin.properties.html#arthropod_describer.plugins.test_plugin.properties.geodesic_utils.neighbors">[docs]</a><span class="k">def</span> <span class="nf">neighbors</span><span class="p">(</span><span class="n">p</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
+    <span class="n">neighs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">j</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">neighs</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">j</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">i</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">neighs</span></div>
+
+
+<div class="viewcode-block" id="get_longest_geodesic"><a class="viewcode-back" href="../../../../../arthropod_describer.plugins.test_plugin.properties.html#arthropod_describer.plugins.test_plugin.properties.geodesic_utils.get_longest_geodesic">[docs]</a><span class="k">def</span> <span class="nf">get_longest_geodesic</span><span class="p">(</span><span class="n">lab_img</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span> <span class="nb">float</span><span class="p">]:</span>
+    <span class="n">region</span> <span class="o">=</span> <span class="n">lab_img</span> <span class="o">==</span> <span class="n">label</span>
+    <span class="n">region</span> <span class="o">=</span> <span class="n">binary_fill_holes</span><span class="p">(</span><span class="n">region</span><span class="p">)</span>
+
+    <span class="n">rr</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">region</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rr</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[],</span> <span class="kc">None</span>
+    <span class="n">top</span><span class="p">,</span> <span class="n">left</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">rr</span><span class="p">)),</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">cc</span><span class="p">))</span>
+    <span class="n">bottom</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">rr</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">cc</span><span class="p">)</span>
+
+    <span class="c1"># get only the region of interest</span>
+    <span class="n">region_</span> <span class="o">=</span> <span class="n">region</span><span class="p">[</span><span class="n">top</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span><span class="n">bottom</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">left</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span><span class="n">right</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">skeleton</span> <span class="o">=</span> <span class="n">skeletonize</span><span class="p">(</span><span class="n">region_</span><span class="p">)</span>
+
+    <span class="c1"># find skeleton endpoints with HMT</span>
+    <span class="n">endpoint_pixels</span> <span class="o">=</span> <span class="n">find_skeleton_endpoints</span><span class="p">(</span><span class="n">skeleton</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">e_codes</span><span class="p">))</span>
+    <span class="n">endpoint_pixels</span> <span class="o">=</span> <span class="p">[(</span><span class="nb">int</span><span class="p">(</span><span class="n">endp</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">endp</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span> <span class="k">for</span> <span class="n">endp</span> <span class="ow">in</span> <span class="n">endpoint_pixels</span><span class="p">]</span>
+
+    <span class="n">geod_dists</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">prop_function</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">skeleton</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+    <span class="c1"># for every skeleton endpoint compute geodesic distance transform inside the skeleton</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">endpoint</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">endpoint_pixels</span><span class="p">):</span>
+        <span class="n">dist</span> <span class="o">=</span> <span class="n">geodesic_distance_for_skeleton</span><span class="p">(</span><span class="n">skeleton</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">)</span>
+        <span class="n">geod_dists</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span>
+        <span class="c1"># update the propagation function</span>
+        <span class="n">prop_function</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">prop_function</span><span class="p">,</span> <span class="n">dist</span><span class="p">)</span>
+        <span class="c1"># io.imsave(f&#39;/home/radoslav/geo_dist{i}.tiff&#39;, dist, check_contrast=False)</span>
+    <span class="c1"># io.imsave(&#39;/home/radoslav/prop_func.tiff&#39;, prop_function, check_contrast=False)</span>
+
+    <span class="c1"># find the maximum of the propagation function</span>
+    <span class="n">max_of_prop</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">prop_function</span><span class="p">)</span>
+
+    <span class="c1"># ideally, find at least 2 endpoints that whose furthest pixel is at distance `max_of_prop`. Wont work now on circle-like regions</span>
+    <span class="n">extremes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">prop_function</span> <span class="o">-</span> <span class="n">max_of_prop</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1e-6</span><span class="p">)[:,</span> <span class="p">::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">extremes</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">endpoint_pixels</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">lab</span> <span class="o">=</span> <span class="n">skimage</span><span class="o">.</span><span class="n">measure</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="n">region</span><span class="p">,</span> <span class="n">connectivity</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">feret_diam</span> <span class="o">=</span> <span class="n">regionprops_table</span><span class="p">(</span><span class="n">lab</span><span class="p">,</span> <span class="n">properties</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;label&#39;</span><span class="p">,</span> <span class="s1">&#39;feret_diameter_max&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="p">[],</span> <span class="n">feret_diam</span><span class="p">[</span><span class="s1">&#39;feret_diameter_max&#39;</span><span class="p">]</span>
+
+    <span class="n">ext1</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">extremes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">extremes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="n">ext2</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">extremes</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">extremes</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]))</span>
+
+    <span class="c1"># these are the two geodesic dist. functions corresponding to the two extreme points</span>
+    <span class="n">ext1_geod</span> <span class="o">=</span> <span class="n">geod_dists</span><span class="p">[</span><span class="n">endpoint_pixels</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">ext1</span><span class="p">)]</span>
+    <span class="n">ext2_geod</span> <span class="o">=</span> <span class="n">geod_dists</span><span class="p">[</span><span class="n">endpoint_pixels</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">ext2</span><span class="p">)]</span>
+
+    <span class="c1"># by summing them, and thresholding with `max_of_prop` we get a path of pixels between the two extremes</span>
+    <span class="n">sum_geod</span> <span class="o">=</span> <span class="n">ext1_geod</span> <span class="o">+</span> <span class="n">ext2_geod</span>
+
+    <span class="n">path_pixels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">sum_geod</span> <span class="o">-</span> <span class="n">max_of_prop</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1e-6</span><span class="p">)[:,</span> <span class="p">::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">path_pixels</span><span class="p">,</span> <span class="n">max_of_prop</span></div>
+
+
+<span class="n">GeodesicPathPixels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+
+
+<div class="viewcode-block" id="get_longest_geodesic2"><a class="viewcode-back" href="../../../../../arthropod_describer.plugins.test_plugin.properties.html#arthropod_describer.plugins.test_plugin.properties.geodesic_utils.get_longest_geodesic2">[docs]</a><span class="k">def</span> <span class="nf">get_longest_geodesic2</span><span class="p">(</span><span class="n">region</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">GeodesicPathPixels</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
+    <span class="n">region_</span> <span class="o">=</span> <span class="n">binary_fill_holes</span><span class="p">(</span><span class="n">region</span><span class="p">)</span>
+
+    <span class="n">rr</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">region_</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rr</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[],</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">top</span><span class="p">,</span> <span class="n">left</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">rr</span><span class="p">)),</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">cc</span><span class="p">))</span>
+    <span class="n">bottom</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">rr</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">cc</span><span class="p">)</span>
+
+    <span class="c1"># get only the region of interest</span>
+    <span class="n">region_</span> <span class="o">=</span> <span class="n">region_</span><span class="p">[</span><span class="n">top</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span><span class="n">bottom</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">left</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span><span class="n">right</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">skeleton</span> <span class="o">=</span> <span class="n">skeletonize</span><span class="p">(</span><span class="n">region_</span><span class="p">)</span>
+
+    <span class="c1"># find skeleton endpoints with HMT</span>
+    <span class="n">endpoint_pixels</span> <span class="o">=</span> <span class="n">find_skeleton_endpoints</span><span class="p">(</span><span class="n">skeleton</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">e_codes</span><span class="p">))</span>
+    <span class="n">endpoint_pixels</span> <span class="o">=</span> <span class="p">[(</span><span class="nb">int</span><span class="p">(</span><span class="n">endp</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">endp</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span> <span class="k">for</span> <span class="n">endp</span> <span class="ow">in</span> <span class="n">endpoint_pixels</span><span class="p">]</span>
+
+    <span class="n">geod_dists</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">prop_function</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">skeleton</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+    <span class="c1"># for every skeleton endpoint compute geodesic distance transform inside the skeleton</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">endpoint</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">endpoint_pixels</span><span class="p">):</span>
+        <span class="n">dist</span> <span class="o">=</span> <span class="n">geodesic_distance_for_skeleton</span><span class="p">(</span><span class="n">skeleton</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">)</span>
+        <span class="n">geod_dists</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span>
+        <span class="c1"># update the propagation function</span>
+        <span class="n">prop_function</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">prop_function</span><span class="p">,</span> <span class="n">dist</span><span class="p">)</span>
+        <span class="c1"># io.imsave(f&#39;/home/radoslav/geo_dist{i}.tiff&#39;, dist, check_contrast=False)</span>
+    <span class="c1"># io.imsave(&#39;/home/radoslav/prop_func.tiff&#39;, prop_function, check_contrast=False)</span>
+
+    <span class="c1"># find the maximum of the propagation function</span>
+    <span class="n">max_of_prop</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">prop_function</span><span class="p">)</span>
+
+    <span class="c1"># ideally, find at least 2 endpoints that whose furthest pixel is at distance `max_of_prop`. Wont work now on circle-like regions</span>
+    <span class="n">extremes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">prop_function</span> <span class="o">-</span> <span class="n">max_of_prop</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1e-6</span><span class="p">)[:,</span> <span class="p">::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">extremes</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">endpoint_pixels</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">lab</span> <span class="o">=</span> <span class="n">skimage</span><span class="o">.</span><span class="n">measure</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="n">region</span><span class="p">,</span> <span class="n">connectivity</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">feret_diam</span> <span class="o">=</span> <span class="n">regionprops_table</span><span class="p">(</span><span class="n">lab</span><span class="p">,</span> <span class="n">properties</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;label&#39;</span><span class="p">,</span> <span class="s1">&#39;feret_diameter_max&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="p">[],</span> <span class="n">feret_diam</span><span class="p">[</span><span class="s1">&#39;feret_diameter_max&#39;</span><span class="p">],</span> <span class="p">(</span><span class="n">top</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">left</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span>
+
+    <span class="n">ext1</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">extremes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">extremes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="n">ext2</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">extremes</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">extremes</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]))</span>
+
+    <span class="c1"># these are the two geodesic dist. functions corresponding to the two extreme points</span>
+    <span class="n">ext1_geod</span> <span class="o">=</span> <span class="n">geod_dists</span><span class="p">[</span><span class="n">endpoint_pixels</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">ext1</span><span class="p">)]</span>
+    <span class="n">ext2_geod</span> <span class="o">=</span> <span class="n">geod_dists</span><span class="p">[</span><span class="n">endpoint_pixels</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">ext2</span><span class="p">)]</span>
+
+    <span class="c1"># by summing them, and thresholding with `max_of_prop` we get a path of pixels between the two extremes</span>
+    <span class="n">sum_geod</span> <span class="o">=</span> <span class="n">ext1_geod</span> <span class="o">+</span> <span class="n">ext2_geod</span>
+
+    <span class="n">path_pixels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">sum_geod</span> <span class="o">-</span> <span class="n">max_of_prop</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1e-6</span><span class="p">)[:,</span> <span class="p">::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">path_pixels</span><span class="p">,</span> <span class="n">max_of_prop</span><span class="p">,</span> <span class="p">(</span><span class="n">top</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">left</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_node_with_longest_shortest_path"><a class="viewcode-back" href="../../../../../arthropod_describer.plugins.test_plugin.properties.html#arthropod_describer.plugins.test_plugin.properties.geodesic_utils.get_node_with_longest_shortest_path">[docs]</a><span class="k">def</span> <span class="nf">get_node_with_longest_shortest_path</span><span class="p">(</span><span class="n">shortest_lengths</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+    <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">shortest_lengths</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="compute_longest_geodesic_perf"><a class="viewcode-back" href="../../../../../arthropod_describer.plugins.test_plugin.properties.html#arthropod_describer.plugins.test_plugin.properties.geodesic_utils.compute_longest_geodesic_perf">[docs]</a><span class="k">def</span> <span class="nf">compute_longest_geodesic_perf</span><span class="p">(</span><span class="n">region</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="n">G</span> <span class="o">=</span> <span class="n">get_graph</span><span class="p">(</span><span class="n">region</span><span class="p">)</span>
+
+    <span class="n">yy</span><span class="p">,</span> <span class="n">xx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">region</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">yy</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mf">1.0</span>
+
+    <span class="n">min_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">xx</span><span class="p">)</span>
+    <span class="n">out_pixel</span> <span class="o">=</span> <span class="p">(</span><span class="n">yy</span><span class="p">[</span><span class="n">min_idx</span><span class="p">],</span> <span class="n">xx</span><span class="p">[</span><span class="n">min_idx</span><span class="p">])</span>
+    <span class="n">out_pixel</span> <span class="o">=</span> <span class="p">(</span><span class="n">xx</span><span class="p">[</span><span class="n">min_idx</span><span class="p">],</span> <span class="n">yy</span><span class="p">[</span><span class="n">min_idx</span><span class="p">])</span>
+
+    <span class="n">shortest_lengths</span> <span class="o">=</span> <span class="n">networkx</span><span class="o">.</span><span class="n">shortest_path_length</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">out_pixel</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="s1">&#39;weight&#39;</span><span class="p">)</span>
+    <span class="n">dst_pix</span> <span class="o">=</span> <span class="n">get_node_with_longest_shortest_path</span><span class="p">(</span><span class="n">shortest_lengths</span><span class="p">)</span>
+
+    <span class="n">shortest_lengths2</span> <span class="o">=</span> <span class="n">networkx</span><span class="o">.</span><span class="n">shortest_path_length</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">dst_pix</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="s1">&#39;weight&#39;</span><span class="p">)</span>
+    <span class="n">dst_pix2</span> <span class="o">=</span> <span class="n">get_node_with_longest_shortest_path</span><span class="p">(</span><span class="n">shortest_lengths2</span><span class="p">)</span>
+
+    <span class="n">shortest_lengths3</span> <span class="o">=</span> <span class="n">networkx</span><span class="o">.</span><span class="n">shortest_path_length</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">dst_pix2</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="s1">&#39;weight&#39;</span><span class="p">)</span>
+    <span class="n">dst_pix3</span> <span class="o">=</span> <span class="n">get_node_with_longest_shortest_path</span><span class="p">(</span><span class="n">shortest_lengths3</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">shortest_lengths3</span><span class="p">[</span><span class="n">dst_pix3</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="compute_longest_geodesic"><a class="viewcode-back" href="../../../../../arthropod_describer.plugins.test_plugin.properties.html#arthropod_describer.plugins.test_plugin.properties.geodesic_utils.compute_longest_geodesic">[docs]</a><span class="k">def</span> <span class="nf">compute_longest_geodesic</span><span class="p">(</span><span class="n">region</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
+    <span class="c1"># path = Path(&#39;C:\\Users\\radoslav\\Desktop\\&#39;)</span>
+    <span class="c1"># bbox = cv2.boundingRect(region.astype(np.uint8))</span>
+    <span class="n">_region</span> <span class="o">=</span> <span class="n">region</span>  <span class="c1">#region[bbox[1]:bbox[1]+bbox[3], bbox[0]:bbox[0]+bbox[2]]</span>
+
+    <span class="n">yy</span><span class="p">,</span> <span class="n">xx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">_region</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">yy</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">min_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">xx</span><span class="p">)</span>
+    <span class="n">out_pixel</span> <span class="o">=</span> <span class="p">(</span><span class="n">yy</span><span class="p">[</span><span class="n">min_idx</span><span class="p">],</span> <span class="n">xx</span><span class="p">[</span><span class="n">min_idx</span><span class="p">])</span>
+
+    <span class="n">gdist1</span> <span class="o">=</span> <span class="n">geodesic_distance_for_skeleton</span><span class="p">(</span><span class="n">_region</span><span class="p">,</span> <span class="n">out_pixel</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="n">dst_pix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">gdist1</span><span class="p">),</span> <span class="n">gdist1</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+    <span class="n">gdist2</span> <span class="o">=</span> <span class="n">geodesic_distance_for_skeleton</span><span class="p">(</span><span class="n">_region</span><span class="p">,</span> <span class="n">dst_pix</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="n">dst_pix2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">gdist2</span><span class="p">),</span> <span class="n">gdist2</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+    <span class="n">gdist3</span> <span class="o">=</span> <span class="n">geodesic_distance_for_skeleton</span><span class="p">(</span><span class="n">_region</span><span class="p">,</span> <span class="n">dst_pix2</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="n">dst_pix3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">gdist3</span><span class="p">),</span> <span class="n">gdist3</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+    <span class="c1"># prop_func = gdist2 + gdist3</span>
+    <span class="c1">#</span>
+    <span class="c1"># prop_max = np.max(prop_func)</span>
+    <span class="c1">#</span>
+    <span class="c1"># path_pixels = np.nonzero(np.abs(prop_func - prop_max) &lt; 1e-4)</span>
+    <span class="c1">#</span>
+
+    <span class="c1"># path_pixels = find_shortest_path(_region, dst_pix2[::-1], dst_pix3[::-1])</span>
+    <span class="c1"># path_pixels = ([px[1] for px in path_pixels], [px[0] for px in path_pixels])</span>
+
+    <span class="c1"># bgr_region = cv2.cvtColor(255 * _region.astype(np.uint8), cv2.COLOR_GRAY2BGR)</span>
+    <span class="c1">#</span>
+    <span class="c1"># bgr_region[path_pixels[0], path_pixels[1]] = [0, 255, 255]</span>
+    <span class="c1"># bgr_region[out_pixel[0], out_pixel[1]] = [0, 255, 0]</span>
+    <span class="c1"># bgr_region[dst_pix[0], dst_pix[1]] = [255, 0, 0]</span>
+    <span class="c1"># bgr_region[dst_pix2[0], dst_pix2[1]] = [0, 0, 255]</span>
+    <span class="c1"># bgr_region[dst_pix3[0], dst_pix3[1]] = [255, 0, 255]</span>
+    <span class="c1">#</span>
+    <span class="c1"># cv2.imwrite(str(path / &#39;region.png&#39;), 255 * _region.astype(np.uint8))</span>
+    <span class="c1"># cv2.imwrite(str(path / &#39;out_pixel.png&#39;), bgr_region)</span>
+    <span class="c1"># cv2.imshow(&#39;bgr_&#39;, bgr_region)</span>
+    <span class="c1"># cv2.waitKey(0)</span>
+    <span class="c1"># cv2.destroyAllWindows()</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">gdist3</span><span class="p">),</span> <span class="n">dst_pix2</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">dst_pix3</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, CBIA @ FI MUNI.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

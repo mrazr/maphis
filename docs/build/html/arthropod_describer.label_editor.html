@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arthropod_describer.label_editor package &mdash; MAPHIS 0.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="arthropod_describer.measurements_viewer package" href="arthropod_describer.measurements_viewer.html" />
+    <link rel="prev" title="arthropod_describer.common package" href="arthropod_describer.common.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> MAPHIS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">arthropod_describer</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="arthropod_describer.html">arthropod_describer package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="arthropod_describer.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="arthropod_describer.bin.html">arthropod_describer.bin package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="arthropod_describer.common.html">arthropod_describer.common package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">arthropod_describer.label_editor package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="arthropod_describer.measurements_viewer.html">arthropod_describer.measurements_viewer package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="arthropod_describer.plugins.html">arthropod_describer.plugins package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="arthropod_describer.resources.html">arthropod_describer.resources package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="arthropod_describer.tools.html">arthropod_describer.tools package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.app">arthropod_describer.app module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.color_tolerance_dialog">arthropod_describer.color_tolerance_dialog module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.custom_graphics_view">arthropod_describer.custom_graphics_view module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.dbg_utils">arthropod_describer.dbg_utils module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.image_controls">arthropod_describer.image_controls module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.image_list_delegate">arthropod_describer.image_list_delegate module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.image_list_model">arthropod_describer.image_list_model module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.image_viewer">arthropod_describer.image_viewer module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.import_dialog">arthropod_describer.import_dialog module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.import_utils">arthropod_describer.import_utils module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.plugin_manager">arthropod_describer.plugin_manager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.resources">arthropod_describer.resources module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.tag_filter_widget">arthropod_describer.tag_filter_widget module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.tags_widget">arthropod_describer.tags_widget module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.thumbnail_gui">arthropod_describer.thumbnail_gui module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.thumbnail_storage">arthropod_describer.thumbnail_storage module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.ui_arthropod_describer">arthropod_describer.ui_arthropod_describer module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.ui_color_tolerance_dialog">arthropod_describer.ui_color_tolerance_dialog module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.ui_image_controls">arthropod_describer.ui_image_controls module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.ui_image_viewer">arthropod_describer.ui_image_viewer module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.ui_import_dialog">arthropod_describer.ui_import_dialog module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.ui_plugins_widget">arthropod_describer.ui_plugins_widget module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.ui_progress_dialog">arthropod_describer.ui_progress_dialog module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.ui_thumbnail_gui">arthropod_describer.ui_thumbnail_gui module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MAPHIS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="modules.html">arthropod_describer</a> &raquo;</li>
+          <li><a href="arthropod_describer.html">arthropod_describer package</a> &raquo;</li>
+      <li>arthropod_describer.label_editor package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/arthropod_describer.label_editor.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="arthropod-describer-label-editor-package">
+<h1>arthropod_describer.label_editor package<a class="headerlink" href="#arthropod-describer-label-editor-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-arthropod_describer.label_editor.computation_widget">
+<span id="arthropod-describer-label-editor-computation-widget-module"></span><h2>arthropod_describer.label_editor.computation_widget module<a class="headerlink" href="#module-arthropod_describer.label_editor.computation_widget" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.computation_widget.ComputationWidget">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ComputationWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.state.State" title="arthropod_describer.common.state.State"><span class="pre">State</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">QWidget</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/computation_widget.html#ComputationWidget"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.computation_widget.ComputationWidget" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QWidget</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.computation_widget.ComputationWidget.apply_computation">
+<span class="sig-name descname"><span class="pre">apply_computation</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;PySide2.QtCore.Signal</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#arthropod_describer.label_editor.computation_widget.ComputationWidget.apply_computation" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.computation_widget.ComputationWidget.handle_apply_all_clicked">
+<span class="sig-name descname"><span class="pre">handle_apply_all_clicked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chkd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/computation_widget.html#ComputationWidget.handle_apply_all_clicked"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.computation_widget.ComputationWidget.handle_apply_all_clicked" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.computation_widget.ComputationWidget.handle_apply_all_unseg_clicked">
+<span class="sig-name descname"><span class="pre">handle_apply_all_unseg_clicked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chkd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/computation_widget.html#ComputationWidget.handle_apply_all_unseg_clicked"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.computation_widget.ComputationWidget.handle_apply_all_unseg_clicked" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.computation_widget.ComputationWidget.handle_apply_clicked">
+<span class="sig-name descname"><span class="pre">handle_apply_clicked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chkd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/computation_widget.html#ComputationWidget.handle_apply_clicked"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.computation_widget.ComputationWidget.handle_apply_clicked" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.computation_widget.ComputationWidget.register_computation">
+<span class="sig-name descname"><span class="pre">register_computation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">computation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.plugin.RegionComputation" title="arthropod_describer.common.plugin.RegionComputation"><span class="pre">RegionComputation</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.plugin.PropertyComputation" title="arthropod_describer.common.plugin.PropertyComputation"><span class="pre">PropertyComputation</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/computation_widget.html#ComputationWidget.register_computation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.computation_widget.ComputationWidget.register_computation" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.computation_widget.ComputationWidget.set_restrict_group_shown">
+<span class="sig-name descname"><span class="pre">set_restrict_group_shown</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shown</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/computation_widget.html#ComputationWidget.set_restrict_group_shown"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.computation_widget.ComputationWidget.set_restrict_group_shown" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.computation_widget.ComputationWidget.set_settings_group_shown">
+<span class="sig-name descname"><span class="pre">set_settings_group_shown</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shown</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/computation_widget.html#ComputationWidget.set_settings_group_shown"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.computation_widget.ComputationWidget.set_settings_group_shown" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.computation_widget.ComputationWidget.staticMetaObject">
+<span class="sig-name descname"><span class="pre">staticMetaObject</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;PySide2.QtCore.QMetaObject</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#arthropod_describer.label_editor.computation_widget.ComputationWidget.staticMetaObject" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-arthropod_describer.label_editor.label_editor">
+<span id="arthropod-describer-label-editor-label-editor-module"></span><h2>arthropod_describer.label_editor.label_editor module<a class="headerlink" href="#module-arthropod_describer.label_editor.label_editor" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_editor.LabelEditor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">LabelEditor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.state.State" title="arthropod_describer.common.state.State"><span class="pre">State</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">undo_action</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QAction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">redo_action</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QAction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmd_executor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.edit_command_executor.EditCommandExecutor" title="arthropod_describer.common.edit_command_executor.EditCommandExecutor"><span class="pre">EditCommandExecutor</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_editor.html#LabelEditor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_editor.LabelEditor" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QObject</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_editor.LabelEditor.approval_changed">
+<span class="sig-name descname"><span class="pre">approval_changed</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;PySide2.QtCore.Signal</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#arthropod_describer.label_editor.label_editor.LabelEditor.approval_changed" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_editor.LabelEditor.approve_level">
+<span class="sig-name descname"><span class="pre">approve_level</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">level_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_editor.html#LabelEditor.approve_level"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_editor.LabelEditor.approve_level" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_editor.LabelEditor.change_labels">
+<span class="sig-name descname"><span class="pre">change_labels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label_img</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">change</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.label_change.LabelChange" title="arthropod_describer.common.label_change.LabelChange"><span class="pre">LabelChange</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_editor.html#LabelEditor.change_labels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_editor.LabelEditor.change_labels" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_editor.LabelEditor.cycle_constraint">
+<span class="sig-name descname"><span class="pre">cycle_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_editor.html#LabelEditor.cycle_constraint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_editor.LabelEditor.cycle_constraint" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_editor.LabelEditor.disable">
+<span class="sig-name descname"><span class="pre">disable</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_editor.html#LabelEditor.disable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_editor.LabelEditor.disable" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_editor.LabelEditor.do_command">
+<span class="sig-name descname"><span class="pre">do_command</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.label_change.CommandEntry" title="arthropod_describer.common.label_change.CommandEntry"><span class="pre">CommandEntry</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_canvas</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.label_change.CommandEntry" title="arthropod_describer.common.label_change.CommandEntry"><span class="pre">CommandEntry</span></a></span></span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_editor.html#LabelEditor.do_command"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_editor.LabelEditor.do_command" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_editor.LabelEditor.do_commands">
+<span class="sig-name descname"><span class="pre">do_commands</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">commands</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.label_change.CommandEntry" title="arthropod_describer.common.label_change.CommandEntry"><span class="pre">CommandEntry</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_canvas</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_editor.html#LabelEditor.do_commands"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_editor.LabelEditor.do_commands" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_editor.LabelEditor.enable">
+<span class="sig-name descname"><span class="pre">enable</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_editor.html#LabelEditor.enable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_editor.LabelEditor.enable" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_editor.LabelEditor.enable_redo_action">
+<span class="sig-name descname"><span class="pre">enable_redo_action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">enable</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">command_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_editor.html#LabelEditor.enable_redo_action"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_editor.LabelEditor.enable_redo_action" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_editor.LabelEditor.enable_undo_action">
+<span class="sig-name descname"><span class="pre">enable_undo_action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">enable</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">command_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_editor.html#LabelEditor.enable_undo_action"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_editor.LabelEditor.enable_undo_action" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_editor.LabelEditor.enable_undo_redo">
+<span class="sig-name descname"><span class="pre">enable_undo_redo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">do_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.label_change.DoType" title="arthropod_describer.common.label_change.DoType"><span class="pre">DoType</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">enable</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">command_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_editor.html#LabelEditor.enable_undo_redo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_editor.LabelEditor.enable_undo_redo" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_editor.LabelEditor.handle_approval_changed">
+<span class="sig-name descname"><span class="pre">handle_approval_changed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">approval</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_editor.html#LabelEditor.handle_approval_changed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_editor.LabelEditor.handle_approval_changed" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_editor.LabelEditor.handle_focus_changed">
+<span class="sig-name descname"><span class="pre">handle_focus_changed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">old</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">now</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_editor.html#LabelEditor.handle_focus_changed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_editor.LabelEditor.handle_focus_changed" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_editor.LabelEditor.handle_label_changed">
+<span class="sig-name descname"><span class="pre">handle_label_changed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.label_change.CommandEntry" title="arthropod_describer.common.label_change.CommandEntry"><span class="pre">CommandEntry</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_editor.html#LabelEditor.handle_label_changed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_editor.LabelEditor.handle_label_changed" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_editor.LabelEditor.handle_label_image_changed">
+<span class="sig-name descname"><span class="pre">handle_label_image_changed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_editor.html#LabelEditor.handle_label_image_changed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_editor.LabelEditor.handle_label_image_changed" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_editor.LabelEditor.handle_label_level_changed">
+<span class="sig-name descname"><span class="pre">handle_label_level_changed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_editor.html#LabelEditor.handle_label_level_changed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_editor.LabelEditor.handle_label_level_changed" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_editor.LabelEditor.handle_label_picked">
+<span class="sig-name descname"><span class="pre">handle_label_picked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_editor.html#LabelEditor.handle_label_picked"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_editor.LabelEditor.handle_label_picked" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_editor.LabelEditor.handle_label_type_button_clicked">
+<span class="sig-name descname"><span class="pre">handle_label_type_button_clicked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">btn</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QAbstractButton</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_editor.html#LabelEditor.handle_label_type_button_clicked"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_editor.LabelEditor.handle_label_type_button_clicked" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_editor.LabelEditor.handle_new_label_requested">
+<span class="sig-name descname"><span class="pre">handle_new_label_requested</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QColor</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_editor.html#LabelEditor.handle_new_label_requested"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_editor.LabelEditor.handle_new_label_requested" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_editor.LabelEditor.handle_redo_clicked">
+<span class="sig-name descname"><span class="pre">handle_redo_clicked</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_editor.html#LabelEditor.handle_redo_clicked"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_editor.LabelEditor.handle_redo_clicked" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_editor.LabelEditor.handle_storage_changed">
+<span class="sig-name descname"><span class="pre">handle_storage_changed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">storage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.storage.Storage" title="arthropod_describer.common.storage.Storage"><span class="pre">Storage</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">old_storage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.storage.Storage" title="arthropod_describer.common.storage.Storage"><span class="pre">Storage</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_editor.html#LabelEditor.handle_storage_changed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_editor.LabelEditor.handle_storage_changed" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_editor.LabelEditor.handle_tool_activated">
+<span class="sig-name descname"><span class="pre">handle_tool_activated</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">btn</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QToolButton</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">checked</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_editor.html#LabelEditor.handle_tool_activated"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_editor.LabelEditor.handle_tool_activated" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_editor.LabelEditor.handle_undo_clicked">
+<span class="sig-name descname"><span class="pre">handle_undo_clicked</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_editor.html#LabelEditor.handle_undo_clicked"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_editor.LabelEditor.handle_undo_clicked" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_editor.LabelEditor.modify_label_node">
+<span class="sig-name descname"><span class="pre">modify_label_node</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.label_hierarchy.Node" title="arthropod_describer.common.label_hierarchy.Node"><span class="pre">Node</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_editor.html#LabelEditor.modify_label_node"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_editor.LabelEditor.modify_label_node" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_editor.LabelEditor.move_constraint_down">
+<span class="sig-name descname"><span class="pre">move_constraint_down</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_editor.html#LabelEditor.move_constraint_down"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_editor.LabelEditor.move_constraint_down" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_editor.LabelEditor.move_constraint_up">
+<span class="sig-name descname"><span class="pre">move_constraint_up</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_editor.html#LabelEditor.move_constraint_up"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_editor.LabelEditor.move_constraint_up" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_editor.LabelEditor.register_tool">
+<span class="sig-name descname"><span class="pre">register_tool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tool</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.tool.Tool" title="arthropod_describer.common.tool.Tool"><span class="pre">Tool</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_editor.html#LabelEditor.register_tool"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_editor.LabelEditor.register_tool" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_editor.LabelEditor.register_tools">
+<span class="sig-name descname"><span class="pre">register_tools</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tools</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.tool.Tool" title="arthropod_describer.common.tool.Tool"><span class="pre">Tool</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_editor.html#LabelEditor.register_tools"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_editor.LabelEditor.register_tools" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_editor.LabelEditor.release_resources">
+<span class="sig-name descname"><span class="pre">release_resources</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_editor.html#LabelEditor.release_resources"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_editor.LabelEditor.release_resources" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_editor.LabelEditor.remove_approval2">
+<span class="sig-name descname"><span class="pre">remove_approval2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">level_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_editor.html#LabelEditor.remove_approval2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_editor.LabelEditor.remove_approval2" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_editor.LabelEditor.remove_approval_for">
+<span class="sig-name descname"><span class="pre">remove_approval_for</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">level_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_editor.html#LabelEditor.remove_approval_for"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_editor.LabelEditor.remove_approval_for" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_editor.LabelEditor.reset_tool">
+<span class="sig-name descname"><span class="pre">reset_tool</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_editor.html#LabelEditor.reset_tool"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_editor.LabelEditor.reset_tool" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_editor.LabelEditor.set_photo2">
+<span class="sig-name descname"><span class="pre">set_photo2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">photo</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.photo.Photo" title="arthropod_describer.common.photo.Photo"><span class="pre">Photo</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset_view</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_editor.html#LabelEditor.set_photo2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_editor.LabelEditor.set_photo2" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_editor.LabelEditor.staticMetaObject">
+<span class="sig-name descname"><span class="pre">staticMetaObject</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;PySide2.QtCore.QMetaObject</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#arthropod_describer.label_editor.label_editor.LabelEditor.staticMetaObject" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_editor.LabelEditor.switch_label_type">
+<span class="sig-name descname"><span class="pre">switch_label_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_editor.html#LabelEditor.switch_label_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_editor.LabelEditor.switch_label_type" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_editor.LabelEditor.toggle_approval_for">
+<span class="sig-name descname"><span class="pre">toggle_approval_for</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">level_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">approved</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_editor.html#LabelEditor.toggle_approval_for"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_editor.LabelEditor.toggle_approval_for" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_editor.LabelEditor.unsaved_changes">
+<span class="sig-name descname"><span class="pre">unsaved_changes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;PySide2.QtCore.Signal</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#arthropod_describer.label_editor.label_editor.LabelEditor.unsaved_changes" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_editor.LabelEditor.visualize_label_level">
+<span class="sig-name descname"><span class="pre">visualize_label_level</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_editor.html#LabelEditor.visualize_label_level"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_editor.LabelEditor.visualize_label_level" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_editor.ToolEntry">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ToolEntry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tool</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.tool.Tool" title="arthropod_describer.common.tool.Tool"><span class="pre">Tool</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">toolbutton</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QToolButton</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_widget</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">QWidget</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_editor.html#ToolEntry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_editor.ToolEntry" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+</section>
+<section id="module-arthropod_describer.label_editor.label_layer">
+<span id="arthropod-describer-label-editor-label-layer-module"></span><h2>arthropod_describer.label_editor.label_layer module<a class="headerlink" href="#module-arthropod_describer.label_editor.label_layer" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_layer.LabelLayer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">LabelLayer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.state.State" title="arthropod_describer.common.state.State"><span class="pre">State</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">QGraphicsItem</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_layer.html#LabelLayer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_layer.LabelLayer" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.layer.Layer" title="arthropod_describer.common.layer.Layer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Layer</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_layer.LabelLayer.boundingRect">
+<span class="sig-name descname"><span class="pre">boundingRect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">PySide2.QtCore.QRectF</span></span></span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_layer.html#LabelLayer.boundingRect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_layer.LabelLayer.boundingRect" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_layer.LabelLayer.change_outline_width">
+<span class="sig-name descname"><span class="pre">change_outline_width</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_layer.html#LabelLayer.change_outline_width"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_layer.LabelLayer.change_outline_width" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_layer.LabelLayer.compute_clip_mask">
+<span class="sig-name descname"><span class="pre">compute_clip_mask</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_layer.html#LabelLayer.compute_clip_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_layer.LabelLayer.compute_clip_mask" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_layer.LabelLayer.compute_viz_mask">
+<span class="sig-name descname"><span class="pre">compute_viz_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bbox</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_from_viz</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_layer.html#LabelLayer.compute_viz_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_layer.LabelLayer.compute_viz_mask" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_layer.LabelLayer.constraint_down">
+<span class="sig-name descname"><span class="pre">constraint_down</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;PySide2.QtCore.Signal</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#arthropod_describer.label_editor.label_layer.LabelLayer.constraint_down" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_layer.LabelLayer.constraint_up">
+<span class="sig-name descname"><span class="pre">constraint_up</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;PySide2.QtCore.Signal</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#arthropod_describer.label_editor.label_layer.LabelLayer.constraint_up" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_layer.LabelLayer.cycle_constraint">
+<span class="sig-name descname"><span class="pre">cycle_constraint</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;PySide2.QtCore.Signal</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#arthropod_describer.label_editor.label_layer.LabelLayer.cycle_constraint" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_layer.LabelLayer.draw_outline">
+<span class="sig-name descname"><span class="pre">draw_outline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bbox</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_from_viz</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_layer.html#LabelLayer.draw_outline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_layer.LabelLayer.draw_outline" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_layer.LabelLayer.handle_primary_label_changed">
+<span class="sig-name descname"><span class="pre">handle_primary_label_changed</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_layer.html#LabelLayer.handle_primary_label_changed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_layer.LabelLayer.handle_primary_label_changed" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_layer.LabelLayer.hover_enter">
+<span class="sig-name descname"><span class="pre">hover_enter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QGraphicsSceneHoverEvent</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_layer.html#LabelLayer.hover_enter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_layer.LabelLayer.hover_enter" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_layer.LabelLayer.hover_leave">
+<span class="sig-name descname"><span class="pre">hover_leave</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QGraphicsSceneHoverEvent</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_layer.html#LabelLayer.hover_leave"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_layer.LabelLayer.hover_leave" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_layer.LabelLayer.hover_move">
+<span class="sig-name descname"><span class="pre">hover_move</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QGraphicsSceneHoverEvent</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_layer.html#LabelLayer.hover_move"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_layer.LabelLayer.hover_move" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_layer.LabelLayer.label_hovered">
+<span class="sig-name descname"><span class="pre">label_hovered</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;PySide2.QtCore.Signal</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#arthropod_describer.label_editor.label_layer.LabelLayer.label_hovered" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_layer.LabelLayer.label_img_modified">
+<span class="sig-name descname"><span class="pre">label_img_modified</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;PySide2.QtCore.Signal</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#arthropod_describer.label_editor.label_layer.LabelLayer.label_img_modified" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_layer.LabelLayer.label_picked">
+<span class="sig-name descname"><span class="pre">label_picked</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;PySide2.QtCore.Signal</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#arthropod_describer.label_editor.label_layer.LabelLayer.label_picked" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_layer.LabelLayer.mouse_double_click">
+<span class="sig-name descname"><span class="pre">mouse_double_click</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QGraphicsSceneMouseEvent</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_layer.html#LabelLayer.mouse_double_click"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_layer.LabelLayer.mouse_double_click" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_layer.LabelLayer.mouse_move">
+<span class="sig-name descname"><span class="pre">mouse_move</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QGraphicsSceneMouseEvent</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_layer.html#LabelLayer.mouse_move"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_layer.LabelLayer.mouse_move" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_layer.LabelLayer.mouse_press">
+<span class="sig-name descname"><span class="pre">mouse_press</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QGraphicsSceneMouseEvent</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_layer.html#LabelLayer.mouse_press"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_layer.LabelLayer.mouse_press" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_layer.LabelLayer.mouse_release">
+<span class="sig-name descname"><span class="pre">mouse_release</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QGraphicsSceneMouseEvent</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_layer.html#LabelLayer.mouse_release"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_layer.LabelLayer.mouse_release" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_layer.LabelLayer.paint">
+<span class="sig-name descname"><span class="pre">paint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">painter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PySide2.QtGui.QPainter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">option</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PySide2.QtWidgets.QStyleOptionGraphicsItem</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">widget</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">PySide2.QtWidgets.QWidget</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">NoneType</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_layer.html#LabelLayer.paint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_layer.LabelLayer.paint" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_layer.LabelLayer.recompute_masks">
+<span class="sig-name descname"><span class="pre">recompute_masks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_layer.html#LabelLayer.recompute_masks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_layer.LabelLayer.recompute_masks" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_layer.LabelLayer.rotate">
+<span class="sig-name descname"><span class="pre">rotate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ccw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_layer.html#LabelLayer.rotate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_layer.LabelLayer.rotate" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_layer.LabelLayer.set_label_image">
+<span class="sig-name descname"><span class="pre">set_label_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.label_image.LabelImg" title="arthropod_describer.common.label_image.LabelImg"><span class="pre">LabelImg</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_layer.html#LabelLayer.set_label_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_layer.LabelLayer.set_label_image" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_layer.LabelLayer.set_label_name">
+<span class="sig-name descname"><span class="pre">set_label_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_layer.html#LabelLayer.set_label_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_layer.LabelLayer.set_label_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_layer.LabelLayer.set_photo">
+<span class="sig-name descname"><span class="pre">set_photo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">photo</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.photo.Photo" title="arthropod_describer.common.photo.Photo"><span class="pre">Photo</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset_tool</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_layer.html#LabelLayer.set_photo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_layer.LabelLayer.set_photo" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_layer.LabelLayer.set_tool">
+<span class="sig-name descname"><span class="pre">set_tool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tool</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.tool.Tool" title="arthropod_describer.common.tool.Tool"><span class="pre">Tool</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset_current</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_layer.html#LabelLayer.set_tool"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_layer.LabelLayer.set_tool" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_layer.LabelLayer.show_mask">
+<span class="sig-name descname"><span class="pre">show_mask</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_layer.html#LabelLayer.show_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_layer.LabelLayer.show_mask" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_layer.LabelLayer.show_outline">
+<span class="sig-name descname"><span class="pre">show_outline</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_layer.html#LabelLayer.show_outline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_layer.LabelLayer.show_outline" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_layer.LabelLayer.staticMetaObject">
+<span class="sig-name descname"><span class="pre">staticMetaObject</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;PySide2.QtCore.QMetaObject</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#arthropod_describer.label_editor.label_layer.LabelLayer.staticMetaObject" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_layer.LabelLayer.switch_label_level">
+<span class="sig-name descname"><span class="pre">switch_label_level</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_layer.html#LabelLayer.switch_label_level"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_layer.LabelLayer.switch_label_level" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_layer.LabelLayer.wheelEvent">
+<span class="sig-name descname"><span class="pre">wheelEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PySide2.QtWidgets.QGraphicsSceneWheelEvent</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_layer.html#LabelLayer.wheelEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_layer.LabelLayer.wheelEvent" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_layer.compute_outline">
+<span class="sig-name descname"><span class="pre">compute_outline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label_img</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_layer.html#compute_outline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_layer.compute_outline" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_layer.compute_outline2">
+<span class="sig-name descname"><span class="pre">compute_outline2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label_img</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_layer.html#compute_outline2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_layer.compute_outline2" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_layer.outside">
+<span class="sig-name descname"><span class="pre">outside</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_layer.html#outside"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_layer.outside" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-arthropod_describer.label_editor.label_level_switch">
+<span id="arthropod-describer-label-editor-label-level-switch-module"></span><h2>arthropod_describer.label_editor.label_level_switch module<a class="headerlink" href="#module-arthropod_describer.label_editor.label_level_switch" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_level_switch.LabelLevelSwitch">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">LabelLevelSwitch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.state.State" title="arthropod_describer.common.state.State"><span class="pre">State</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">QWidget</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_level_switch.html#LabelLevelSwitch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_level_switch.LabelLevelSwitch" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QGroupBox</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_level_switch.LabelLevelSwitch.approval_toggled">
+<span class="sig-name descname"><span class="pre">approval_toggled</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;PySide2.QtCore.Signal</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#arthropod_describer.label_editor.label_level_switch.LabelLevelSwitch.approval_toggled" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_level_switch.LabelLevelSwitch.get_level_button">
+<span class="sig-name descname"><span class="pre">get_level_button</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_level_switch.html#LabelLevelSwitch.get_level_button"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_level_switch.LabelLevelSwitch.get_level_button" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_level_switch.LabelLevelSwitch.handle_storage_changed">
+<span class="sig-name descname"><span class="pre">handle_storage_changed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">storage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.storage.Storage" title="arthropod_describer.common.storage.Storage"><span class="pre">Storage</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">old_storage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.storage.Storage" title="arthropod_describer.common.storage.Storage"><span class="pre">Storage</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_level_switch.html#LabelLevelSwitch.handle_storage_changed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_level_switch.LabelLevelSwitch.handle_storage_changed" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_level_switch.LabelLevelSwitch.label_level_switched">
+<span class="sig-name descname"><span class="pre">label_level_switched</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;PySide2.QtCore.Signal</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#arthropod_describer.label_editor.label_level_switch.LabelLevelSwitch.label_level_switched" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_level_switch.LabelLevelSwitch.mark_approved">
+<span class="sig-name descname"><span class="pre">mark_approved</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">approved</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_level_switch.html#LabelLevelSwitch.mark_approved"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_level_switch.LabelLevelSwitch.mark_approved" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_level_switch.LabelLevelSwitch.return_to_level_for">
+<span class="sig-name descname"><span class="pre">return_to_level_for</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_level_switch.html#LabelLevelSwitch.return_to_level_for"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_level_switch.LabelLevelSwitch.return_to_level_for" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_level_switch.LabelLevelSwitch.set_label_hierarchy">
+<span class="sig-name descname"><span class="pre">set_label_hierarchy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lab_hier</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.label_hierarchy.LabelHierarchy" title="arthropod_describer.common.label_hierarchy.LabelHierarchy"><span class="pre">LabelHierarchy</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_level_switch.html#LabelLevelSwitch.set_label_hierarchy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_level_switch.LabelLevelSwitch.set_label_hierarchy" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_level_switch.LabelLevelSwitch.staticMetaObject">
+<span class="sig-name descname"><span class="pre">staticMetaObject</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;PySide2.QtCore.QMetaObject</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#arthropod_describer.label_editor.label_level_switch.LabelLevelSwitch.staticMetaObject" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-arthropod_describer.label_editor.label_view_widget">
+<span id="arthropod-describer-label-editor-label-view-widget-module"></span><h2>arthropod_describer.label_editor.label_view_widget module<a class="headerlink" href="#module-arthropod_describer.label_editor.label_view_widget" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_view_widget.LabelView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">LabelView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.state.State" title="arthropod_describer.common.state.State"><span class="pre">State</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_view_widget.html#LabelView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_view_widget.LabelView" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QGraphicsObject</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_view_widget.LabelView.adapt_to_constraint">
+<span class="sig-name descname"><span class="pre">adapt_to_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_view_widget.html#LabelView.adapt_to_constraint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_view_widget.LabelView.adapt_to_constraint" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_view_widget.LabelView.boundingRect">
+<span class="sig-name descname"><span class="pre">boundingRect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">PySide2.QtCore.QRectF</span></span></span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_view_widget.html#LabelView.boundingRect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_view_widget.LabelView.boundingRect" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_view_widget.LabelView.compute_clip_mask">
+<span class="sig-name descname"><span class="pre">compute_clip_mask</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_view_widget.html#LabelView.compute_clip_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_view_widget.LabelView.compute_clip_mask" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_view_widget.LabelView.compute_viz_mask">
+<span class="sig-name descname"><span class="pre">compute_viz_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bbox</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_view_widget.html#LabelView.compute_viz_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_view_widget.LabelView.compute_viz_mask" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_view_widget.LabelView.draw_outline">
+<span class="sig-name descname"><span class="pre">draw_outline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bbox</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_from_viz</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_view_widget.html#LabelView.draw_outline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_view_widget.LabelView.draw_outline" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_view_widget.LabelView.handle_outline_width_changed">
+<span class="sig-name descname"><span class="pre">handle_outline_width_changed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_view_widget.html#LabelView.handle_outline_width_changed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_view_widget.LabelView.handle_outline_width_changed" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_view_widget.LabelView.handle_primary_label_changed">
+<span class="sig-name descname"><span class="pre">handle_primary_label_changed</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_view_widget.html#LabelView.handle_primary_label_changed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_view_widget.LabelView.handle_primary_label_changed" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_view_widget.LabelView.hoverEnterEvent">
+<span class="sig-name descname"><span class="pre">hoverEnterEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PySide2.QtWidgets.QGraphicsSceneHoverEvent</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_view_widget.html#LabelView.hoverEnterEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_view_widget.LabelView.hoverEnterEvent" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_view_widget.LabelView.hoverLeaveEvent">
+<span class="sig-name descname"><span class="pre">hoverLeaveEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PySide2.QtWidgets.QGraphicsSceneHoverEvent</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_view_widget.html#LabelView.hoverLeaveEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_view_widget.LabelView.hoverLeaveEvent" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_view_widget.LabelView.hoverMoveEvent">
+<span class="sig-name descname"><span class="pre">hoverMoveEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PySide2.QtWidgets.QGraphicsSceneHoverEvent</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_view_widget.html#LabelView.hoverMoveEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_view_widget.LabelView.hoverMoveEvent" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_view_widget.LabelView.label_hovered">
+<span class="sig-name descname"><span class="pre">label_hovered</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;PySide2.QtCore.Signal</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#arthropod_describer.label_editor.label_view_widget.LabelView.label_hovered" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_view_widget.LabelView.label_img_modified">
+<span class="sig-name descname"><span class="pre">label_img_modified</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;PySide2.QtCore.Signal</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#arthropod_describer.label_editor.label_view_widget.LabelView.label_img_modified" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_view_widget.LabelView.label_picked">
+<span class="sig-name descname"><span class="pre">label_picked</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;PySide2.QtCore.Signal</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#arthropod_describer.label_editor.label_view_widget.LabelView.label_picked" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_view_widget.LabelView.mouseMoveEvent">
+<span class="sig-name descname"><span class="pre">mouseMoveEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PySide2.QtWidgets.QGraphicsSceneMouseEvent</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_view_widget.html#LabelView.mouseMoveEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_view_widget.LabelView.mouseMoveEvent" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_view_widget.LabelView.mousePressEvent">
+<span class="sig-name descname"><span class="pre">mousePressEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PySide2.QtWidgets.QGraphicsSceneMouseEvent</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_view_widget.html#LabelView.mousePressEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_view_widget.LabelView.mousePressEvent" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_view_widget.LabelView.mouseReleaseEvent">
+<span class="sig-name descname"><span class="pre">mouseReleaseEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PySide2.QtWidgets.QGraphicsSceneMouseEvent</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_view_widget.html#LabelView.mouseReleaseEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_view_widget.LabelView.mouseReleaseEvent" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_view_widget.LabelView.paint">
+<span class="sig-name descname"><span class="pre">paint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">painter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PySide2.QtGui.QPainter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">option</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PySide2.QtWidgets.QStyleOptionGraphicsItem</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">widget</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">PySide2.QtWidgets.QWidget</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">NoneType</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_view_widget.html#LabelView.paint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_view_widget.LabelView.paint" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_view_widget.LabelView.rotate">
+<span class="sig-name descname"><span class="pre">rotate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ccw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_view_widget.html#LabelView.rotate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_view_widget.LabelView.rotate" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_view_widget.LabelView.set_label_image">
+<span class="sig-name descname"><span class="pre">set_label_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.label_image.LabelImg" title="arthropod_describer.common.label_image.LabelImg"><span class="pre">LabelImg</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_view_widget.html#LabelView.set_label_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_view_widget.LabelView.set_label_image" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_view_widget.LabelView.set_label_name">
+<span class="sig-name descname"><span class="pre">set_label_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_view_widget.html#LabelView.set_label_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_view_widget.LabelView.set_label_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_view_widget.LabelView.set_tool">
+<span class="sig-name descname"><span class="pre">set_tool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tool</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.tool.Tool" title="arthropod_describer.common.tool.Tool"><span class="pre">Tool</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">tool_cursor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.tool.ToolCursor" title="arthropod_describer.common.tool.ToolCursor"><span class="pre">ToolCursor</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_view_widget.html#LabelView.set_tool"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_view_widget.LabelView.set_tool" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_view_widget.LabelView.show_mask">
+<span class="sig-name descname"><span class="pre">show_mask</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_view_widget.html#LabelView.show_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_view_widget.LabelView.show_mask" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_view_widget.LabelView.show_outline">
+<span class="sig-name descname"><span class="pre">show_outline</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_view_widget.html#LabelView.show_outline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_view_widget.LabelView.show_outline" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_view_widget.LabelView.staticMetaObject">
+<span class="sig-name descname"><span class="pre">staticMetaObject</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;PySide2.QtCore.QMetaObject</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#arthropod_describer.label_editor.label_view_widget.LabelView.staticMetaObject" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_view_widget.LabelView.switch_label_level">
+<span class="sig-name descname"><span class="pre">switch_label_level</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_view_widget.html#LabelView.switch_label_level"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_view_widget.LabelView.switch_label_level" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_view_widget.compute_outline">
+<span class="sig-name descname"><span class="pre">compute_outline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label_img</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_view_widget.html#compute_outline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_view_widget.compute_outline" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.label_view_widget.outside">
+<span class="sig-name descname"><span class="pre">outside</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/label_view_widget.html#outside"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.label_view_widget.outside" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-arthropod_describer.label_editor.new_label_dialog">
+<span id="arthropod-describer-label-editor-new-label-dialog-module"></span><h2>arthropod_describer.label_editor.new_label_dialog module<a class="headerlink" href="#module-arthropod_describer.label_editor.new_label_dialog" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.new_label_dialog.LabelNameValidator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">LabelNameValidator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.state.State" title="arthropod_describer.common.state.State"><span class="pre">State</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">QObject</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/new_label_dialog.html#LabelNameValidator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.new_label_dialog.LabelNameValidator" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QValidator</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.new_label_dialog.LabelNameValidator.initialize_with_name">
+<span class="sig-name descname"><span class="pre">initialize_with_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/new_label_dialog.html#LabelNameValidator.initialize_with_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.new_label_dialog.LabelNameValidator.initialize_with_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.new_label_dialog.LabelNameValidator.staticMetaObject">
+<span class="sig-name descname"><span class="pre">staticMetaObject</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;PySide2.QtCore.QMetaObject</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#arthropod_describer.label_editor.new_label_dialog.LabelNameValidator.staticMetaObject" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.new_label_dialog.LabelNameValidator.validate">
+<span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg__1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg__2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">PySide2.QtGui.QValidator.State</span></span></span><a class="reference internal" href="_modules/arthropod_describer/label_editor/new_label_dialog.html#LabelNameValidator.validate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.new_label_dialog.LabelNameValidator.validate" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.new_label_dialog.NewLabelDialog">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NewLabelDialog</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state:</span> <span class="pre">~arthropod_describer.common.state.State</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent:</span> <span class="pre">~typing.Optional[~PySide2.QtWidgets.QWidget]</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f:</span> <span class="pre">~PySide2.QtCore.Qt.WindowFlags</span> <span class="pre">=</span> <span class="pre">&lt;PySide2.QtCore.Qt.WindowFlags</span> <span class="pre">object&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/new_label_dialog.html#NewLabelDialog"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.new_label_dialog.NewLabelDialog" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QDialog</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.new_label_dialog.NewLabelDialog.add_new_label">
+<span class="sig-name descname"><span class="pre">add_new_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent_label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/new_label_dialog.html#NewLabelDialog.add_new_label"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.new_label_dialog.NewLabelDialog.add_new_label" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.new_label_dialog.NewLabelDialog.add_new_label_requested">
+<span class="sig-name descname"><span class="pre">add_new_label_requested</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;PySide2.QtCore.Signal</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#arthropod_describer.label_editor.new_label_dialog.NewLabelDialog.add_new_label_requested" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.new_label_dialog.NewLabelDialog.modified_label">
+<span class="sig-name descname"><span class="pre">modified_label</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;PySide2.QtCore.Signal</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#arthropod_describer.label_editor.new_label_dialog.NewLabelDialog.modified_label" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.new_label_dialog.NewLabelDialog.modify_label">
+<span class="sig-name descname"><span class="pre">modify_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/new_label_dialog.html#NewLabelDialog.modify_label"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.new_label_dialog.NewLabelDialog.modify_label" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.new_label_dialog.NewLabelDialog.staticMetaObject">
+<span class="sig-name descname"><span class="pre">staticMetaObject</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;PySide2.QtCore.QMetaObject</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#arthropod_describer.label_editor.new_label_dialog.NewLabelDialog.staticMetaObject" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-arthropod_describer.label_editor.ui_colormap_widget">
+<span id="arthropod-describer-label-editor-ui-colormap-widget-module"></span><h2>arthropod_describer.label_editor.ui_colormap_widget module<a class="headerlink" href="#module-arthropod_describer.label_editor.ui_colormap_widget" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.ui_colormap_widget.Ui_ColormapWidget">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Ui_ColormapWidget</span></span><a class="reference internal" href="_modules/arthropod_describer/label_editor/ui_colormap_widget.html#Ui_ColormapWidget"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.ui_colormap_widget.Ui_ColormapWidget" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.ui_colormap_widget.Ui_ColormapWidget.retranslateUi">
+<span class="sig-name descname"><span class="pre">retranslateUi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ColormapWidget</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/ui_colormap_widget.html#Ui_ColormapWidget.retranslateUi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.ui_colormap_widget.Ui_ColormapWidget.retranslateUi" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.ui_colormap_widget.Ui_ColormapWidget.setupUi">
+<span class="sig-name descname"><span class="pre">setupUi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ColormapWidget</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/ui_colormap_widget.html#Ui_ColormapWidget.setupUi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.ui_colormap_widget.Ui_ColormapWidget.setupUi" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-arthropod_describer.label_editor.ui_computation">
+<span id="arthropod-describer-label-editor-ui-computation-module"></span><h2>arthropod_describer.label_editor.ui_computation module<a class="headerlink" href="#module-arthropod_describer.label_editor.ui_computation" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.ui_computation.Ui_Computations">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Ui_Computations</span></span><a class="reference internal" href="_modules/arthropod_describer/label_editor/ui_computation.html#Ui_Computations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.ui_computation.Ui_Computations" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.ui_computation.Ui_Computations.retranslateUi">
+<span class="sig-name descname"><span class="pre">retranslateUi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Computations</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/ui_computation.html#Ui_Computations.retranslateUi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.ui_computation.Ui_Computations.retranslateUi" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.ui_computation.Ui_Computations.setupUi">
+<span class="sig-name descname"><span class="pre">setupUi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Computations</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/ui_computation.html#Ui_Computations.setupUi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.ui_computation.Ui_Computations.setupUi" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-arthropod_describer.label_editor.ui_label_editor">
+<span id="arthropod-describer-label-editor-ui-label-editor-module"></span><h2>arthropod_describer.label_editor.ui_label_editor module<a class="headerlink" href="#module-arthropod_describer.label_editor.ui_label_editor" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.ui_label_editor.Ui_LabelEditor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Ui_LabelEditor</span></span><a class="reference internal" href="_modules/arthropod_describer/label_editor/ui_label_editor.html#Ui_LabelEditor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.ui_label_editor.Ui_LabelEditor" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.ui_label_editor.Ui_LabelEditor.retranslateUi">
+<span class="sig-name descname"><span class="pre">retranslateUi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">LabelEditor</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/ui_label_editor.html#Ui_LabelEditor.retranslateUi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.ui_label_editor.Ui_LabelEditor.retranslateUi" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.ui_label_editor.Ui_LabelEditor.setupUi">
+<span class="sig-name descname"><span class="pre">setupUi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">LabelEditor</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/ui_label_editor.html#Ui_LabelEditor.setupUi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.ui_label_editor.Ui_LabelEditor.setupUi" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-arthropod_describer.label_editor.ui_new_label_dialog">
+<span id="arthropod-describer-label-editor-ui-new-label-dialog-module"></span><h2>arthropod_describer.label_editor.ui_new_label_dialog module<a class="headerlink" href="#module-arthropod_describer.label_editor.ui_new_label_dialog" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.ui_new_label_dialog.Ui_NewLabelDialog">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Ui_NewLabelDialog</span></span><a class="reference internal" href="_modules/arthropod_describer/label_editor/ui_new_label_dialog.html#Ui_NewLabelDialog"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.ui_new_label_dialog.Ui_NewLabelDialog" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.ui_new_label_dialog.Ui_NewLabelDialog.retranslateUi">
+<span class="sig-name descname"><span class="pre">retranslateUi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">NewLabelDialog</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/ui_new_label_dialog.html#Ui_NewLabelDialog.retranslateUi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.ui_new_label_dialog.Ui_NewLabelDialog.retranslateUi" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.label_editor.ui_new_label_dialog.Ui_NewLabelDialog.setupUi">
+<span class="sig-name descname"><span class="pre">setupUi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">NewLabelDialog</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/label_editor/ui_new_label_dialog.html#Ui_NewLabelDialog.setupUi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.label_editor.ui_new_label_dialog.Ui_NewLabelDialog.setupUi" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-arthropod_describer.label_editor">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-arthropod_describer.label_editor" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="arthropod_describer.common.html" class="btn btn-neutral float-left" title="arthropod_describer.common package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="arthropod_describer.measurements_viewer.html" class="btn btn-neutral float-right" title="arthropod_describer.measurements_viewer package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, CBIA @ FI MUNI.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

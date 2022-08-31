@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arthropod_describer.label_editor.new_label_dialog &mdash; MAPHIS 0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> MAPHIS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">arthropod_describer</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">MAPHIS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>arthropod_describer.label_editor.new_label_dialog</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for arthropod_describer.label_editor.new_label_dialog</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">typing</span>
+
+<span class="kn">import</span> <span class="nn">PySide2</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtCore</span> <span class="kn">import</span> <span class="n">Qt</span><span class="p">,</span> <span class="n">Signal</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtGui</span> <span class="kn">import</span> <span class="n">QColor</span><span class="p">,</span> <span class="n">QPixmap</span><span class="p">,</span> <span class="n">QValidator</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtWidgets</span> <span class="kn">import</span> <span class="n">QWidget</span><span class="p">,</span> <span class="n">QColorDialog</span><span class="p">,</span> <span class="n">QDialogButtonBox</span><span class="p">,</span> <span class="n">QDialog</span>
+
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.label_hierarchy</span> <span class="kn">import</span> <span class="n">Node</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.state</span> <span class="kn">import</span> <span class="n">State</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.label_editor.ui_new_label_dialog</span> <span class="kn">import</span> <span class="n">Ui_NewLabelDialog</span>
+
+
+<div class="viewcode-block" id="LabelNameValidator"><a class="viewcode-back" href="../../../arthropod_describer.label_editor.html#arthropod_describer.label_editor.new_label_dialog.LabelNameValidator">[docs]</a><span class="k">class</span> <span class="nc">LabelNameValidator</span><span class="p">(</span><span class="n">QValidator</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">State</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">PySide2</span><span class="o">.</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QObject</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">:</span> <span class="n">State</span> <span class="o">=</span> <span class="n">state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_editted_label_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_all_names</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+<div class="viewcode-block" id="LabelNameValidator.initialize_with_name"><a class="viewcode-back" href="../../../arthropod_describer.label_editor.html#arthropod_describer.label_editor.new_label_dialog.LabelNameValidator.initialize_with_name">[docs]</a>    <span class="k">def</span> <span class="nf">initialize_with_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_editted_label_name</span> <span class="o">=</span> <span class="n">label_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_all_names</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_all_names</span> <span class="o">=</span> <span class="p">{</span><span class="n">node</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">label_hierarchy</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">values</span><span class="p">()}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_all_names</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">label_name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LabelNameValidator.validate"><a class="viewcode-back" href="../../../arthropod_describer.label_editor.html#arthropod_describer.label_editor.new_label_dialog.LabelNameValidator.validate">[docs]</a>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cand_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">cursor_pos</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PySide2</span><span class="o">.</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QValidator</span><span class="o">.</span><span class="n">State</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">cand_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_names</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">QValidator</span><span class="o">.</span><span class="n">Intermediate</span>
+        <span class="k">return</span> <span class="n">QValidator</span><span class="o">.</span><span class="n">Acceptable</span></div></div>
+
+
+<div class="viewcode-block" id="NewLabelDialog"><a class="viewcode-back" href="../../../arthropod_describer.label_editor.html#arthropod_describer.label_editor.new_label_dialog.NewLabelDialog">[docs]</a><span class="k">class</span> <span class="nc">NewLabelDialog</span><span class="p">(</span><span class="n">QDialog</span><span class="p">):</span>
+    <span class="n">add_new_label_requested</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">([</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">QColor</span><span class="p">])</span>
+    <span class="n">modified_label</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">QColor</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">State</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">PySide2</span><span class="o">.</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QWidget</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">f</span><span class="p">:</span> <span class="n">PySide2</span><span class="o">.</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">WindowFlags</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">WindowFlags</span><span class="p">()):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">:</span> <span class="n">State</span> <span class="o">=</span> <span class="n">state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span> <span class="o">=</span> <span class="n">Ui_NewLabelDialog</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">setupUi</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lblColor_pixmap</span> <span class="o">=</span> <span class="n">QPixmap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">lblColor</span><span class="o">.</span><span class="n">minimumSize</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_label_color</span><span class="p">:</span> <span class="n">QColor</span> <span class="o">=</span> <span class="n">QColor</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">btnSetColor</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pick_color</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parent_node</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Node</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">buttonBox</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="n">QDialogButtonBox</span><span class="o">.</span><span class="n">Ok</span><span class="p">)</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">accept</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">buttonBox</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="n">QDialogButtonBox</span><span class="o">.</span><span class="n">Cancel</span><span class="p">)</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reject</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">txtLabelCode</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="c1"># TODO set a validator for self.ui.txtLabelName to reject values clashing with already used label names</span>
+        <span class="c1"># self._name_validator: LabelNameValidator = LabelNameValidator(self.state)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">txtLabelName</span><span class="o">.</span><span class="n">textChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_handle_txtLabelName_changed</span><span class="p">)</span>
+        <span class="c1"># self.ui.btnColor.setPixmap(self._lblColor_pixmap)</span>
+        <span class="c1"># self.ui.btnColor.setIcon(QIcon(self._lblColor_pixmap))</span>
+        <span class="c1"># self.ui.btnColor.setIconSize(self.ui.btnColor.minimumSize())</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_modified_label_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_all_label_names</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">setWindowModality</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">ApplicationModal</span><span class="p">)</span>
+
+<div class="viewcode-block" id="NewLabelDialog.add_new_label"><a class="viewcode-back" href="../../../arthropod_describer.label_editor.html#arthropod_describer.label_editor.new_label_dialog.NewLabelDialog.add_new_label">[docs]</a>    <span class="k">def</span> <span class="nf">add_new_label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent_label</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="n">parent_node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">label_hierarchy</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">parent_label</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_label_color</span> <span class="o">=</span> <span class="n">QColor</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parent_node</span> <span class="o">=</span> <span class="n">parent_node</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lblColor_pixmap</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">QColor</span><span class="p">(</span><span class="o">*</span><span class="n">parent_node</span><span class="o">.</span><span class="n">color</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">txtLabelName</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">new_label</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">label_hierarchy</span><span class="o">.</span><span class="n">get_available_label</span><span class="p">(</span><span class="n">parent_label</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">txtLabelCode</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">label_hierarchy</span><span class="o">.</span><span class="n">code</span><span class="p">(</span><span class="n">new_label</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_modified_label_name</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_all_label_names</span> <span class="o">=</span> <span class="p">{</span><span class="n">node</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">label_hierarchy</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">values</span><span class="p">()}</span>
+        <span class="c1"># self._name_validator.initialize_with_name(&#39;&#39;)</span>
+        <span class="c1"># self.ui.txtLabelName.setValidator(self._name_validator)</span>
+
+        <span class="c1"># self.ui.btnColor.setIcon(QIcon(self._lblColor_pixmap))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setWindowTitle</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Add a new child label of </span><span class="si">{</span><span class="n">parent_node</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">lblColor</span><span class="o">.</span><span class="n">setPixmap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lblColor_pixmap</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">exec_</span><span class="p">()</span> <span class="o">==</span> <span class="n">QDialog</span><span class="o">.</span><span class="n">Accepted</span><span class="p">:</span>
+            <span class="c1"># self.state.label_hierarchy.add_child_label(self._parent_node.label, self.ui.txtLabelName.text(),</span>
+            <span class="c1">#                                            self._label_color.toTuple()[:3])</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_new_label_requested</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parent_node</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">txtLabelName</span><span class="o">.</span><span class="n">text</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_color</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="NewLabelDialog.modify_label"><a class="viewcode-back" href="../../../arthropod_describer.label_editor.html#arthropod_describer.label_editor.new_label_dialog.NewLabelDialog.modify_label">[docs]</a>    <span class="k">def</span> <span class="nf">modify_label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="n">label_node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">label_hierarchy</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">label</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_label_color</span> <span class="o">=</span> <span class="n">QColor</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parent_node</span> <span class="o">=</span> <span class="n">label_node</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">btnSetColor</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="n">label</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_modified_label_name</span> <span class="o">=</span> <span class="n">label_node</span><span class="o">.</span><span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_all_label_names</span> <span class="o">=</span> <span class="p">{</span><span class="n">node</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">label_hierarchy</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">values</span><span class="p">()}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_all_label_names</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_modified_label_name</span><span class="p">)</span>
+
+        <span class="c1"># self._name_validator.initialize_with_name(label_node.name)</span>
+        <span class="c1"># self.ui.txtLabelName.setValidator(self._name_validator)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lblColor_pixmap</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">QColor</span><span class="p">(</span><span class="o">*</span><span class="n">label_node</span><span class="o">.</span><span class="n">color</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">lblColor</span><span class="o">.</span><span class="n">setPixmap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lblColor_pixmap</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">txtLabelName</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">label_node</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">txtLabelCode</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">label_node</span><span class="o">.</span><span class="n">code</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setWindowTitle</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Modify </span><span class="si">{</span><span class="n">label_node</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">role</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exec_</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">role</span> <span class="o">==</span> <span class="n">QDialog</span><span class="o">.</span><span class="n">Accepted</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">modified_label</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">label_node</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">txtLabelName</span><span class="o">.</span><span class="n">text</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_color</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_handle_txtLabelName_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">buttonBox</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="n">QDialogButtonBox</span><span class="o">.</span><span class="n">Ok</span><span class="p">)</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="n">text</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_label_names</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_pick_color</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="n">QColorDialog</span><span class="o">.</span><span class="n">getColor</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">QColor</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_parent_node</span><span class="o">.</span><span class="n">color</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">color</span><span class="o">.</span><span class="n">isValid</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_lblColor_pixmap</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">color</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">lblColor</span><span class="o">.</span><span class="n">setPixmap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lblColor_pixmap</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_label_color</span> <span class="o">=</span> <span class="n">color</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, CBIA @ FI MUNI.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

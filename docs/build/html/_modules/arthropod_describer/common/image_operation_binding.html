@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arthropod_describer.common.image_operation_binding &mdash; MAPHIS 0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> MAPHIS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">arthropod_describer</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">MAPHIS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>arthropod_describer.common.image_operation_binding</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for arthropod_describer.common.image_operation_binding</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">typing</span>
+
+<span class="kn">import</span> <span class="nn">PySide2</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtCore</span> <span class="kn">import</span> <span class="n">QObject</span><span class="p">,</span> <span class="n">Signal</span><span class="p">,</span> <span class="n">Qt</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtWidgets</span> <span class="kn">import</span> <span class="n">QWidget</span><span class="p">,</span> <span class="n">QGridLayout</span><span class="p">,</span> <span class="n">QLabel</span><span class="p">,</span> <span class="n">QSpinBox</span><span class="p">,</span> <span class="n">QDoubleSpinBox</span><span class="p">,</span> <span class="n">QPushButton</span><span class="p">,</span> <span class="n">QDialogButtonBox</span><span class="p">,</span> \
+    <span class="n">QDialog</span><span class="p">,</span> <span class="n">QVBoxLayout</span>
+
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.photo</span> <span class="kn">import</span> <span class="n">Photo</span>
+
+
+<div class="viewcode-block" id="ResizeWidget"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.image_operation_binding.ResizeWidget">[docs]</a><span class="k">class</span> <span class="nc">ResizeWidget</span><span class="p">(</span><span class="n">QWidget</span><span class="p">):</span>
+    <span class="n">invalid_input</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
+    <span class="n">valid_input</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">PySide2</span><span class="o">.</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QWidget</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">f</span><span class="p">:</span> <span class="n">PySide2</span><span class="o">.</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">WindowFlags</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">WindowFlags</span><span class="p">()):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+        <span class="n">layout</span> <span class="o">=</span> <span class="n">QGridLayout</span><span class="p">()</span>
+
+        <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QLabel</span><span class="p">(</span><span class="s2">&quot;Width&quot;</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spboxWidth</span> <span class="o">=</span> <span class="n">QSpinBox</span><span class="p">()</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spboxWidth</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QLabel</span><span class="p">(</span><span class="s2">&quot;Height&quot;</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spboxHeight</span> <span class="o">=</span> <span class="n">QSpinBox</span><span class="p">()</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spboxHeight</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QLabel</span><span class="p">(</span><span class="s2">&quot;Resize factor&quot;</span><span class="p">),</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spboxFactor</span> <span class="o">=</span> <span class="n">QDoubleSpinBox</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spboxFactor</span><span class="o">.</span><span class="n">setSingleStep</span><span class="p">(</span><span class="mf">0.25</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spboxFactor</span><span class="o">.</span><span class="n">setDecimals</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spboxFactor</span><span class="o">.</span><span class="n">setMinimum</span><span class="p">(</span><span class="mf">0.001</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spboxFactor</span><span class="o">.</span><span class="n">setMaximum</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spboxFactor</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">layout</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_aspect</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_size</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">spboxWidth</span><span class="o">.</span><span class="n">valueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_update_height</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spboxHeight</span><span class="o">.</span><span class="n">valueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_update_width</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spboxFactor</span><span class="o">.</span><span class="n">valueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_update_width_height</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">button_box</span> <span class="o">=</span> <span class="n">QDialogButtonBox</span><span class="p">(</span><span class="n">QDialogButtonBox</span><span class="o">.</span><span class="n">Ok</span> <span class="o">|</span> <span class="n">QDialogButtonBox</span><span class="o">.</span><span class="n">Cancel</span><span class="p">)</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">button_box</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ResizeWidget.set_size"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.image_operation_binding.ResizeWidget.set_size">[docs]</a>    <span class="k">def</span> <span class="nf">set_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">factor</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">max_factor</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_size</span> <span class="o">=</span> <span class="n">size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_aspect</span> <span class="o">=</span> <span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spboxWidth</span><span class="o">.</span><span class="n">setMaximum</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">max_factor</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spboxWidth</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">factor</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">spboxHeight</span><span class="o">.</span><span class="n">setMaximum</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">max_factor</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spboxHeight</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">factor</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">spboxFactor</span><span class="o">.</span><span class="n">blockSignals</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spboxFactor</span><span class="o">.</span><span class="n">setMaximum</span><span class="p">(</span><span class="n">max_factor</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spboxFactor</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">factor</span><span class="p">,</span> <span class="n">max_factor</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spboxFactor</span><span class="o">.</span><span class="n">blockSignals</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_update_height</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spboxHeight</span><span class="o">.</span><span class="n">blockSignals</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spboxWidth</span><span class="o">.</span><span class="n">value</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">spboxHeight</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spboxWidth</span><span class="o">.</span><span class="n">value</span><span class="p">()</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_aspect</span><span class="p">)))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_factor</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">invalid_input</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spboxHeight</span><span class="o">.</span><span class="n">blockSignals</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_input</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_update_width</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spboxWidth</span><span class="o">.</span><span class="n">blockSignals</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spboxHeight</span><span class="o">.</span><span class="n">value</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spboxHeight</span><span class="o">.</span><span class="n">value</span><span class="p">()</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_aspect</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">spboxWidth</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_factor</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">invalid_input</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spboxWidth</span><span class="o">.</span><span class="n">blockSignals</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_input</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_update_width_height</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spboxFactor</span><span class="o">.</span><span class="n">value</span><span class="p">()</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">invalid_input</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spboxWidth</span><span class="o">.</span><span class="n">blockSignals</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spboxWidth</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">spboxFactor</span><span class="o">.</span><span class="n">value</span><span class="p">())))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spboxWidth</span><span class="o">.</span><span class="n">blockSignals</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">spboxHeight</span><span class="o">.</span><span class="n">blockSignals</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spboxHeight</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">spboxFactor</span><span class="o">.</span><span class="n">value</span><span class="p">())))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spboxHeight</span><span class="o">.</span><span class="n">blockSignals</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_input</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_update_factor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spboxFactor</span><span class="o">.</span><span class="n">blockSignals</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spboxFactor</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spboxWidth</span><span class="o">.</span><span class="n">value</span><span class="p">()</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_size</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spboxFactor</span><span class="o">.</span><span class="n">blockSignals</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_input</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_validate_input</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spboxWidth</span><span class="o">.</span><span class="n">value</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">spboxHeight</span><span class="o">.</span><span class="n">value</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1">#self.invalid_input.emit(True)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">button_box</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="n">QDialogButtonBox</span><span class="o">.</span><span class="n">Ok</span><span class="p">)</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1">#self.valid_input.emit(True)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">button_box</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="n">QDialogButtonBox</span><span class="o">.</span><span class="n">Ok</span><span class="p">)</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ResizeWidget.set_photo"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.image_operation_binding.ResizeWidget.set_photo">[docs]</a>    <span class="k">def</span> <span class="nf">set_photo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">photo</span><span class="p">:</span> <span class="n">Photo</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_size</span><span class="p">(</span><span class="n">photo</span><span class="o">.</span><span class="n">image_size</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="ImageOperation"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.image_operation_binding.ImageOperation">[docs]</a><span class="k">class</span> <span class="nc">ImageOperation</span><span class="p">(</span><span class="n">QObject</span><span class="p">):</span>
+    <span class="n">photo_resized</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">(</span><span class="n">Photo</span><span class="p">)</span>
+    <span class="n">photo_rotated</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">([</span><span class="n">Photo</span><span class="p">,</span> <span class="nb">bool</span><span class="p">])</span>
+    <span class="n">photo_resolution_changed</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">(</span><span class="n">Photo</span><span class="p">)</span>
+    <span class="n">operation_running</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">(</span><span class="n">Photo</span><span class="p">)</span>
+    <span class="n">operation_finished</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">(</span><span class="n">Photo</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">widg_parent</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">QWidget</span><span class="p">],</span> <span class="n">parent</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">PySide2</span><span class="o">.</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QObject</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">photo</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Photo</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget_parent</span> <span class="o">=</span> <span class="n">widg_parent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_widget</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">QWidget</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="ImageOperation.init"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.image_operation_binding.ImageOperation.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">photo</span><span class="p">:</span> <span class="n">Photo</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">photo</span> <span class="o">=</span> <span class="n">photo</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_widget</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_widget</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_widget</span><span class="o">.</span><span class="n">deleteLater</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_widget</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="ImageOperation.rotate"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.image_operation_binding.ImageOperation.rotate">[docs]</a>    <span class="k">def</span> <span class="nf">rotate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clockwise</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">photo</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="ow">not</span> <span class="n">clockwise</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">photo_rotated</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">photo</span><span class="p">,</span> <span class="n">clockwise</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ImageOperation.resize"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.image_operation_binding.ImageOperation.resize">[docs]</a>    <span class="k">def</span> <span class="nf">resize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">resize_widg</span> <span class="o">=</span> <span class="n">ResizeWidget</span><span class="p">(</span><span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">widget_parent</span><span class="p">)</span>
+        <span class="n">resize_widg</span><span class="o">.</span><span class="n">set_photo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">photo</span><span class="p">)</span>
+        <span class="n">diag</span> <span class="o">=</span> <span class="n">QDialog</span><span class="p">(</span><span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">widget_parent</span><span class="p">)</span>
+        <span class="n">diag</span><span class="o">.</span><span class="n">setWindowTitle</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Resizing: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">photo</span><span class="o">.</span><span class="n">image_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">diag</span><span class="o">.</span><span class="n">setWindowModality</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">WindowModal</span><span class="p">)</span>
+        <span class="n">diag</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">QVBoxLayout</span><span class="p">())</span>
+        <span class="n">diag</span><span class="o">.</span><span class="n">layout</span><span class="p">()</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">resize_widg</span><span class="p">)</span>
+
+        <span class="n">resize_widg</span><span class="o">.</span><span class="n">button_box</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="n">QDialogButtonBox</span><span class="o">.</span><span class="n">Ok</span><span class="p">)</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">diag</span><span class="o">.</span><span class="n">accept</span><span class="p">)</span>
+        <span class="n">resize_widg</span><span class="o">.</span><span class="n">button_box</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="n">QDialogButtonBox</span><span class="o">.</span><span class="n">Cancel</span><span class="p">)</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">diag</span><span class="o">.</span><span class="n">reject</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">operation_running</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">photo</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">diag</span><span class="o">.</span><span class="n">exec_</span><span class="p">()</span> <span class="o">==</span> <span class="n">QDialog</span><span class="o">.</span><span class="n">Accepted</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">photo</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">resize_widg</span><span class="o">.</span><span class="n">spboxFactor</span><span class="o">.</span><span class="n">value</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">photo_resized</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">photo</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">operation_finished</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">photo</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, CBIA @ FI MUNI.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arthropod_describer.plugins.test_plugin.properties.basic_props &mdash; MAPHIS 0.1 documentation</title>
+      <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
+        <script src="../../../../../_static/jquery.js"></script>
+        <script src="../../../../../_static/underscore.js"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../../../_static/doctools.js"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../../../index.html" class="icon icon-home"> MAPHIS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../modules.html">arthropod_describer</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">MAPHIS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../../../index.html">Module code</a> &raquo;</li>
+      <li>arthropod_describer.plugins.test_plugin.properties.basic_props</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for arthropod_describer.plugins.test_plugin.properties.basic_props</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">operator</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">typing</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+
+<span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">skimage.measure</span>
+<span class="kn">from</span> <span class="nn">skimage</span> <span class="kn">import</span> <span class="n">io</span>
+<span class="kn">from</span> <span class="nn">skimage.color</span> <span class="kn">import</span> <span class="n">rgb2hsv</span>
+<span class="kn">from</span> <span class="nn">skimage.morphology</span> <span class="kn">import</span> <span class="n">binary_erosion</span>
+<span class="kn">import</span> <span class="nn">skimage.transform</span>
+<span class="kn">import</span> <span class="nn">scipy.ndimage</span>
+<span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
+
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.label_hierarchy</span> <span class="kn">import</span> <span class="n">LabelHierarchy</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.label_image</span> <span class="kn">import</span> <span class="n">RegionProperty</span><span class="p">,</span> <span class="n">PropertyType</span><span class="p">,</span> <span class="n">LabelImg</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.photo</span> <span class="kn">import</span> <span class="n">Photo</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.plugin</span> <span class="kn">import</span> <span class="n">PropertyComputation</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.common</span> <span class="kn">import</span> <span class="n">Info</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.regions_cache</span> <span class="kn">import</span> <span class="n">RegionsCache</span><span class="p">,</span> <span class="n">Region</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.units</span> <span class="kn">import</span> <span class="n">Value</span><span class="p">,</span> <span class="n">Unit</span><span class="p">,</span> <span class="n">SIPrefix</span><span class="p">,</span> <span class="n">BaseUnit</span>
+<span class="kn">from</span> <span class="nn">.geodesic_utils</span> <span class="kn">import</span> <span class="n">get_longest_geodesic</span><span class="p">,</span> <span class="n">get_longest_geodesic2</span><span class="p">,</span> <span class="n">compute_longest_geodesic</span><span class="p">,</span> <span class="n">find_shortest_path</span>
+
+
+<div class="viewcode-block" id="BasicProperties"><a class="viewcode-back" href="../../../../../arthropod_describer.plugins.test_plugin.properties.html#arthropod_describer.plugins.test_plugin.properties.basic_props.BasicProperties">[docs]</a><span class="k">class</span> <span class="nc">BasicProperties</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    NAME: Basic properties</span>
+<span class="sd">    DESCRIPTION: Computes basic region properties.</span>
+
+<span class="sd">    REGION_RESTRICTED</span>
+
+<span class="sd">    USER_PARAMS:</span>
+<span class="sd">        PARAM_NAME: ABC</span>
+<span class="sd">        PARAM_KEY: abc</span>
+<span class="sd">        PARAM_TYPE: INT</span>
+<span class="sd">        VALUE: 10</span>
+<span class="sd">        MIN_VALUE: 5</span>
+<span class="sd">        MAX_VALUE: 25</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">info</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Info</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">PropertyComputation</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">info</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="n">Info</span><span class="o">.</span><span class="n">load_from_doc_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_px_unit</span><span class="p">:</span> <span class="n">Unit</span> <span class="o">=</span> <span class="n">Unit</span><span class="p">(</span><span class="n">BaseUnit</span><span class="o">.</span><span class="n">px</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="n">SIPrefix</span><span class="o">.</span><span class="n">none</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_no_unit</span><span class="p">:</span> <span class="n">Unit</span> <span class="o">=</span> <span class="n">Unit</span><span class="p">(</span><span class="n">BaseUnit</span><span class="o">.</span><span class="n">none</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="n">SIPrefix</span><span class="o">.</span><span class="n">none</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_available_props</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="c1"># &#39;area&#39;: Info(&#39;Area&#39;, key=&#39;area&#39;, description=&#39;Area of the region (px or mm\u00b2)&#39;),</span>
+            <span class="s1">&#39;mean_intensity&#39;</span><span class="p">:</span> <span class="n">Info</span><span class="p">(</span><span class="s1">&#39;Mean intensity&#39;</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s1">&#39;mean_intensity&#39;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Mean intensity (R, G, B)&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;circularity&#39;</span><span class="p">:</span> <span class="n">Info</span><span class="p">(</span><span class="s1">&#39;Circularity&#39;</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s1">&#39;circularity&#39;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Circularity (0.0 to 1.0, where 1.0 = perfect circle)&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;max_feret&#39;</span><span class="p">:</span> <span class="n">Info</span><span class="p">(</span><span class="s1">&#39;Max Feret&#39;</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s1">&#39;max_feret&#39;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Maximum Feret diameter (px or mm)&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;geodesic_length&#39;</span><span class="p">:</span> <span class="n">Info</span><span class="p">(</span><span class="s1">&#39;Geodesic length&#39;</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s1">&#39;geodesic_length&#39;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Geodesic length (px or mm)&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;mean_width&#39;</span><span class="p">:</span> <span class="n">Info</span><span class="p">(</span><span class="s1">&#39;Mean width&#39;</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s1">&#39;mean_width&#39;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Mean width of a region (px or mm)&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;contour&#39;</span><span class="p">:</span> <span class="n">Info</span><span class="p">(</span><span class="s1">&#39;Contour&#39;</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s1">&#39;contour&#39;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Compute contour feature vector&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;mean_hsv&#39;</span><span class="p">:</span> <span class="n">Info</span><span class="p">(</span><span class="s1">&#39;Mean HSV&#39;</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s1">&#39;mean_hsv&#39;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Mean HSV of a region&#39;</span><span class="p">)</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">_compute_mean_intensity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region</span><span class="p">:</span> <span class="n">Region</span><span class="p">,</span> <span class="n">refl</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">RegionProperty</span><span class="p">]:</span>
+        <span class="c1"># mask = np.logical_xor(lab_img &gt; 0, refl &gt; 0)</span>
+        <span class="c1"># label_img = np.where(mask, lab_img, 0)</span>
+
+        <span class="c1"># reg_props = skimage.measure.regionprops_table(label_img, photo,</span>
+        <span class="c1">#                                               properties=[&#39;label&#39;, &#39;mean_intensity&#39;])</span>
+
+        <span class="n">top</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="n">region</span><span class="o">.</span><span class="n">bbox</span>
+        <span class="n">refl_roi</span> <span class="o">=</span> <span class="n">refl</span><span class="p">[</span><span class="n">top</span><span class="p">:</span><span class="n">top</span> <span class="o">+</span> <span class="n">height</span><span class="p">,</span> <span class="n">left</span><span class="p">:</span><span class="n">left</span> <span class="o">+</span> <span class="n">width</span><span class="p">]</span>
+
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_xor</span><span class="p">(</span><span class="n">region</span><span class="o">.</span><span class="n">mask</span><span class="p">,</span> <span class="n">refl_roi</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">yy</span><span class="p">,</span> <span class="n">xx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
+
+        <span class="n">pixels</span> <span class="o">=</span> <span class="n">region</span><span class="o">.</span><span class="n">image</span><span class="p">[</span><span class="n">yy</span><span class="p">,</span> <span class="n">xx</span><span class="p">]</span>
+
+        <span class="n">mean_intensity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">pixels</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">prop</span> <span class="o">=</span> <span class="n">RegionProperty</span><span class="p">()</span>
+        <span class="n">prop</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">example</span><span class="p">(</span><span class="s1">&#39;mean_intensity&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">info</span><span class="p">)</span>
+        <span class="n">prop</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">region</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
+        <span class="n">prop</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="p">(</span><span class="n">mean_intensity</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_no_unit</span><span class="p">)</span>
+        <span class="n">prop</span><span class="o">.</span><span class="n">prop_type</span> <span class="o">=</span> <span class="n">PropertyType</span><span class="o">.</span><span class="n">Intensity</span>
+        <span class="n">prop</span><span class="o">.</span><span class="n">num_vals</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="n">prop</span><span class="o">.</span><span class="n">val_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;R&#39;</span><span class="p">,</span> <span class="s1">&#39;G&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="n">prop</span><span class="p">]</span>
+
+        <span class="n">props</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">RegionProperty</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">reg_props</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]):</span>
+            <span class="k">if</span> <span class="n">label</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">prop</span> <span class="o">=</span> <span class="n">RegionProperty</span><span class="p">()</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_available_props</span><span class="p">[</span><span class="s1">&#39;mean_intensity&#39;</span><span class="p">])</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="p">([</span>
+                <span class="nb">float</span><span class="p">(</span><span class="n">reg_props</span><span class="p">[</span><span class="s1">&#39;mean_intensity-0&#39;</span><span class="p">][</span><span class="n">idx</span><span class="p">]),</span>
+                <span class="nb">float</span><span class="p">(</span><span class="n">reg_props</span><span class="p">[</span><span class="s1">&#39;mean_intensity-1&#39;</span><span class="p">][</span><span class="n">idx</span><span class="p">]),</span>
+                <span class="nb">float</span><span class="p">(</span><span class="n">reg_props</span><span class="p">[</span><span class="s1">&#39;mean_intensity-2&#39;</span><span class="p">][</span><span class="n">idx</span><span class="p">])</span>
+            <span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_no_unit</span><span class="p">)</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">prop_type</span> <span class="o">=</span> <span class="n">PropertyType</span><span class="o">.</span><span class="n">Intensity</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">num_vals</span> <span class="o">=</span> <span class="mi">3</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">val_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;R&#39;</span><span class="p">,</span> <span class="s1">&#39;G&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">]</span>
+            <span class="n">props</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prop</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">props</span>
+
+    <span class="k">def</span> <span class="nf">_compute_area</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region</span><span class="p">:</span> <span class="n">Region</span><span class="p">,</span> <span class="n">photo</span><span class="p">:</span> <span class="n">Photo</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">RegionProperty</span><span class="p">]:</span>
+        <span class="n">props</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">prop</span> <span class="o">=</span> <span class="n">RegionProperty</span><span class="p">()</span>
+        <span class="n">prop</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">region</span><span class="o">.</span><span class="n">label</span>
+        <span class="n">prop</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_available_props</span><span class="p">[</span><span class="s1">&#39;area&#39;</span><span class="p">])</span>
+        <span class="c1"># prop.value = int(np.count_nonzero(lab_img == label))</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">Value</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">region</span><span class="o">.</span><span class="n">mask</span><span class="p">)),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_px_unit</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_px_unit</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">photo</span><span class="o">.</span><span class="n">image_scale</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">photo</span><span class="o">.</span><span class="n">image_scale</span><span class="o">.</span><span class="n">value</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span> <span class="o">/</span> <span class="p">(</span><span class="n">photo</span><span class="o">.</span><span class="n">image_scale</span> <span class="o">*</span> <span class="n">photo</span><span class="o">.</span><span class="n">image_scale</span><span class="p">)</span>
+            <span class="c1"># prop.unit = &#39;mm\u00b2&#39;  # TODO sync unit with the units in Photo</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="n">prop</span><span class="o">.</span><span class="n">prop_type</span> <span class="o">=</span> <span class="n">PropertyType</span><span class="o">.</span><span class="n">Scalar</span>
+        <span class="n">prop</span><span class="o">.</span><span class="n">val_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Area&#39;</span><span class="p">]</span>
+        <span class="n">prop</span><span class="o">.</span><span class="n">num_vals</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">props</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prop</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">props</span>
+
+    <span class="k">def</span> <span class="nf">_compute_max_feret</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lab_img</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">photo</span><span class="p">:</span> <span class="n">Photo</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">RegionProperty</span><span class="p">]:</span>
+        <span class="n">reg_props</span> <span class="o">=</span> <span class="n">skimage</span><span class="o">.</span><span class="n">measure</span><span class="o">.</span><span class="n">regionprops_table</span><span class="p">(</span><span class="n">lab_img</span><span class="p">,</span> <span class="n">photo</span><span class="o">.</span><span class="n">image</span><span class="p">,</span>
+                                                      <span class="n">properties</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">,</span> <span class="s1">&#39;feret_diameter_max&#39;</span><span class="p">])</span>
+
+        <span class="n">props</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">RegionProperty</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">reg_props</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]):</span>
+            <span class="k">if</span> <span class="n">label</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">prop</span> <span class="o">=</span> <span class="n">RegionProperty</span><span class="p">()</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_available_props</span><span class="p">[</span><span class="s1">&#39;max_feret&#39;</span><span class="p">])</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">Value</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">reg_props</span><span class="p">[</span><span class="s1">&#39;feret_diameter_max&#39;</span><span class="p">][</span><span class="n">idx</span><span class="p">]),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_px_unit</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">photo</span><span class="o">.</span><span class="n">image_scale</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">photo</span><span class="o">.</span><span class="n">image_scale</span><span class="o">.</span><span class="n">value</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c1"># prop.value /= photo.image_scale</span>
+                <span class="n">prop</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">prop</span><span class="o">.</span><span class="n">value</span> <span class="o">/</span> <span class="n">photo</span><span class="o">.</span><span class="n">image_scale</span>
+                <span class="n">prop</span><span class="o">.</span><span class="n">unit</span> <span class="o">=</span> <span class="s1">&#39;mm&#39;</span>  <span class="c1"># TODO sync unit with the units in Photo</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">prop</span><span class="o">.</span><span class="n">unit</span> <span class="o">=</span> <span class="s1">&#39;px&#39;</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">prop_type</span> <span class="o">=</span> <span class="n">PropertyType</span><span class="o">.</span><span class="n">Scalar</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">val_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Max Feret&#39;</span><span class="p">]</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">num_vals</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">props</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prop</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">props</span>
+
+    <span class="k">def</span> <span class="nf">_compute_circularity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lab_img</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">photo</span><span class="p">:</span> <span class="n">Photo</span><span class="p">,</span> <span class="n">perimeter_measurement_flavor</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">RegionProperty</span><span class="p">]:</span>
+        <span class="c1"># &#39;perimeter&#39; or &#39;perimeter_crofton&#39; is possible as perimeter_measurement_flavor</span>
+        <span class="n">reg_props</span> <span class="o">=</span> <span class="n">skimage</span><span class="o">.</span><span class="n">measure</span><span class="o">.</span><span class="n">regionprops_table</span><span class="p">(</span><span class="n">lab_img</span><span class="p">,</span> <span class="n">photo</span><span class="o">.</span><span class="n">image</span><span class="p">,</span>
+                                                      <span class="n">properties</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">,</span> <span class="n">perimeter_measurement_flavor</span><span class="p">])</span>
+        <span class="n">props</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">RegionProperty</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">reg_props</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]):</span>
+            <span class="k">if</span> <span class="n">label</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">perimeter</span> <span class="o">=</span> <span class="n">reg_props</span><span class="p">[</span><span class="n">perimeter_measurement_flavor</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span>
+            <span class="n">area</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">lab_img</span> <span class="o">==</span> <span class="n">label</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">perimeter</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">circularity</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># TODO: Careful about division by zero (can we somehow return N/A here?)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">circularity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">((</span><span class="mi">4</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">area</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">perimeter</span> <span class="o">**</span> <span class="mi">2</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+            <span class="c1">#print(f&#39;idx: {idx}, label: {label}&#39;)</span>
+            <span class="c1">#print(f&#39;  perimeter: {perimeter}&#39;)</span>
+            <span class="c1">#print(f&#39;  area: {area}&#39;)</span>
+            <span class="c1">#print(f&#39;  circularity: {circularity}&#39;)</span>
+
+            <span class="n">prop</span> <span class="o">=</span> <span class="n">RegionProperty</span><span class="p">()</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_available_props</span><span class="p">[</span><span class="s1">&#39;circularity&#39;</span><span class="p">])</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">Value</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">circularity</span><span class="p">),</span> <span class="n">Unit</span><span class="p">(</span><span class="n">BaseUnit</span><span class="o">.</span><span class="n">none</span><span class="p">,</span> <span class="n">SIPrefix</span><span class="o">.</span><span class="n">none</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+            <span class="c1"># prop.unit = &#39;&#39; # TODO: Is this ok for a unitless property?</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">prop_type</span> <span class="o">=</span> <span class="n">PropertyType</span><span class="o">.</span><span class="n">Scalar</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">val_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Circularity&#39;</span><span class="p">]</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">num_vals</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">props</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prop</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">props</span>
+
+    <span class="k">def</span> <span class="nf">_compute_geodesic_length</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lab_img</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">photo</span><span class="p">:</span> <span class="n">Photo</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">RegionProperty</span><span class="p">]:</span>
+        <span class="n">props</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">RegionProperty</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">:</span>
+            <span class="c1"># _, length = get_longest_geodesic(lab_img, label)</span>
+            <span class="n">length</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">compute_longest_geodesic</span><span class="p">(</span><span class="n">lab_img</span> <span class="o">==</span> <span class="n">label</span><span class="p">)</span>
+            <span class="c1"># compute_longest_geodesic(lab_img == label)</span>
+            <span class="k">if</span> <span class="n">length</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">prop</span> <span class="o">=</span> <span class="n">RegionProperty</span><span class="p">()</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_available_props</span><span class="p">[</span><span class="s1">&#39;geodesic_length&#39;</span><span class="p">])</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">Value</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">length</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_px_unit</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">photo</span><span class="o">.</span><span class="n">image_scale</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># prop.unit = &#39;mm&#39;</span>
+                <span class="n">prop</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span> <span class="o">/</span> <span class="n">photo</span><span class="o">.</span><span class="n">image_scale</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">prop</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">val_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Geodesic length&#39;</span><span class="p">]</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">num_vals</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">props</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prop</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">props</span>
+
+    <span class="k">def</span> <span class="nf">_compute_mean_width</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lab_img</span><span class="p">:</span> <span class="n">LabelImg</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">photo</span><span class="p">:</span> <span class="n">Photo</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">RegionProperty</span><span class="p">]:</span>
+        <span class="n">props</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">RegionProperty</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">:</span>
+            <span class="n">bin_img</span> <span class="o">=</span> <span class="n">lab_img</span><span class="o">.</span><span class="n">mask_for</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">bin_img</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="c1"># geodesic, length, bbox = get_longest_geodesic2(bin_img)</span>
+            <span class="c1"># bin_roi = bin_img[bbox[0]:bbox[1]+1, bbox[2]:bbox[3]+1]</span>
+            <span class="n">gdist</span><span class="p">,</span> <span class="n">px1</span><span class="p">,</span> <span class="n">px2</span> <span class="o">=</span> <span class="n">compute_longest_geodesic</span><span class="p">(</span><span class="n">bin_img</span><span class="p">)</span>
+            <span class="n">geodesic</span> <span class="o">=</span> <span class="n">find_shortest_path</span><span class="p">(</span><span class="n">bin_img</span><span class="p">,</span> <span class="n">px1</span><span class="p">,</span> <span class="n">px2</span><span class="p">)</span>
+            <span class="n">geodesic</span> <span class="o">=</span> <span class="p">([</span><span class="n">px</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">px</span> <span class="ow">in</span> <span class="n">geodesic</span><span class="p">],</span> <span class="p">[</span><span class="n">px</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">px</span> <span class="ow">in</span> <span class="n">geodesic</span><span class="p">])</span>
+            <span class="n">outline</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">bin_img</span><span class="p">,</span> <span class="n">binary_erosion</span><span class="p">(</span><span class="n">bin_img</span><span class="p">,</span> <span class="n">footprint</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)))</span>
+            <span class="n">dst</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">ndimage</span><span class="o">.</span><span class="n">distance_transform_edt</span><span class="p">(</span><span class="n">outline</span><span class="p">)</span>
+            <span class="n">mean_width</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">dst</span><span class="p">[</span><span class="n">geodesic</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">geodesic</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">mean_width</span><span class="p">):</span>
+                <span class="c1"># TODO inspect `get_longest_geodesic2` function</span>
+                <span class="n">mean_width</span> <span class="o">=</span> <span class="o">-</span><span class="mf">42.0</span>
+
+            <span class="c1"># io.imsave(f&#39;C:\\Users\\radoslav\\Desktop\\mean_width\\{label}_bin_roi.png&#39;, bin_roi, check_contrast=False)</span>
+            <span class="c1"># io.imsave(f&#39;C:\\Users\\radoslav\\Desktop\\mean_width\\{label}_outline.png&#39;, outline, check_contrast=False)</span>
+            <span class="c1"># io.imsave(f&#39;C:\\Users\\radoslav\\Desktop\\mean_width\\{label}_dst.png&#39;,</span>
+            <span class="c1">#           (255.0 * (dst / (np.max(dst) + 1e-6))).astype(np.uint8), check_contrast=False)</span>
+
+            <span class="n">prop</span> <span class="o">=</span> <span class="n">RegionProperty</span><span class="p">()</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_available_props</span><span class="p">[</span><span class="s1">&#39;mean_width&#39;</span><span class="p">])</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">prop_type</span> <span class="o">=</span> <span class="n">PropertyType</span><span class="o">.</span><span class="n">Scalar</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">label</span>
+            <span class="k">if</span> <span class="n">photo</span><span class="o">.</span><span class="n">image_scale</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">prop</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">Value</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">mean_width</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_px_unit</span><span class="p">)</span> <span class="o">/</span> <span class="n">photo</span><span class="o">.</span><span class="n">image_scale</span>
+                <span class="c1"># prop.unit = &#39;mm&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">prop</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">Value</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">mean_width</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_px_unit</span><span class="p">)</span>
+                <span class="c1"># prop.unit = &#39;px&#39;</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">num_vals</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">val_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Mean width&#39;</span><span class="p">]</span>
+            <span class="n">props</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prop</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">props</span>
+
+    <span class="k">def</span> <span class="nf">_compute_contour_feature_vector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lab_img</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">photo</span><span class="p">:</span> <span class="n">Photo</span><span class="p">,</span>
+                                        <span class="n">lab_hier</span><span class="p">:</span> <span class="n">LabelHierarchy</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">RegionProperty</span><span class="p">]:</span>
+        <span class="n">props</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">RegionProperty</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># folder = &#39;radoslav\\Desktop\\contours&#39;</span>
+        <span class="c1">#folder = &#39;Karel\\Desktop\\arthropods_debug&#39;</span>
+        <span class="c1"># path = Path(f&#39;C:\\Users\\{folder}\\{photo.image_name}&#39;)</span>
+        <span class="c1"># if not path.exists():</span>
+        <span class="c1">#    path.mkdir()</span>
+        <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">:</span>
+            <span class="c1"># lab_path = path / lab_hier.nodes[label].name</span>
+            <span class="c1"># if not lab_path.exists():</span>
+            <span class="c1">#    lab_path.mkdir()</span>
+            <span class="n">region</span> <span class="o">=</span> <span class="n">lab_img</span> <span class="o">==</span> <span class="n">label</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">region</span><span class="p">):</span>
+                <span class="k">continue</span>
+
+            <span class="n">pixels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">region</span><span class="p">)</span>  <span class="c1"># format (y, x)</span>
+
+            <span class="n">top</span><span class="p">,</span> <span class="n">left</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">pixels</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">pixels</span><span class="p">[:,</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">bottom</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">pixels</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">pixels</span><span class="p">[:,</span><span class="mi">1</span><span class="p">])</span>
+
+            <span class="n">roi</span> <span class="o">=</span> <span class="n">region</span><span class="p">[</span><span class="n">top</span><span class="p">:</span><span class="n">bottom</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">left</span><span class="p">:</span><span class="n">right</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="n">roi_rgb</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="mi">255</span> <span class="o">*</span> <span class="n">roi</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">),</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_GRAY2BGR</span><span class="p">)</span>
+
+            <span class="c1"># cv2.imwrite(str(lab_path / &#39;region.png&#39;), roi_rgb)</span>
+
+            <span class="c1"># pixels = pixels - np.array([top, left])  # make local to `roi`</span>
+            <span class="n">yy</span><span class="p">,</span> <span class="n">xx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">roi</span><span class="p">)</span>
+
+            <span class="n">x_c</span><span class="p">,</span> <span class="n">y_c</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">xx</span><span class="p">)),</span> <span class="nb">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">yy</span><span class="p">))</span>  <span class="c1"># centroid for nonzero pixels in `roi`</span>
+
+            <span class="c1"># roi_cent = cv2.circle(roi_rgb, (x_c, y_c), 3, [0, 255, 0])</span>
+
+            <span class="c1"># cv2.imwrite(str(lab_path / &#39;roi_centroid.png&#39;), roi_cent)</span>
+
+            <span class="n">reg_orient</span> <span class="o">=</span> <span class="n">skimage</span><span class="o">.</span><span class="n">measure</span><span class="o">.</span><span class="n">regionprops_table</span><span class="p">(</span><span class="mi">1</span> <span class="o">*</span> <span class="n">roi</span><span class="p">,</span> <span class="n">properties</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;orientation&#39;</span><span class="p">,))</span>
+
+            <span class="c1"># get the angle between y-axis and the major axis of the region in `roi`</span>
+            <span class="n">angle</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">reg_orient</span><span class="p">[</span><span class="s1">&#39;orientation&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+
+            <span class="c1"># pca = PCA(n_components=2)  # compute principal axes for `pixels[::-1]` format (x, y)</span>
+            <span class="c1"># pca.fit(pixels[::-1])</span>
+
+            <span class="c1"># angle = np.rad2deg(np.arccos(np.dot(np.array([0.0, -1.0]), pca.components_[-1])))</span>
+
+            <span class="c1"># axis = cv2.line(roi_rgb, (x_c, y_c), (round(x_c + 100 * pca.components_[-1][0]),</span>
+            <span class="c1">#                                       round(y_c + 100 * pca.components_[-1][1])),</span>
+            <span class="c1">#                                       [255, 0, 0], 2)</span>
+
+            <span class="c1"># cv2.imwrite(str(lab_path / &#39;axis.png&#39;), axis)</span>
+
+            <span class="c1"># rotate `roi` so that the major axis coincides with y-axis</span>
+            <span class="n">rotated</span> <span class="o">=</span> <span class="n">skimage</span><span class="o">.</span><span class="n">transform</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">roi</span><span class="p">,</span> <span class="n">angle</span><span class="o">=-</span><span class="n">angle</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="p">(</span><span class="n">x_c</span><span class="p">,</span> <span class="n">y_c</span><span class="p">),</span> <span class="n">resize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="c1"># io.imsave(str(lab_path / &#39;roi_rotated.png&#39;), rotated)</span>
+
+            <span class="c1"># outline = np.logical_xor(rotated, binary_erosion(rotated, footprint=np.ones((3, 3))))</span>
+            <span class="n">outline</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_xor</span><span class="p">(</span><span class="n">rotated</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">erode</span><span class="p">(</span><span class="mi">255</span> <span class="o">*</span> <span class="n">rotated</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)),</span>
+                                                        <span class="n">borderValue</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">borderType</span><span class="o">=</span><span class="n">cv2</span><span class="o">.</span><span class="n">BORDER_CONSTANT</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+
+            <span class="c1"># io.imsave(str(lab_path / &#39;outline.png&#39;), outline)</span>
+
+            <span class="n">outline_yy</span><span class="p">,</span> <span class="n">outline_xx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">outline</span><span class="p">)</span>
+
+            <span class="n">xs_by_y</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+
+            <span class="k">for</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">outline_yy</span><span class="p">,</span> <span class="n">outline_xx</span><span class="p">):</span>
+                <span class="n">xs_by_y</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+            <span class="n">outline_yy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">outline_yy</span><span class="p">)</span>
+
+            <span class="c1"># y_sort_inds = np.argsort(outline_yy)</span>
+
+            <span class="n">step</span> <span class="o">=</span> <span class="n">outline_yy</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mf">40.0</span>
+
+            <span class="n">feat_vector</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="c1"># indices_ = outline_yy.tolist() #list(outline_yy[y_sort_inds])</span>
+            <span class="c1"># indices = indices_[::step]</span>
+
+            <span class="c1"># print(f&#39;height is {outline_yy.shape} and step is {step}&#39;)</span>
+            <span class="c1"># print(f&#39;indices are {indices}&#39;)</span>
+
+            <span class="c1"># if (last_idx := max(y_sort_inds)) not in indices:</span>
+            <span class="c1">#     indices.append(last_idx)</span>
+
+            <span class="c1"># viz = cv2.cvtColor(255 * outline.copy().astype(np.uint8), cv2.COLOR_GRAY2BGR)</span>
+
+            <span class="n">y_start</span> <span class="o">=</span> <span class="n">outline_yy</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">y_curr</span> <span class="o">=</span> <span class="n">y_start</span>
+            <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">40</span><span class="p">):</span>
+                <span class="n">y_curr</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">y_start</span> <span class="o">+</span> <span class="n">offset</span><span class="p">)),</span> <span class="nb">max</span><span class="p">(</span><span class="n">outline_yy</span><span class="p">))</span>
+                <span class="n">offset</span> <span class="o">+=</span> <span class="n">step</span>
+                <span class="c1"># y = [idx]</span>
+                <span class="n">left</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">xs_by_y</span><span class="p">[</span><span class="n">y_curr</span><span class="p">])</span>
+                <span class="n">right</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">xs_by_y</span><span class="p">[</span><span class="n">y_curr</span><span class="p">])</span>
+
+                <span class="c1"># viz[y_curr, left] = [255, 0, 0]</span>
+                <span class="c1"># viz[y_curr, right] = [0, 255, 0]</span>
+
+                <span class="n">width</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">right</span> <span class="o">-</span> <span class="n">left</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">photo</span><span class="o">.</span><span class="n">image_scale</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">width</span> <span class="o">/=</span> <span class="n">photo</span><span class="o">.</span><span class="n">image_scale</span><span class="o">.</span><span class="n">value</span>
+                <span class="n">feat_vector</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">width</span><span class="p">)</span>
+            <span class="c1"># print(f&#39;computed contour vector for {photo.image_name}: {feat_vector}&#39;)</span>
+            <span class="c1"># cv2.imwrite(str(lab_path / &#39;viz.png&#39;), viz)</span>
+            <span class="n">prop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">example</span><span class="p">(</span><span class="s1">&#39;contour&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">photo</span><span class="o">.</span><span class="n">image_scale</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">prop</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="p">(</span><span class="n">feat_vector</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_px_unit</span> <span class="o">/</span> <span class="n">photo</span><span class="o">.</span><span class="n">image_scale</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">prop</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="p">(</span><span class="n">feat_vector</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_px_unit</span><span class="p">)</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">label</span>
+            <span class="n">props</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prop</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">props</span>
+
+    <span class="k">def</span> <span class="nf">_compute_mean_hsv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lab_img</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">photo</span><span class="p">:</span> <span class="n">Photo</span><span class="p">,</span>
+                                        <span class="n">lab_hier</span><span class="p">:</span> <span class="n">LabelHierarchy</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">RegionProperty</span><span class="p">]:</span>
+        <span class="n">props</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">RegionProperty</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">hsv_img</span> <span class="o">=</span> <span class="n">rgb2hsv</span><span class="p">(</span><span class="n">photo</span><span class="o">.</span><span class="n">image</span><span class="p">)</span>
+        <span class="n">hsv_img</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">360</span> <span class="o">*</span> <span class="n">hsv_img</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">reflection</span> <span class="o">=</span> <span class="n">photo</span><span class="p">[</span><span class="s1">&#39;Reflections&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">label_image</span>
+
+        <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">:</span>
+            <span class="n">region_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">lab_img</span> <span class="o">==</span> <span class="n">label</span><span class="p">,</span> <span class="n">reflection</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">ys</span><span class="p">,</span> <span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">region_mask</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ys</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">hues</span> <span class="o">=</span> <span class="n">hsv_img</span><span class="p">[</span><span class="n">ys</span><span class="p">,</span> <span class="n">xs</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+
+            <span class="n">hue_radians</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">hues</span> <span class="o">/</span> <span class="mf">180.0</span>
+
+            <span class="n">avg_sin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">hue_radians</span><span class="p">))</span>
+            <span class="n">avg_cos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">hue_radians</span><span class="p">))</span>
+
+            <span class="n">average_vector_angle</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">avg_sin</span><span class="p">,</span> <span class="n">avg_cos</span><span class="p">)</span>
+
+            <span class="n">average_vector_degrees</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mod</span><span class="p">((</span><span class="mf">180.0</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">*</span> <span class="n">average_vector_angle</span><span class="p">,</span> <span class="mi">360</span><span class="p">)</span>
+
+            <span class="n">average_vector_length</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">avg_sin</span> <span class="o">*</span> <span class="n">avg_sin</span> <span class="o">+</span> <span class="n">avg_cos</span> <span class="o">*</span> <span class="n">avg_cos</span><span class="p">)</span>
+
+            <span class="n">mean_sat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">hsv_img</span><span class="p">[</span><span class="n">ys</span><span class="p">,</span> <span class="n">xs</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+            <span class="n">mean_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">hsv_img</span><span class="p">[</span><span class="n">ys</span><span class="p">,</span> <span class="n">xs</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+
+            <span class="n">prop</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">example</span><span class="p">(</span><span class="s1">&#39;mean_hsv&#39;</span><span class="p">))</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="p">([</span><span class="nb">float</span><span class="p">(</span><span class="n">average_vector_degrees</span><span class="p">),</span>
+                           <span class="mi">100</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">mean_sat</span> <span class="o">*</span> <span class="n">average_vector_length</span><span class="p">),</span>
+                           <span class="mi">100</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">mean_val</span><span class="p">)],</span>
+                          <span class="bp">self</span><span class="o">.</span><span class="n">_no_unit</span><span class="p">)</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">label</span>
+            <span class="n">props</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prop</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">props</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">photo</span><span class="p">:</span> <span class="n">Photo</span><span class="p">,</span> <span class="n">prop_labels</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span> <span class="n">regions_cache</span><span class="p">:</span> <span class="n">RegionsCache</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">RegionProperty</span><span class="p">]:</span>
+        <span class="n">reg_img</span> <span class="o">=</span> <span class="n">photo</span><span class="p">[</span><span class="s1">&#39;Labels&#39;</span><span class="p">]</span>
+
+        <span class="n">props</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># all_labels: typing.Set[int] = set(functools.reduce(set.union, prop_labels.keys())) # all_labels -- All labels for which the user requested any property to be computed.</span>
+
+        <span class="n">level_groups</span> <span class="o">=</span> <span class="n">reg_img</span><span class="o">.</span><span class="n">label_hierarchy</span><span class="o">.</span><span class="n">group_by_level</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">prop_labels</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+        <span class="n">now</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">region_label</span><span class="p">,</span> <span class="n">prop_strs</span> <span class="ow">in</span> <span class="n">prop_labels</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">region_label</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">regions_cache</span><span class="o">.</span><span class="n">regions</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">region</span><span class="p">:</span> <span class="n">Region</span> <span class="o">=</span> <span class="n">regions_cache</span><span class="o">.</span><span class="n">regions</span><span class="p">[</span><span class="n">region_label</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">prop_str</span> <span class="ow">in</span> <span class="n">prop_strs</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">prop_str</span> <span class="o">==</span> <span class="s1">&#39;mean_intensity&#39;</span><span class="p">:</span>
+                    <span class="n">_props</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_mean_intensity</span><span class="p">(</span><span class="n">region</span><span class="p">,</span> <span class="n">photo</span><span class="p">[</span><span class="s1">&#39;Reflections&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">label_image</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">prop_str</span> <span class="o">==</span> <span class="s1">&#39;area&#39;</span><span class="p">:</span>
+                    <span class="n">_props</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_area</span><span class="p">(</span><span class="n">region</span><span class="p">,</span> <span class="n">photo</span><span class="p">)</span>
+                <span class="c1"># elif prop_str == &#39;circularity&#39;:</span>
+                <span class="c1">#     _props = self._compute_circularity(level_img, level_labels_for_prop, photo, &#39;perimeter&#39;)</span>
+                <span class="c1"># elif prop_str == &#39;max_feret&#39;:</span>
+                <span class="c1">#     _props = self._compute_max_feret(level_img, level_labels_for_prop, photo)</span>
+                <span class="c1"># elif prop_str == &#39;geodesic_length&#39;:</span>
+                <span class="c1">#     _props = self._compute_geodesic_length(level_img, level_labels_for_prop, photo)</span>
+                <span class="c1"># elif prop_str == &#39;mean_width&#39;:</span>
+                <span class="c1">#     _props = self._compute_mean_width(reg_img, labels, photo)</span>
+                <span class="c1"># elif prop_str == &#39;contour&#39;:</span>
+                <span class="c1">#     _props = self._compute_contour_feature_vector(level_img, level_labels_for_prop, photo,</span>
+                <span class="c1">#                                                   reg_img.label_hierarchy)</span>
+                <span class="c1"># elif prop_str == &#39;mean_hsv&#39;:</span>
+                <span class="c1">#     _props = self._compute_mean_hsv(level_img, level_labels_for_prop, photo, reg_img.label_hierarchy)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;property </span><span class="si">{</span><span class="n">prop_str</span><span class="si">}</span><span class="s1"> not fully implemented&#39;</span><span class="p">)</span>
+                    <span class="n">_props</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">props</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">_props</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;took </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">now</span><span class="si">}</span><span class="s1"> secs&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">props</span>
+
+
+        <span class="k">for</span> <span class="n">level</span><span class="p">,</span> <span class="n">level_labels</span> <span class="ow">in</span> <span class="n">level_groups</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">level_img</span> <span class="o">=</span> <span class="n">reg_img</span><span class="p">[</span><span class="n">level</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">prop_str</span><span class="p">,</span> <span class="n">labels</span> <span class="ow">in</span> <span class="n">prop_labels</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">level_labels_for_prop</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">level_labels</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">prop_str</span> <span class="o">==</span> <span class="s1">&#39;mean_intensity&#39;</span><span class="p">:</span>
+                    <span class="n">_props</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_mean_intensity</span><span class="p">(</span><span class="n">level_img</span><span class="p">,</span> <span class="n">photo</span><span class="p">[</span><span class="s1">&#39;Reflections&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">label_image</span><span class="p">,</span> <span class="n">photo</span><span class="o">.</span><span class="n">image</span><span class="p">,</span>
+                                                          <span class="n">level_labels_for_prop</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">prop_str</span> <span class="o">==</span> <span class="s1">&#39;area&#39;</span><span class="p">:</span>
+                    <span class="n">_props</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_area</span><span class="p">(</span><span class="n">level_img</span><span class="p">,</span> <span class="n">level_labels_for_prop</span><span class="p">,</span> <span class="n">photo</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">prop_str</span> <span class="o">==</span> <span class="s1">&#39;circularity&#39;</span><span class="p">:</span>
+                    <span class="n">_props</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_circularity</span><span class="p">(</span><span class="n">level_img</span><span class="p">,</span> <span class="n">level_labels_for_prop</span><span class="p">,</span> <span class="n">photo</span><span class="p">,</span> <span class="s1">&#39;perimeter&#39;</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">prop_str</span> <span class="o">==</span> <span class="s1">&#39;max_feret&#39;</span><span class="p">:</span>
+                    <span class="n">_props</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_max_feret</span><span class="p">(</span><span class="n">level_img</span><span class="p">,</span> <span class="n">level_labels_for_prop</span><span class="p">,</span> <span class="n">photo</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">prop_str</span> <span class="o">==</span> <span class="s1">&#39;geodesic_length&#39;</span><span class="p">:</span>
+                    <span class="n">_props</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_geodesic_length</span><span class="p">(</span><span class="n">level_img</span><span class="p">,</span> <span class="n">level_labels_for_prop</span><span class="p">,</span> <span class="n">photo</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">prop_str</span> <span class="o">==</span> <span class="s1">&#39;mean_width&#39;</span><span class="p">:</span>
+                    <span class="n">_props</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_mean_width</span><span class="p">(</span><span class="n">reg_img</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">photo</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">prop_str</span> <span class="o">==</span> <span class="s1">&#39;contour&#39;</span><span class="p">:</span>
+                    <span class="n">_props</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_contour_feature_vector</span><span class="p">(</span><span class="n">level_img</span><span class="p">,</span> <span class="n">level_labels_for_prop</span><span class="p">,</span> <span class="n">photo</span><span class="p">,</span>
+                                                                  <span class="n">reg_img</span><span class="o">.</span><span class="n">label_hierarchy</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">prop_str</span> <span class="o">==</span> <span class="s1">&#39;mean_hsv&#39;</span><span class="p">:</span>
+                    <span class="n">_props</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_mean_hsv</span><span class="p">(</span><span class="n">level_img</span><span class="p">,</span> <span class="n">level_labels_for_prop</span><span class="p">,</span> <span class="n">photo</span><span class="p">,</span> <span class="n">reg_img</span><span class="o">.</span><span class="n">label_hierarchy</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;property </span><span class="si">{</span><span class="n">prop_str</span><span class="si">}</span><span class="s1"> not fully implemented&#39;</span><span class="p">)</span>
+                    <span class="n">_props</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">props</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">_props</span><span class="p">)</span>
+            <span class="c1">#reg_props = skimage.measure.regionprops(level_img, intensity_image=photo.image)</span>
+            <span class="c1">#for prop_str, labels in prop_labels.items():</span>
+            <span class="c1">#    example_prop = self.example(prop_str)</span>
+            <span class="c1">#    for _prop in reg_props:</span>
+            <span class="c1">#        if _prop.label not in labels:</span>
+            <span class="c1">#            continue</span>
+            <span class="c1">#        reg_prop = RegionProperty()</span>
+            <span class="c1">#        reg_prop.info = copy.deepcopy(prop_info_dict[prop_str])</span>
+            <span class="c1">#        reg_prop.label = _prop.label</span>
+            <span class="c1">#        reg_prop.value = operator.attrgetter(prop_str)(_prop)</span>
+            <span class="c1">#        reg_prop.prop_type = example_prop.prop_type</span>
+            <span class="c1">#        reg_prop.num_vals = example_prop.num_vals</span>
+            <span class="c1">#        reg_prop.val_names = example_prop.val_names</span>
+            <span class="c1">#        if isinstance(reg_prop.value, np.integer):</span>
+            <span class="c1">#            reg_prop.value = int(reg_prop.value)</span>
+            <span class="c1">#        elif isinstance(reg_prop.value, np.float):</span>
+            <span class="c1">#            reg_prop.value = float(reg_prop.value)</span>
+            <span class="c1">#        elif isinstance(reg_prop.value, np.ndarray):</span>
+            <span class="c1">#            reg_prop.value = reg_prop.value.tolist()</span>
+            <span class="c1">#        props.append(reg_prop)</span>
+        <span class="k">return</span> <span class="n">props</span>
+
+
+    <span class="c1">#def __call__(self, photo: Photo, prop_labels: typing.Dict[str, typing.Set[int]]):</span>
+    <span class="c1">#    reg_img = photo[&#39;Labels&#39;]</span>
+
+    <span class="c1">#    region_props = skimage.measure.regionprops(reg_img.label_image, photo.image)</span>
+
+    <span class="c1">#    props = []</span>
+    <span class="c1">#    prop_info_dict = {info.key: info for info in self._available_props}</span>
+    <span class="c1">#    for reg_prop in region_props:</span>
+    <span class="c1">#        for prop_name, labels in prop_labels.items():</span>
+    <span class="c1">#            if reg_prop.label not in labels:</span>
+    <span class="c1">#                continue</span>
+    <span class="c1">#            reg_property = RegionProperty()</span>
+    <span class="c1">#            reg_property.info = copy.deepcopy(prop_info_dict[prop_name])</span>
+    <span class="c1">#            reg_property.label = reg_prop.label</span>
+    <span class="c1">#            reg_property.value = operator.attrgetter(prop_name)(reg_prop)</span>
+    <span class="c1">#            if reg_property.info.name == &#39;Area&#39;:</span>
+    <span class="c1">#                reg_property.prop_type = PropertyType.Scalar</span>
+    <span class="c1">#            else:</span>
+    <span class="c1">#                reg_property.prop_type = PropertyType.Intensity</span>
+    <span class="c1">#                reg_property.num_vals = len(reg_property.value)</span>
+    <span class="c1">#                reg_property.val_names = [&#39;R&#39;, &#39;G&#39;, &#39;B&#39;] if reg_property.num_vals == 3 else [&#39;&#39;]</span>
+    <span class="c1">#            if isinstance(reg_property.value, np.integer):</span>
+    <span class="c1">#                reg_property.value = int(reg_property.value)</span>
+    <span class="c1">#            elif isinstance(reg_property.value, np.float):</span>
+    <span class="c1">#                reg_property.value = float(reg_property.value)</span>
+    <span class="c1">#            elif isinstance(reg_property.value, np.ndarray):</span>
+    <span class="c1">#                reg_property.value = reg_property.value.tolist()</span>
+    <span class="c1">#            props.append(reg_property)</span>
+    <span class="c1">#    return props</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">computes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Info</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_available_props</span>
+
+<div class="viewcode-block" id="BasicProperties.example"><a class="viewcode-back" href="../../../../../arthropod_describer.plugins.test_plugin.properties.html#arthropod_describer.plugins.test_plugin.properties.basic_props.BasicProperties.example">[docs]</a>    <span class="k">def</span> <span class="nf">example</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prop_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RegionProperty</span><span class="p">:</span>
+        <span class="n">prop</span> <span class="o">=</span> <span class="n">RegionProperty</span><span class="p">()</span>
+        <span class="n">prop</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">prop</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">prop_key</span> <span class="o">==</span> <span class="s1">&#39;area&#39;</span><span class="p">:</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_available_props</span><span class="p">[</span><span class="s1">&#39;area&#39;</span><span class="p">])</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">num_vals</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">prop_type</span> <span class="o">=</span> <span class="n">PropertyType</span><span class="o">.</span><span class="n">Scalar</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">val_names</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">elif</span> <span class="n">prop_key</span> <span class="o">==</span> <span class="s1">&#39;mean_intensity&#39;</span><span class="p">:</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_available_props</span><span class="p">[</span><span class="s1">&#39;mean_intensity&#39;</span><span class="p">])</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">num_vals</span> <span class="o">=</span> <span class="mi">3</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">prop_type</span> <span class="o">=</span> <span class="n">PropertyType</span><span class="o">.</span><span class="n">Intensity</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">val_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;R&#39;</span><span class="p">,</span> <span class="s1">&#39;G&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">prop_key</span> <span class="o">==</span> <span class="s1">&#39;circularity&#39;</span><span class="p">:</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_available_props</span><span class="p">[</span><span class="s1">&#39;circularity&#39;</span><span class="p">])</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">num_vals</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">prop_type</span> <span class="o">=</span> <span class="n">PropertyType</span><span class="o">.</span><span class="n">Scalar</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">val_names</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">elif</span> <span class="n">prop_key</span> <span class="o">==</span> <span class="s1">&#39;max_feret&#39;</span><span class="p">:</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_available_props</span><span class="p">[</span><span class="s1">&#39;max_feret&#39;</span><span class="p">])</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">num_vals</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">prop_type</span> <span class="o">=</span> <span class="n">PropertyType</span><span class="o">.</span><span class="n">Scalar</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">val_names</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">elif</span> <span class="n">prop_key</span> <span class="o">==</span> <span class="s1">&#39;geodesic_length&#39;</span><span class="p">:</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_available_props</span><span class="p">[</span><span class="s1">&#39;geodesic_length&#39;</span><span class="p">])</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">num_vals</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">prop_type</span> <span class="o">=</span> <span class="n">PropertyType</span><span class="o">.</span><span class="n">Scalar</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">val_names</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">elif</span> <span class="n">prop_key</span> <span class="o">==</span> <span class="s1">&#39;mean_width&#39;</span><span class="p">:</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_available_props</span><span class="p">[</span><span class="s1">&#39;mean_width&#39;</span><span class="p">])</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">num_vals</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">prop_type</span> <span class="o">=</span> <span class="n">PropertyType</span><span class="o">.</span><span class="n">Scalar</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">val_names</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">elif</span> <span class="n">prop_key</span> <span class="o">==</span> <span class="s1">&#39;contour&#39;</span><span class="p">:</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_available_props</span><span class="p">[</span><span class="s1">&#39;contour&#39;</span><span class="p">])</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">num_vals</span> <span class="o">=</span> <span class="mi">40</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">prop_type</span> <span class="o">=</span> <span class="n">PropertyType</span><span class="o">.</span><span class="n">Vector</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">val_names</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">elif</span> <span class="n">prop_key</span> <span class="o">==</span> <span class="s1">&#39;mean_hsv&#39;</span><span class="p">:</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_available_props</span><span class="p">[</span><span class="s1">&#39;mean_hsv&#39;</span><span class="p">])</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">num_vals</span> <span class="o">=</span> <span class="mi">3</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">prop_type</span> <span class="o">=</span> <span class="n">PropertyType</span><span class="o">.</span><span class="n">IntensityHSV</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">val_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;H&#39;</span><span class="p">,</span> <span class="s1">&#39;S&#39;</span><span class="p">,</span> <span class="s1">&#39;V&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Log an error when encountering unknown property key</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;property </span><span class="si">{</span><span class="n">prop_key</span><span class="si">}</span><span class="s1"> not fully implemented&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">prop</span></div>
+
+<div class="viewcode-block" id="BasicProperties.target_worksheet"><a class="viewcode-back" href="../../../../../arthropod_describer.plugins.test_plugin.properties.html#arthropod_describer.plugins.test_plugin.properties.basic_props.BasicProperties.target_worksheet">[docs]</a>    <span class="k">def</span> <span class="nf">target_worksheet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prop_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">prop_key</span> <span class="o">==</span> <span class="s1">&#39;contour&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;Contour&#39;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">target_worksheet</span><span class="p">(</span><span class="n">prop_key</span><span class="p">)</span></div></div>
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, CBIA @ FI MUNI.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

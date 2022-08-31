@@ -6,7 +6,7 @@ from pathlib import Path
 
 from PySide2.QtGui import QImage
 
-import arthropod_describer.common.photo_loader as ploader
+import arthropod_describer.common.local_storage as ploader
 
 
 class MockStorage(ploader.LocalStorage):

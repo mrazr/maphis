@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arthropod_describer.tools.brush &mdash; MAPHIS 0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> MAPHIS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">arthropod_describer</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">MAPHIS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>arthropod_describer.tools.brush</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for arthropod_describer.tools.brush</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">importlib.resources</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtCore</span> <span class="kn">import</span> <span class="n">QPoint</span><span class="p">,</span> <span class="n">Slot</span><span class="p">,</span> <span class="n">QRect</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtGui</span> <span class="kn">import</span> <span class="n">QImage</span><span class="p">,</span> <span class="n">QPainter</span><span class="p">,</span> <span class="n">QColor</span><span class="p">,</span> <span class="n">QBrush</span><span class="p">,</span> <span class="n">QPen</span><span class="p">,</span> <span class="n">QBitmap</span><span class="p">,</span> <span class="n">QRegion</span><span class="p">,</span> <span class="n">QPaintDevice</span><span class="p">,</span> <span class="n">Qt</span><span class="p">,</span> <span class="n">QPixmap</span><span class="p">,</span> <span class="n">QIcon</span>
+<span class="kn">from</span> <span class="nn">skimage</span> <span class="kn">import</span> <span class="n">draw</span>
+<span class="kn">import</span> <span class="nn">skimage.morphology</span> <span class="k">as</span> <span class="nn">M</span>
+<span class="kn">import</span> <span class="nn">qimage2ndarray</span>
+
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.photo</span> <span class="kn">import</span> <span class="n">LabelImg</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.state</span> <span class="kn">import</span> <span class="n">State</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.tool</span> <span class="kn">import</span> <span class="n">Tool</span><span class="p">,</span> <span class="n">EditContext</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.user_params</span> <span class="kn">import</span> <span class="n">UserParam</span><span class="p">,</span> <span class="n">ParamType</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.label_change</span> <span class="kn">import</span> <span class="n">LabelChange</span><span class="p">,</span> <span class="n">label_difference_to_label_changes</span><span class="p">,</span> <span class="n">CommandEntry</span>
+
+<span class="n">TOOL_CLASS_NAME</span> <span class="o">=</span> <span class="s1">&#39;Brush&#39;</span>
+
+
+<div class="viewcode-block" id="Tool_Brush"><a class="viewcode-back" href="../../../arthropod_describer.tools.html#arthropod_describer.tools.brush.Tool_Brush">[docs]</a><span class="k">class</span> <span class="nc">Tool_Brush</span><span class="p">(</span><span class="n">Tool</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">State</span><span class="p">):</span>
+        <span class="n">Tool</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tool_name</span> <span class="o">=</span> <span class="s2">&quot;Brush&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_user_params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Radius&#39;</span><span class="p">:</span> <span class="n">UserParam</span><span class="p">(</span><span class="s1">&#39;Radius&#39;</span><span class="p">,</span> <span class="n">ParamType</span><span class="o">.</span><span class="n">INT</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="n">min_val</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_val</span><span class="o">=</span><span class="mi">75</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">2</span><span class="p">)}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_user_params</span><span class="p">[</span><span class="s1">&#39;Radius&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">default_instance</span><span class="o">.</span><span class="n">value_changed</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">cursor_changed</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tool_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cursor_image</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_img</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edit_mask</span> <span class="o">=</span> <span class="n">QImage</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edit_painter</span> <span class="o">=</span> <span class="n">QPainter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">edit_mask</span><span class="p">)</span>
+        <span class="n">radius</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_params</span><span class="p">[</span><span class="s1">&#39;Radius&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">state</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_primary_label</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_secondary_label</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">commands</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">CommandEntry</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_changes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">LabelChange</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_brush_mask</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">M</span><span class="o">.</span><span class="n">disk</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">uint16</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_brush_icon</span> <span class="o">=</span> <span class="n">QImage</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_brush_center</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">radius</span><span class="p">,</span> <span class="n">radius</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_brush_coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_brush_mask</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_brush_center</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modified_coords</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_active</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">with</span> <span class="n">importlib</span><span class="o">.</span><span class="n">resources</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="s2">&quot;tools.icons&quot;</span><span class="p">,</span> <span class="s2">&quot;brush.png&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">path</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_tool_icon</span> <span class="o">=</span> <span class="n">QIcon</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_icon</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">tool_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tool_name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">cursor_image</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QImage</span><span class="p">:</span>
+        <span class="n">radius</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_params</span><span class="p">[</span><span class="s1">&#39;Radius&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_brush_mask</span> <span class="o">=</span> <span class="n">M</span><span class="o">.</span><span class="n">disk</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">uint16</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_brush_center</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">radius</span><span class="p">,</span> <span class="n">radius</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_brush_coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_brush_mask</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_brush_center</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_icon</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_brush_icon</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">user_params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">UserParam</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_params</span>
+
+<div class="viewcode-block" id="Tool_Brush.set_user_param"><a class="viewcode-back" href="../../../arthropod_describer.tools.html#arthropod_describer.tools.brush.Tool_Brush.set_user_param">[docs]</a>    <span class="k">def</span> <span class="nf">set_user_param</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">param_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_params</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">param</span><span class="p">:</span> <span class="n">UserParam</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_params</span><span class="p">[</span><span class="n">param_name</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">param_type</span> <span class="o">==</span> <span class="n">ParamType</span><span class="o">.</span><span class="n">INT</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">value</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_user_params</span><span class="p">[</span><span class="n">param_name</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">elif</span> <span class="n">param</span><span class="o">.</span><span class="n">param_type</span> <span class="o">==</span> <span class="n">ParamType</span><span class="o">.</span><span class="n">BOOL</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_user_params</span><span class="p">[</span><span class="n">param_name</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">if</span> <span class="n">param_name</span> <span class="o">==</span> <span class="s1">&#39;Radius&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cursor_changed</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tool_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cursor_image</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">value</span></div>
+
+<div class="viewcode-block" id="Tool_Brush.get_auto_scroll_distance"><a class="viewcode-back" href="../../../arthropod_describer.tools.html#arthropod_describer.tools.brush.Tool_Brush.get_auto_scroll_distance">[docs]</a>    <span class="k">def</span> <span class="nf">get_auto_scroll_distance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Tool</span><span class="o">.</span><span class="n">get_auto_scroll_distance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_params</span><span class="p">[</span><span class="s1">&#39;Radius&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">current_view_transform</span><span class="o">.</span><span class="n">m11</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Tool_Brush.left_press"><a class="viewcode-back" href="../../../arthropod_describer.tools.html#arthropod_describer.tools.brush.Tool_Brush.left_press">[docs]</a>    <span class="k">def</span> <span class="nf">left_press</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">painter</span><span class="p">:</span> <span class="n">QPainter</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="n">QPoint</span><span class="p">,</span> <span class="n">ctx</span><span class="p">:</span> <span class="n">EditContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">CommandEntry</span><span class="p">],</span> <span class="n">QRect</span><span class="p">]:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_active</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_img</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">image</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_primary_label</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">label</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_changes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">edit_mask</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">.</span><span class="n">toTuple</span><span class="p">()</span> <span class="o">==</span> <span class="n">ctx</span><span class="o">.</span><span class="n">label_img</span><span class="o">.</span><span class="n">label_image</span><span class="o">.</span><span class="n">shape</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">edit_mask</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">QColor</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">edit_mask</span> <span class="o">=</span> <span class="n">QImage</span><span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">label_img</span><span class="o">.</span><span class="n">label_image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                                    <span class="n">ctx</span><span class="o">.</span><span class="n">label_img</span><span class="o">.</span><span class="n">label_image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">QImage</span><span class="o">.</span><span class="n">Format_Grayscale8</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">edit_mask</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">QColor</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mouse_move</span><span class="p">(</span><span class="n">painter</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">ctx</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Tool_Brush.mouse_move"><a class="viewcode-back" href="../../../arthropod_describer.tools.html#arthropod_describer.tools.brush.Tool_Brush.mouse_move">[docs]</a>    <span class="k">def</span> <span class="nf">mouse_move</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">painter</span><span class="p">:</span> <span class="n">QPainter</span><span class="p">,</span> <span class="n">new_pos</span><span class="p">:</span> <span class="n">QPoint</span><span class="p">,</span> <span class="n">old_pos</span><span class="p">:</span> <span class="n">QPoint</span><span class="p">,</span> <span class="n">ctx</span><span class="p">:</span> <span class="n">EditContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">CommandEntry</span><span class="p">],</span> <span class="n">QRect</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">active</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">QRect</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">ctx</span><span class="o">.</span><span class="n">label</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_primary_label</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">label_changes</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_label_changes</span><span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">label_img</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">edit_mask</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">QColor</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_primary_label</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">label</span>
+        <span class="c1">#brush_color = QColor.fromRgb(*self.cmap[ctx.label])</span>
+        <span class="n">brush_color</span> <span class="o">=</span> <span class="n">QColor</span><span class="o">.</span><span class="n">fromRgb</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">colormap</span><span class="p">[</span><span class="n">ctx</span><span class="o">.</span><span class="n">label</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">ctx</span><span class="o">.</span><span class="n">label</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1">#brush_color = QColor.fromRgb(20, 20, 200, 255)</span>
+            <span class="n">brush_color</span> <span class="o">=</span> <span class="n">QColor</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">transparent</span><span class="p">)</span>
+
+        <span class="n">rr</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="n">draw</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">old_pos</span><span class="o">.</span><span class="n">y</span><span class="p">(),</span> <span class="n">old_pos</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span>
+                           <span class="n">new_pos</span><span class="o">.</span><span class="n">y</span><span class="p">(),</span> <span class="n">new_pos</span><span class="o">.</span><span class="n">x</span><span class="p">())</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">paint_on</span><span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">label_viz</span><span class="p">,</span> <span class="n">rr</span><span class="p">,</span> <span class="n">cc</span><span class="p">,</span> <span class="n">QPen</span><span class="p">(</span><span class="n">brush_color</span><span class="p">),</span> <span class="n">QBrush</span><span class="p">(</span><span class="n">brush_color</span><span class="p">),</span> <span class="n">ctx</span><span class="o">.</span><span class="n">clip_region</span><span class="p">)</span>
+        <span class="n">brush_color</span> <span class="o">=</span> <span class="n">QColor</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">paint_on</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">edit_mask</span><span class="p">,</span> <span class="n">rr</span><span class="p">,</span> <span class="n">cc</span><span class="p">,</span> <span class="n">QPen</span><span class="p">(</span><span class="n">brush_color</span><span class="p">),</span> <span class="n">QBrush</span><span class="p">(</span><span class="n">brush_color</span><span class="p">),</span> <span class="n">ctx</span><span class="o">.</span><span class="n">clip_region</span><span class="p">)</span>
+
+        <span class="n">rad</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_params</span><span class="p">[</span><span class="s1">&#39;Radius&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">rr</span><span class="p">)</span> <span class="o">-</span> <span class="n">rad</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">rr</span><span class="p">)</span> <span class="o">+</span> <span class="n">rad</span>
+        <span class="n">left</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">cc</span><span class="p">)</span> <span class="o">-</span> <span class="n">rad</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">cc</span><span class="p">)</span> <span class="o">+</span> <span class="n">rad</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">QRect</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">right</span> <span class="o">-</span> <span class="n">left</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">bottom</span> <span class="o">-</span> <span class="n">top</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Tool_Brush.left_release"><a class="viewcode-back" href="../../../arthropod_describer.tools.html#arthropod_describer.tools.brush.Tool_Brush.left_release">[docs]</a>    <span class="k">def</span> <span class="nf">left_release</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">painter</span><span class="p">:</span> <span class="n">QPainter</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="n">QPoint</span><span class="p">,</span> <span class="n">ctx</span><span class="p">:</span> <span class="n">EditContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">CommandEntry</span><span class="p">],</span> <span class="n">QRect</span><span class="p">]:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_active</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="c1">#edit_nd = np.squeeze(qimage2ndarray.byte_view(self.edit_mask))</span>
+        <span class="c1">#lab_diff = np.where(edit_nd &gt; 0, ctx.label, -1) #np.where(qimage2ndarray(self.edit_mask) &gt; 0, ctx.label, -1)</span>
+        <span class="c1">#lab_changes = label_difference_to_label_changes(lab_diff, ctx.label_img)</span>
+        <span class="c1">#if len(lab_changes) == 0:</span>
+        <span class="c1">#    return None, QRect()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_command</span><span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">label_img</span><span class="p">),</span> <span class="n">QRect</span><span class="p">()</span> <span class="c1">#CommandEntry(lab_changes, update_canvas=False), QRect()</span></div>
+
+<div class="viewcode-block" id="Tool_Brush.mouse_wheel"><a class="viewcode-back" href="../../../arthropod_describer.tools.html#arthropod_describer.tools.brush.Tool_Brush.mouse_wheel">[docs]</a>    <span class="k">def</span> <span class="nf">mouse_wheel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delta</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">painter</span><span class="p">:</span> <span class="n">QPainter</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="n">QPoint</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">EditContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">CommandEntry</span><span class="p">],</span> <span class="n">QRect</span><span class="p">]:</span>
+        <span class="n">my_delta</span> <span class="o">=</span> <span class="mi">2</span> <span class="k">if</span> <span class="n">delta</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="o">-</span><span class="mi">2</span>
+        <span class="n">curr_rad</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_params</span><span class="p">[</span><span class="s1">&#39;Radius&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">new_rad</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">curr_rad</span> <span class="o">+</span> <span class="n">my_delta</span><span class="p">)</span>
+        <span class="c1"># print(f&#39;delta is {delta}&#39;)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_params</span><span class="p">[</span><span class="s1">&#39;Radius&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">new_rad</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cursor_changed</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tool_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cursor_image</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">QRect</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Tool_Brush.get_command"><a class="viewcode-back" href="../../../arthropod_describer.tools.html#arthropod_describer.tools.brush.Tool_Brush.get_command">[docs]</a>    <span class="k">def</span> <span class="nf">get_command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lab_img</span><span class="p">:</span> <span class="n">LabelImg</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">CommandEntry</span><span class="p">]:</span>
+        <span class="n">edit_nd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">qimage2ndarray</span><span class="o">.</span><span class="n">byte_view</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">edit_mask</span><span class="p">))</span>
+        <span class="n">lab_diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">edit_nd</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_primary_label</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="c1">#np.where(qimage2ndarray(self.edit_mask) &gt; 0, ctx.label, -1)</span>
+        <span class="n">yy</span><span class="p">,</span> <span class="n">xx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">lab_diff</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">top</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">yy</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">xx</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">yy</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">xx</span><span class="p">)</span>
+        <span class="c1"># lab_diff_ = lab_diff[top:bottom+1, left:right+1]</span>
+        <span class="n">lab_changes</span> <span class="o">=</span> <span class="n">label_difference_to_label_changes</span><span class="p">(</span><span class="n">lab_diff</span><span class="p">,</span> <span class="n">lab_img</span><span class="p">,</span> <span class="p">(</span><span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">all_label_changes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_changes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_changes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">all_label_changes</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">lab_changes</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_label_changes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">CommandEntry</span><span class="p">(</span><span class="n">all_label_changes</span><span class="p">,</span> <span class="n">update_canvas</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tool_name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Tool_Brush.get_label_changes"><a class="viewcode-back" href="../../../arthropod_describer.tools.html#arthropod_describer.tools.brush.Tool_Brush.get_label_changes">[docs]</a>    <span class="k">def</span> <span class="nf">get_label_changes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lab_img</span><span class="p">:</span> <span class="n">LabelImg</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">LabelChange</span><span class="p">]:</span>
+        <span class="n">edit_nd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">qimage2ndarray</span><span class="o">.</span><span class="n">byte_view</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">edit_mask</span><span class="p">))</span>
+        <span class="n">lab_diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">edit_nd</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_primary_label</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="c1">#np.where(qimage2ndarray(self.edit_mask) &gt; 0, ctx.label, -1)</span>
+        <span class="k">return</span> <span class="n">label_difference_to_label_changes</span><span class="p">(</span><span class="n">lab_diff</span><span class="p">,</span> <span class="n">lab_img</span><span class="p">)</span></div>
+
+    <span class="c1">#def right_press(self, painter: QPainter, pos: QPoint, ctx: EditContext) -&gt; List[LabelChange]:</span>
+    <span class="c1">#    return np.array([]), -1</span>
+
+    <span class="c1">#def right_release(self, painter: QPainter, pos: QPoint, ctx: EditContext) -&gt; List[LabelChange]:</span>
+    <span class="c1">#    return np.array([]), -1</span>
+
+    <span class="c1">#def middle_click(self, painter: QPainter, pos: QPoint, ctx: EditContext) -&gt; List[LabelChange]:</span>
+    <span class="c1">#    pass</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">active</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_active</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">viz_active</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_active</span>
+
+<div class="viewcode-block" id="Tool_Brush.update_primary_label"><a class="viewcode-back" href="../../../arthropod_describer.tools.html#arthropod_describer.tools.brush.Tool_Brush.update_primary_label">[docs]</a>    <span class="nd">@Slot</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">update_primary_label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">active</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_primary_label</span> <span class="o">=</span> <span class="n">label</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_icon</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Tool_Brush.update_secondary_label"><a class="viewcode-back" href="../../../arthropod_describer.tools.html#arthropod_describer.tools.brush.Tool_Brush.update_secondary_label">[docs]</a>    <span class="nd">@Slot</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">update_secondary_label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_secondary_label</span> <span class="o">=</span> <span class="n">label</span></div>
+
+    <span class="k">def</span> <span class="nf">_update_icon</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">colormap</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">colormap</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">sz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_brush_mask</span><span class="o">.</span><span class="n">shape</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_brush_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">primary_label</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_brush_mask</span> <span class="c1">#self._primary_label * self._brush_mask</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_brush_icon</span> <span class="o">=</span> <span class="n">QImage</span><span class="p">(</span><span class="n">sz</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">sz</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">QImage</span><span class="o">.</span><span class="n">Format_ARGB32</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_brush_icon</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">QColor</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+            <span class="c1">#brush_color = QColor.fromRgb(*self.cmap[self.state.primary_label])</span>
+            <span class="n">brush_color</span> <span class="o">=</span> <span class="n">QColor</span><span class="o">.</span><span class="n">fromRgb</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">colormap</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">primary_label</span><span class="p">])</span>
+            <span class="n">painter</span> <span class="o">=</span> <span class="n">QPainter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_brush_icon</span><span class="p">)</span>
+            <span class="n">painter</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">brush_color</span><span class="p">)</span>
+            <span class="n">radius</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_params</span><span class="p">[</span><span class="s1">&#39;Radius&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">painter</span><span class="o">.</span><span class="n">setBrush</span><span class="p">(</span><span class="n">QBrush</span><span class="p">(</span><span class="n">brush_color</span><span class="p">))</span>
+            <span class="n">painter</span><span class="o">.</span><span class="n">drawEllipse</span><span class="p">(</span><span class="n">QPoint</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">radius</span><span class="p">),</span> <span class="n">radius</span><span class="p">,</span> <span class="n">radius</span><span class="p">)</span>
+
+            <span class="c1"># Add a crosshair &quot;hole&quot; for pipetting</span>
+            <span class="k">if</span> <span class="n">radius</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">original_composition_mode</span> <span class="o">=</span> <span class="n">painter</span><span class="o">.</span><span class="n">compositionMode</span><span class="p">()</span>
+                <span class="n">painter</span><span class="o">.</span><span class="n">setCompositionMode</span><span class="p">(</span><span class="n">painter</span><span class="o">.</span><span class="n">CompositionMode_Clear</span><span class="p">)</span>
+                <span class="n">painter</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QColor</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+                <span class="n">painter</span><span class="o">.</span><span class="n">drawLine</span><span class="p">(</span><span class="n">radius</span> <span class="o">-</span> <span class="mi">2</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">radius</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="n">radius</span><span class="p">)</span>
+                <span class="n">painter</span><span class="o">.</span><span class="n">drawLine</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">radius</span> <span class="o">-</span> <span class="mi">2</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">radius</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span>
+                <span class="n">painter</span><span class="o">.</span><span class="n">setCompositionMode</span><span class="p">(</span><span class="n">original_composition_mode</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Tool_Brush.color_map_changed"><a class="viewcode-back" href="../../../arthropod_describer.tools.html#arthropod_describer.tools.brush.Tool_Brush.color_map_changed">[docs]</a>    <span class="nd">@Slot</span><span class="p">(</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">color_map_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmap</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]):</span>
+        <span class="k">if</span> <span class="n">cmap</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_icon</span><span class="p">()</span></div>
+
+    <span class="c1">#@property</span>
+    <span class="c1">#def tool_id(self) -&gt; int:</span>
+    <span class="c1">#    return self._tool_id</span>
+
+    <span class="c1">#def set_tool_id(self, tool_id: int):</span>
+    <span class="c1">#    self._tool_id = tool_id</span>
+
+<div class="viewcode-block" id="Tool_Brush.paint_on"><a class="viewcode-back" href="../../../arthropod_describer.tools.html#arthropod_describer.tools.brush.Tool_Brush.paint_on">[docs]</a>    <span class="k">def</span> <span class="nf">paint_on</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">canvas</span><span class="p">:</span> <span class="n">QPaintDevice</span><span class="p">,</span> <span class="n">rr</span><span class="p">,</span> <span class="n">cc</span><span class="p">,</span> <span class="n">pen</span><span class="p">:</span> <span class="n">QPen</span><span class="p">,</span> <span class="n">brush</span><span class="p">:</span> <span class="n">QBrush</span><span class="p">,</span> <span class="n">clip_mask</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">QRegion</span><span class="p">]):</span>
+        <span class="n">painter</span> <span class="o">=</span> <span class="n">QPainter</span><span class="p">(</span><span class="n">canvas</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">clip_mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">painter</span><span class="o">.</span><span class="n">setClipRegion</span><span class="p">(</span><span class="n">clip_mask</span><span class="p">,</span> <span class="n">Qt</span><span class="o">.</span><span class="n">ReplaceClip</span><span class="p">)</span>
+        <span class="n">painter</span><span class="o">.</span><span class="n">setCompositionMode</span><span class="p">(</span><span class="n">QPainter</span><span class="o">.</span><span class="n">CompositionMode_Source</span><span class="p">)</span>
+        <span class="n">painter</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">pen</span><span class="p">)</span>
+        <span class="n">painter</span><span class="o">.</span><span class="n">setBrush</span><span class="p">(</span><span class="n">brush</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">cc</span><span class="p">,</span> <span class="n">rr</span><span class="p">):</span>
+            <span class="n">painter</span><span class="o">.</span><span class="n">drawEllipse</span><span class="p">(</span><span class="n">QPoint</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_params</span><span class="p">[</span><span class="s1">&#39;Radius&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">user_params</span><span class="p">[</span><span class="s1">&#39;Radius&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">painter</span><span class="o">.</span><span class="n">end</span><span class="p">()</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, CBIA @ FI MUNI.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1059</width>
+    <width>1220</width>
     <height>704</height>
    </rect>
   </property>
@@ -30,6 +30,9 @@
        <property name="text">
         <string>Undo</string>
        </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextUnderIcon</enum>
+       </property>
       </widget>
      </item>
      <item>
@@ -40,24 +43,19 @@
        <property name="text">
         <string>Redo</string>
        </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="btnResetZoom">
-       <property name="text">
-        <string>Reset zoom</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="btnZoomBug">
-       <property name="text">
-        <string>Zoom on bug</string>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextUnderIcon</enum>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QGroupBox" name="toolBox">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="title">
         <string>Mask tools</string>
        </property>
@@ -72,14 +70,92 @@
      </item>
      <item>
       <widget class="QGroupBox" name="MaskGroup">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="title">
         <string>Active mask</string>
        </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <layout class="QHBoxLayout" name="horizontalLayout_2"/>
+      </widget>
+     </item>
+     <item>
+      <widget class="QGroupBox" name="grpMaskStyle">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="title">
+        <string>Mask style</string>
+       </property>
+       <property name="flat">
+        <bool>false</bool>
+       </property>
+       <property name="checkable">
+        <bool>false</bool>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
         <item>
-         <widget class="QToolButton" name="tbtnBugMask">
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="label_2">
+            <property name="text">
+             <string>Opacity</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSlider" name="sliderOpacity">
+            <property name="maximum">
+             <number>100</number>
+            </property>
+            <property name="singleStep">
+             <number>5</number>
+            </property>
+            <property name="value">
+             <number>75</number>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="tickPosition">
+             <enum>QSlider::TicksBelow</enum>
+            </property>
+            <property name="tickInterval">
+             <number>15</number>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item alignment="Qt::AlignVCenter">
+         <widget class="QRadioButton" name="btnFilledStyle">
           <property name="text">
-           <string>Bug</string>
+           <string>Filled</string>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+          <property name="autoExclusive">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="btnOutlineStyle">
+          <property name="text">
+           <string>Outline</string>
           </property>
           <property name="checkable">
            <bool>true</bool>
@@ -90,45 +166,34 @@
          </widget>
         </item>
         <item>
-         <widget class="QToolButton" name="tbtnSegmentsMask">
+         <widget class="QLabel" name="label">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="text">
-           <string>Segments</string>
-          </property>
-          <property name="checkable">
-           <bool>true</bool>
-          </property>
-          <property name="autoExclusive">
-           <bool>true</bool>
+           <string>Width</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QToolButton" name="tbtnReflectionMask">
-          <property name="text">
-           <string>Reflections</string>
-          </property>
-          <property name="checkable">
-           <bool>true</bool>
-          </property>
-          <property name="autoExclusive">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="Line" name="line">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="btnResetLabel">
+         <widget class="QSpinBox" name="spinOutlineWidth">
           <property name="enabled">
            <bool>false</bool>
           </property>
-          <property name="text">
-           <string>Reset</string>
+          <property name="suffix">
+           <string>px</string>
+          </property>
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>7</number>
+          </property>
+          <property name="value">
+           <number>3</number>
           </property>
          </widget>
         </item>
@@ -163,19 +228,6 @@
        <item>
         <layout class="QHBoxLayout" name="controls">
          <item>
-          <widget class="QPushButton" name="btnPrevious">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>&lt;</string>
-           </property>
-          </widget>
-         </item>
-         <item>
           <spacer name="hspcLeft">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
@@ -187,6 +239,34 @@
             </size>
            </property>
           </spacer>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="layoutLabelInfo">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="lblHovered">
+             <property name="text">
+              <string>Hovered label:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="lblLabelIcon">
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="lblLabelInfo">
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
          <item>
           <spacer name="hspcRight">
@@ -201,33 +281,9 @@
            </property>
           </spacer>
          </item>
-         <item>
-          <widget class="QPushButton" name="btnNext">
-           <property name="text">
-            <string>&gt;</string>
-           </property>
-          </widget>
-         </item>
         </layout>
        </item>
       </layout>
-     </item>
-     <item>
-      <widget class="QTabWidget" name="tabSidebar">
-       <property name="currentIndex">
-        <number>0</number>
-       </property>
-       <widget class="QWidget" name="tabEditing">
-        <attribute name="title">
-         <string>Editing</string>
-        </attribute>
-       </widget>
-       <widget class="QWidget" name="tabPlugins">
-        <attribute name="title">
-         <string>Plugins</string>
-        </attribute>
-       </widget>
-      </widget>
      </item>
     </layout>
    </item>

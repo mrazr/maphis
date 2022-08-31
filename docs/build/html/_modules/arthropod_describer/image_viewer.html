@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arthropod_describer.image_viewer &mdash; MAPHIS 0.1 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> MAPHIS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">arthropod_describer</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">MAPHIS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>arthropod_describer.image_viewer</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for arthropod_describer.image_viewer</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">typing</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">IntEnum</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+<span class="kn">import</span> <span class="nn">importlib.resources</span>
+
+<span class="kn">import</span> <span class="nn">PySide2</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtCore</span> <span class="kn">import</span> <span class="n">Qt</span><span class="p">,</span> <span class="n">QRegExp</span><span class="p">,</span> <span class="n">Signal</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtGui</span> <span class="kn">import</span> <span class="n">QRegExpValidator</span><span class="p">,</span> <span class="n">QImage</span><span class="p">,</span> <span class="n">QIcon</span><span class="p">,</span> <span class="n">QPixmap</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtWidgets</span> <span class="kn">import</span> <span class="n">QWidget</span><span class="p">,</span> <span class="n">QGraphicsScene</span><span class="p">,</span> <span class="n">QVBoxLayout</span><span class="p">,</span> <span class="n">QSizePolicy</span>
+
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.layer</span> <span class="kn">import</span> <span class="n">Layer</span><span class="p">,</span> <span class="n">MouseEventLayer</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.photo</span> <span class="kn">import</span> <span class="n">Photo</span><span class="p">,</span> <span class="n">UpdateContext</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.state</span> <span class="kn">import</span> <span class="n">State</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.storage</span> <span class="kn">import</span> <span class="n">Storage</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.tool</span> <span class="kn">import</span> <span class="n">Tool</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.custom_graphics_view</span> <span class="kn">import</span> <span class="n">CustomGraphicsView</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.ui_image_viewer</span> <span class="kn">import</span> <span class="n">Ui_ImageViewer</span>
+
+
+<div class="viewcode-block" id="ViewerMode"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.image_viewer.ViewerMode">[docs]</a><span class="k">class</span> <span class="nc">ViewerMode</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+    <span class="n">OnlyPhoto</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">Combined</span> <span class="o">=</span> <span class="mi">1</span></div>
+
+
+<div class="viewcode-block" id="ImageViewer"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.image_viewer.ImageViewer">[docs]</a><span class="k">class</span> <span class="nc">ImageViewer</span><span class="p">(</span><span class="n">QWidget</span><span class="p">):</span>
+    <span class="n">first_photo_requested</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">()</span>
+    <span class="n">prev_photo_requested</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">()</span>
+    <span class="n">next_photo_requested</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">()</span>
+    <span class="n">last_photo_requested</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">()</span>
+    <span class="n">rotate_cw_requested</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">()</span>
+    <span class="n">rotate_ccw_requested</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">()</span>
+    <span class="n">photo_switched</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">(</span><span class="n">Photo</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">State</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="n">ViewerMode</span> <span class="o">=</span> <span class="n">ViewerMode</span><span class="o">.</span><span class="n">Combined</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">PySide2</span><span class="o">.</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QWidget</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">f</span><span class="p">:</span> <span class="n">PySide2</span><span class="o">.</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">WindowFlags</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">WindowFlags</span><span class="p">()):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span> <span class="o">=</span> <span class="n">Ui_ImageViewer</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">setupUi</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">tbtnFirst</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">first_photo_requested</span><span class="o">.</span><span class="n">emit</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">tbtnPrev</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prev_photo_requested</span><span class="o">.</span><span class="n">emit</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">tbtnNext</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">next_photo_requested</span><span class="o">.</span><span class="n">emit</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">tbtnLast</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">last_photo_requested</span><span class="o">.</span><span class="n">emit</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">tbtnRotateCW</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">tbtnRotateCCW</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">tbtnRotateCW</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rotate_cw_requested</span><span class="o">.</span><span class="n">emit</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">tbtnRotateCCW</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rotate_ccw_requested</span><span class="o">.</span><span class="n">emit</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">importlib</span><span class="o">.</span><span class="n">resources</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="s1">&#39;resources&#39;</span><span class="p">,</span> <span class="s1">&#39;rotate.png&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">path</span><span class="p">:</span>
+            <span class="n">img</span> <span class="o">=</span> <span class="n">QImage</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">tbtnRotateCW</span><span class="o">.</span><span class="n">setIcon</span><span class="p">(</span><span class="n">QIcon</span><span class="p">(</span><span class="n">QPixmap</span><span class="o">.</span><span class="n">fromImage</span><span class="p">(</span><span class="n">img</span><span class="p">)))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">tbtnRotateCCW</span><span class="o">.</span><span class="n">setIcon</span><span class="p">(</span><span class="n">QIcon</span><span class="p">(</span><span class="n">QPixmap</span><span class="o">.</span><span class="n">fromImage</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">mirrored</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">))))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">:</span> <span class="n">State</span> <span class="o">=</span> <span class="n">state</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">graphics_scene</span><span class="p">:</span> <span class="n">QGraphicsScene</span> <span class="o">=</span> <span class="n">QGraphicsScene</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">:</span> <span class="n">ViewerMode</span> <span class="o">=</span> <span class="n">mode</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mouse_event_layer</span> <span class="o">=</span> <span class="n">MouseEventLayer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mouse_event_layer</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">graphics_scene</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mouse_event_layer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mouse_event_layer</span><span class="o">.</span><span class="n">setZValue</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mouse_event_layer</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Layer</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mouse_event_layer</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_setup_zoom_combo_box</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_setup_photo_view</span><span class="p">()</span>
+
+        <span class="c1"># TODO Karel: when the rotate icons are ready in arthropod_describer/resources, uncomment and modify this block to load them and assign them to the rotation buttons</span>
+        <span class="c1">#with importlib.resources.path(&#39;arthropod_describer.resources&#39;, &#39;rotate_cw.png&#39;) as path:</span>
+        <span class="c1">#    img = QImage(str(path))</span>
+        <span class="c1">#    self.ui.tbtnRotateCW.setIcon(QIcon(QPixmap.fromImage(img)))</span>
+        <span class="c1">#    self.ui.tbtnRotateCW.setIconSize(......)</span>
+
+        <span class="k">with</span> <span class="n">importlib</span><span class="o">.</span><span class="n">resources</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="s1">&#39;resources&#39;</span><span class="p">,</span> <span class="s1">&#39;next.png&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">path</span><span class="p">:</span>
+            <span class="n">img</span> <span class="o">=</span> <span class="n">QImage</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">tbtnPrev</span><span class="o">.</span><span class="n">setIcon</span><span class="p">(</span><span class="n">QIcon</span><span class="p">(</span><span class="n">QPixmap</span><span class="o">.</span><span class="n">fromImage</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">mirrored</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">))))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">tbtnNext</span><span class="o">.</span><span class="n">setIcon</span><span class="p">(</span><span class="n">QIcon</span><span class="p">(</span><span class="n">QPixmap</span><span class="o">.</span><span class="n">fromImage</span><span class="p">(</span><span class="n">img</span><span class="p">)))</span>
+            <span class="c1">#self.ui.tbtnPrev.setIconSize(......)</span>
+            <span class="c1">#self.ui.tbtnNext.setIconSize(......)</span>
+
+        <span class="k">with</span> <span class="n">importlib</span><span class="o">.</span><span class="n">resources</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="s1">&#39;resources&#39;</span><span class="p">,</span> <span class="s1">&#39;last.png&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">path</span><span class="p">:</span>
+            <span class="n">img</span> <span class="o">=</span> <span class="n">QImage</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">tbtnFirst</span><span class="o">.</span><span class="n">setIcon</span><span class="p">(</span><span class="n">QIcon</span><span class="p">(</span><span class="n">QPixmap</span><span class="o">.</span><span class="n">fromImage</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">mirrored</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">))))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">tbtnLast</span><span class="o">.</span><span class="n">setIcon</span><span class="p">(</span><span class="n">QIcon</span><span class="p">(</span><span class="n">QPixmap</span><span class="o">.</span><span class="n">fromImage</span><span class="p">(</span><span class="n">img</span><span class="p">)))</span>
+            <span class="c1">#self.ui.tbtnFirst.setIconSize(......)</span>
+            <span class="c1">#self.ui.tbtnLast.setIconSize(......)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Storage</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">_setup_photo_view</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">photo_view</span> <span class="o">=</span> <span class="n">CustomGraphicsView</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">viewFrame</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">QVBoxLayout</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">viewFrame</span><span class="o">.</span><span class="n">layout</span><span class="p">()</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">photo_view</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">photo_view</span><span class="o">.</span><span class="n">setScene</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graphics_scene</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">photo_view</span><span class="o">.</span><span class="n">setSizePolicy</span><span class="p">(</span><span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Expanding</span><span class="p">,</span> <span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Expanding</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">photo_view</span><span class="o">.</span><span class="n">setInteractive</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">photo_view</span><span class="o">.</span><span class="n">view_changed</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_handle_view_changed</span><span class="p">)</span>
+        <span class="c1"># TODO make space, tab into proper shortcuts</span>
+        <span class="c1">#self.photo_view.space_pressed.connect(self._toggle_approval_of_mask)</span>
+        <span class="c1">#self.photo_view.tab_pressed.connect(self._pick_next_label)</span>
+
+    <span class="k">def</span> <span class="nf">_setup_zoom_combo_box</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">cbxZoom</span><span class="o">.</span><span class="n">currentTextChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handle_zoom_selected</span><span class="p">)</span>
+        <span class="n">fit_photo_string</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">cbxZoom</span><span class="o">.</span><span class="n">itemText</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">fit_specimen_string</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">cbxZoom</span><span class="o">.</span><span class="n">itemText</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">zoom_validation_regexp</span> <span class="o">=</span> <span class="s1">&#39;^(\d+%?)|&#39;</span> <span class="o">+</span> <span class="n">fit_photo_string</span> <span class="o">+</span> <span class="s1">&#39;|&#39;</span> <span class="o">+</span> <span class="n">fit_specimen_string</span> <span class="o">+</span> <span class="s1">&#39;$&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">cbxZoom</span><span class="o">.</span><span class="n">setValidator</span><span class="p">(</span><span class="n">QRegExpValidator</span><span class="p">(</span><span class="n">QRegExp</span><span class="p">(</span><span class="n">zoom_validation_regexp</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">cbxZoom</span><span class="p">))</span>
+
+<div class="viewcode-block" id="ImageViewer.add_layer"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.image_viewer.ImageViewer.add_layer">[docs]</a>    <span class="k">def</span> <span class="nf">add_layer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer</span><span class="p">:</span> <span class="n">Layer</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">graphics_scene</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
+        <span class="n">layer</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
+        <span class="n">layer</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">setZValue</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mouse_event_layer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mouse_event_layer</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_handle_view_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Update the zoom combo box if the zoom got changed during the view change. Temporarily block signals to prevent infinite loop.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">cbxZoom</span><span class="o">.</span><span class="n">blockSignals</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1">#print(&#39;_handle_view_changed&#39;)</span>
+        <span class="n">int_zoom_value</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mi">100</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">photo_view</span><span class="o">.</span><span class="n">transform</span><span class="p">()</span><span class="o">.</span><span class="n">m11</span><span class="p">())</span> <span class="c1"># Calculate the actual zoom in %.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">cbxZoom</span><span class="o">.</span><span class="n">setCurrentText</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">int_zoom_value</span><span class="si">}</span><span class="s1">%&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">cbxZoom</span><span class="o">.</span><span class="n">blockSignals</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># TODO: Wouldn&#39;t it be better to store a reference to the CustomGraphicsView in State, and where needed,</span>
+        <span class="c1">#       just extract the transform from there? That would give no opportunity for inconsistencies.</span>
+        <span class="c1">#       Otherwise, all parts of the code that affect the transform must keep State updated like this,</span>
+        <span class="c1">#       e.g. by calling _handle_view_changed().</span>
+        <span class="c1">#       .</span>
+        <span class="c1">#       If ImageViewer._handle_view_changed() is always connected to CustomGraphicsView.view_changed</span>
+        <span class="c1">#       (seems to be), then it isn&#39;t necessary to explicitly do `self.state.current_view_transform = m`</span>
+        <span class="c1">#       at the end of CustomGraphicsView.wheelEvent() -- has been removed from there.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">current_view_transform</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">photo_view</span><span class="o">.</span><span class="n">transform</span><span class="p">()</span>
+
+<div class="viewcode-block" id="ImageViewer.handle_zoom_selected"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.image_viewer.ImageViewer.handle_zoom_selected">[docs]</a>    <span class="k">def</span> <span class="nf">handle_zoom_selected</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="n">zoom_digits</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">value</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">isdigit</span><span class="p">())</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">zoom_digits</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">int_zoom_value</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">zoom_digits</span><span class="p">)</span>
+            <span class="c1"># Change the current zoom to int_zoom_value.</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">photo_view</span><span class="o">.</span><span class="n">transform</span><span class="p">()</span>
+            <span class="n">m</span><span class="o">.</span><span class="n">setMatrix</span><span class="p">(</span><span class="n">int_zoom_value</span> <span class="o">/</span> <span class="mi">100</span><span class="p">,</span>              <span class="n">m</span><span class="o">.</span><span class="n">m12</span><span class="p">(),</span> <span class="n">m</span><span class="o">.</span><span class="n">m13</span><span class="p">(),</span>
+                        <span class="n">m</span><span class="o">.</span><span class="n">m21</span><span class="p">(),</span> <span class="n">int_zoom_value</span> <span class="o">/</span> <span class="mi">100</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">m23</span><span class="p">(),</span>
+                        <span class="n">m</span><span class="o">.</span><span class="n">m31</span><span class="p">(),</span>              <span class="n">m</span><span class="o">.</span><span class="n">m32</span><span class="p">(),</span> <span class="n">m</span><span class="o">.</span><span class="n">m33</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">photo_view</span><span class="o">.</span><span class="n">setTransform</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="c1"># Make sure not to zoom out too much.</span>
+            <span class="n">srect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">photo_view</span><span class="o">.</span><span class="n">sceneRect</span><span class="p">()</span>
+            <span class="n">rrect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">photo_view</span><span class="o">.</span><span class="n">mapToScene</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">photo_view</span><span class="o">.</span><span class="n">rect</span><span class="p">())</span><span class="o">.</span><span class="n">boundingRect</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">rrect</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">srect</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="ow">and</span> <span class="n">rrect</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">srect</span><span class="o">.</span><span class="n">width</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">photo_view</span><span class="o">.</span><span class="n">fitInView</span><span class="p">(</span><span class="n">srect</span><span class="p">,</span> <span class="n">Qt</span><span class="o">.</span><span class="n">KeepAspectRatio</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">photo_view</span><span class="o">.</span><span class="n">scene</span><span class="p">()</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;zoom: changed via combo box to &quot;</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s1">&quot;, int_zoom_value: </span><span class="si">{</span><span class="n">int_zoom_value</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="c1"># Call &quot;self.photo_view.view_changed.emit()&quot; or &quot;self._handle_view_changed()&quot; to update the combo box text in case zooming out too much was prevented, i.e. different value than what was entered got used. (Careful about infinite loops.)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">photo_view</span><span class="o">.</span><span class="n">view_changed</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fit_photo_string</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">cbxZoom</span><span class="o">.</span><span class="n">itemText</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">fit_specimen_string</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">cbxZoom</span><span class="o">.</span><span class="n">itemText</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">value</span> <span class="o">==</span> <span class="n">fit_specimen_string</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">current_photo</span><span class="o">.</span><span class="n">bug_bbox</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>  <span class="c1"># TODO: Is this bug_bbox set properly? Currently, it seems to be always None, and its source code is marked with &quot;remove this&quot; todo.</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;zoom: no specimen found, will fit whole photo instead&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">cbxZoom</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="k">return</span>
+
+            <span class="c1"># Process the &quot;Fit photo&quot; (self.ui.cbxZoom.itemText(0)) option</span>
+            <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="n">fit_photo_string</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">show_whole_image</span><span class="p">()</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;zoom: changed via combo box to &quot;</span><span class="si">{</span><span class="n">fit_photo_string</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+
+            <span class="c1"># Process the &quot;Fit specimen&quot; (self.ui.cbxZoom.itemText(1)) option</span>
+            <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="n">fit_specimen_string</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">zoom_on_bug</span><span class="p">()</span>  <span class="c1"># TODO: Implement zoom_on_bug() once a bounding box is available.</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;zoom: changed via combo box to &quot;</span><span class="si">{</span><span class="n">fit_specimen_string</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+
+            <span class="c1"># Trigger the update of the zoom combo box (transforms &quot;Fit photo&quot; and &quot;Fit specimen&quot; to percentages)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_handle_view_changed</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ImageViewer.set_photo"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.image_viewer.ImageViewer.set_photo">[docs]</a>    <span class="k">def</span> <span class="nf">set_photo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">photo</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Photo</span><span class="p">],</span> <span class="n">reset_view</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">reset_tool</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">:</span>
+            <span class="n">layer</span><span class="o">.</span><span class="n">set_photo</span><span class="p">(</span><span class="n">photo</span><span class="p">,</span> <span class="n">reset_tool</span><span class="o">=</span><span class="n">reset_tool</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">reset_view</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">show_whole_image</span><span class="p">()</span>
+        <span class="c1"># This will trigger updating the zoom combo box.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_handle_view_changed</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">photo</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">image_names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">photo</span><span class="o">.</span><span class="n">image_name</span><span class="p">)</span>
+            <span class="c1"># TODO in case of a filtered list of photos, the line below does not work with correct count of photos</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">enable_navigation_buttons</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">photo_switched</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">photo</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ImageViewer.set_tool"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.image_viewer.ImageViewer.set_tool">[docs]</a>    <span class="k">def</span> <span class="nf">set_tool</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tool</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Tool</span><span class="p">],</span> <span class="n">reset_current</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">current_tool</span> <span class="o">=</span> <span class="n">tool</span>
+        <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">:</span>
+            <span class="n">layer</span><span class="o">.</span><span class="n">set_tool</span><span class="p">(</span><span class="n">tool</span><span class="p">,</span> <span class="n">reset_current</span><span class="p">)</span></div>
+
+    <span class="c1">#def visualize_label_level(self, level: int):</span>
+    <span class="c1">#    self.state.current_label_level = level</span>
+    <span class="c1">#    self.canvas.label_view.switch_label_level(level)</span>
+
+<div class="viewcode-block" id="ImageViewer.show_whole_image"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.image_viewer.ImageViewer.show_whole_image">[docs]</a>    <span class="k">def</span> <span class="nf">show_whole_image</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">graphics_scene</span><span class="o">.</span><span class="n">setSceneRect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sceneBoundingRect</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">graphics_scene</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+        <span class="c1"># Temporarily turn off the scrollbars so that their size doesn&#39;t interfere with fitInView() calculations.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">photo_view</span><span class="o">.</span><span class="n">setHorizontalScrollBarPolicy</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">ScrollBarAlwaysOff</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">photo_view</span><span class="o">.</span><span class="n">setVerticalScrollBarPolicy</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">ScrollBarAlwaysOff</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">photo_view</span><span class="o">.</span><span class="n">fitInView</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">Qt</span><span class="o">.</span><span class="n">KeepAspectRatio</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">photo_view</span><span class="o">.</span><span class="n">setHorizontalScrollBarPolicy</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">ScrollBarAsNeeded</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">photo_view</span><span class="o">.</span><span class="n">setVerticalScrollBarPolicy</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">ScrollBarAsNeeded</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ImageViewer.enable_first_button"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.image_viewer.ImageViewer.enable_first_button">[docs]</a>    <span class="k">def</span> <span class="nf">enable_first_button</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">enable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">tbtnFirst</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="n">enable</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ImageViewer.enable_prev_button"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.image_viewer.ImageViewer.enable_prev_button">[docs]</a>    <span class="k">def</span> <span class="nf">enable_prev_button</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">enable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">tbtnPrev</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="n">enable</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ImageViewer.enable_next_button"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.image_viewer.ImageViewer.enable_next_button">[docs]</a>    <span class="k">def</span> <span class="nf">enable_next_button</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">enable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">tbtnNext</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="n">enable</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ImageViewer.enable_last_button"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.image_viewer.ImageViewer.enable_last_button">[docs]</a>    <span class="k">def</span> <span class="nf">enable_last_button</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">enable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">tbtnLast</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="n">enable</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ImageViewer.enable_navigation_buttons"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.image_viewer.ImageViewer.enable_navigation_buttons">[docs]</a>    <span class="k">def</span> <span class="nf">enable_navigation_buttons</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">current_photo_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">max_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">image_count</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">current_photo_count</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">current_photo_count</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enable_first_button</span><span class="p">(</span><span class="n">idx</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enable_prev_button</span><span class="p">(</span><span class="n">idx</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enable_next_button</span><span class="p">(</span><span class="n">idx</span> <span class="o">&lt;</span> <span class="n">max_index</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enable_last_button</span><span class="p">(</span><span class="n">idx</span> <span class="o">&lt;</span> <span class="n">max_index</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_handle_update_photo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ctx</span><span class="p">:</span> <span class="n">UpdateContext</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="n">ctx</span> <span class="o">==</span> <span class="n">UpdateContext</span><span class="o">.</span><span class="n">Measurements</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;reacting to photo update </span><span class="si">{</span><span class="n">ctx</span><span class="si">}</span><span class="s1"> for </span><span class="si">{</span><span class="n">img_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">current_photo</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">current_photo</span><span class="o">.</span><span class="n">image_name</span> <span class="o">==</span> <span class="n">img_name</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_photo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">current_photo</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ImageViewer.set_storage"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.image_viewer.ImageViewer.set_storage">[docs]</a>    <span class="k">def</span> <span class="nf">set_storage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">storage</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Storage</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">update_photo</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_handle_update_photo</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">storage</span> <span class="o">=</span> <span class="n">storage</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">update_photo</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_handle_update_photo</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, CBIA @ FI MUNI.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

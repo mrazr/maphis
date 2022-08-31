@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arthropod_describer.common.utils &mdash; MAPHIS 0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> MAPHIS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">arthropod_describer</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">MAPHIS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>arthropod_describer.common.utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for arthropod_describer.common.utils</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">dataclasses</span>
+<span class="kn">import</span> <span class="nn">typing</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">importlib.resources</span>
+<span class="kn">import</span> <span class="nn">platform</span>
+
+<span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtCore</span> <span class="kn">import</span> <span class="n">Qt</span><span class="p">,</span> <span class="n">QPoint</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtGui</span> <span class="kn">import</span> <span class="n">QImage</span><span class="p">,</span> <span class="n">QCursor</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtWidgets</span> <span class="kn">import</span> <span class="n">QFileDialog</span><span class="p">,</span> <span class="n">QWidget</span>
+<span class="kn">import</span> <span class="nn">pytesseract</span>
+
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.units</span> <span class="kn">import</span> <span class="n">Value</span><span class="p">,</span> <span class="n">Unit</span><span class="p">,</span> <span class="n">BaseUnit</span><span class="p">,</span> <span class="n">CompoundUnit</span><span class="p">,</span> <span class="n">SIPrefix</span>
+
+
+<div class="viewcode-block" id="choose_folder"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.utils.choose_folder">[docs]</a><span class="k">def</span> <span class="nf">choose_folder</span><span class="p">(</span><span class="n">parent</span><span class="p">:</span> <span class="n">QWidget</span><span class="p">,</span> <span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;Open folder&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Shows a file dialog and lets the user choose a folder.</span>
+
+<span class="sd">    :param parent: Widget parent for the file dialog.</span>
+<span class="sd">    :type parent: QWidget</span>
+<span class="sd">    :param title: Title for the file dialog.</span>
+<span class="sd">    :type title: str</span>
+<span class="sd">    :param path: Optional path to set as the initial location of the file dialog.</span>
+<span class="sd">    :type path: pathlib.Path</span>
+
+<span class="sd">    :returns: Optional path if user confirmed their choice</span>
+<span class="sd">    :rtype: pathlib.Path</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">file_dialog</span> <span class="o">=</span> <span class="n">QFileDialog</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">file_dialog</span><span class="o">.</span><span class="n">setDirectory</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+    <span class="n">file_dialog</span><span class="o">.</span><span class="n">setFileMode</span><span class="p">(</span><span class="n">QFileDialog</span><span class="o">.</span><span class="n">Directory</span><span class="p">)</span>
+    <span class="n">file_dialog</span><span class="o">.</span><span class="n">setWindowTitle</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+    <span class="n">file_dialog</span><span class="o">.</span><span class="n">setWindowModality</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">WindowModal</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">file_dialog</span><span class="o">.</span><span class="n">exec_</span><span class="p">():</span>
+        <span class="n">file_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">file_dialog</span><span class="o">.</span><span class="n">selectedFiles</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">file_path</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="get_dict_from_doc_str"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.utils.get_dict_from_doc_str">[docs]</a><span class="k">def</span> <span class="nf">get_dict_from_doc_str</span><span class="p">(</span><span class="n">doc_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">doc_str</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">isspace</span><span class="p">()]</span>
+
+    <span class="n">splits</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">]</span>
+    <span class="n">splits</span> <span class="o">=</span> <span class="p">[</span><span class="n">split</span> <span class="k">for</span> <span class="n">split</span> <span class="ow">in</span> <span class="n">splits</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">split</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="p">{</span><span class="n">split</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span> <span class="n">split</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">split</span> <span class="ow">in</span> <span class="n">splits</span><span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="is_valid_annotation_project"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.utils.is_valid_annotation_project">[docs]</a><span class="k">def</span> <span class="nf">is_valid_annotation_project</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">req_folders</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">return</span> <span class="nb">all</span><span class="p">([(</span><span class="n">path</span> <span class="o">/</span> <span class="n">folder</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="k">for</span> <span class="n">folder</span> <span class="ow">in</span> <span class="n">req_folders</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="get_scale_marker_roi"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.utils.get_scale_marker_roi">[docs]</a><span class="k">def</span> <span class="nf">get_scale_marker_roi</span><span class="p">(</span><span class="n">img</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
+    <span class="n">gray</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_RGB2GRAY</span><span class="p">)</span>
+
+    <span class="n">gray_</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">morphologyEx</span><span class="p">(</span><span class="n">gray</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">MORPH_CLOSE</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">getStructuringElement</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">MORPH_RECT</span><span class="p">,</span> <span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">)))</span>
+
+    <span class="n">_</span><span class="p">,</span> <span class="n">th</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">threshold</span><span class="p">(</span><span class="n">gray_</span><span class="p">,</span> <span class="mi">245</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">THRESH_BINARY</span><span class="p">)</span>
+
+    <span class="n">closed</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">morphologyEx</span><span class="p">(</span><span class="n">th</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">MORPH_OPEN</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">getStructuringElement</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">MORPH_RECT</span><span class="p">,</span> <span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">15</span><span class="p">)))</span>
+    <span class="n">closed</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">morphologyEx</span><span class="p">(</span><span class="n">closed</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">MORPH_CLOSE</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">getStructuringElement</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">MORPH_RECT</span><span class="p">,</span> <span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">15</span><span class="p">)))</span>
+
+    <span class="n">N</span><span class="p">,</span> <span class="n">label_img</span><span class="p">,</span> <span class="n">stats</span><span class="p">,</span> <span class="n">centroids</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">connectedComponentsWithStats</span><span class="p">(</span><span class="n">closed</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+
+    <span class="n">ratios</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+        <span class="n">l</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="n">stats</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">[</span><span class="n">cv2</span><span class="o">.</span><span class="n">CC_STAT_LEFT</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">CC_STAT_TOP</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">CC_STAT_WIDTH</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">CC_STAT_HEIGHT</span><span class="p">]]</span>
+        <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">l</span><span class="p">)</span><span class="o">+</span><span class="nb">int</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">closed</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">or</span> <span class="nb">int</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">+</span><span class="nb">int</span><span class="p">(</span><span class="n">h</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">closed</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="n">ratios</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="o">-</span><span class="mi">42</span><span class="p">)</span>
+            <span class="k">continue</span>
+        <span class="n">nonzeros</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">th</span><span class="p">[</span><span class="n">t</span><span class="p">:</span><span class="n">t</span><span class="o">+</span><span class="n">h</span><span class="p">,</span> <span class="n">l</span><span class="p">:</span><span class="n">l</span><span class="o">+</span><span class="n">w</span><span class="p">])</span>
+        <span class="n">bbox_area</span> <span class="o">=</span> <span class="n">w</span> <span class="o">*</span> <span class="n">h</span>
+        <span class="n">ratios</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nonzeros</span> <span class="o">/</span> <span class="n">bbox_area</span><span class="p">)</span>
+
+    <span class="n">idxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">ratios</span><span class="p">)</span>
+    <span class="n">largest_idx</span> <span class="o">=</span> <span class="n">idxs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">top</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="n">stats</span><span class="p">[</span><span class="n">largest_idx</span><span class="p">,</span> <span class="p">[</span><span class="n">cv2</span><span class="o">.</span><span class="n">CC_STAT_TOP</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">CC_STAT_LEFT</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">CC_STAT_HEIGHT</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">CC_STAT_WIDTH</span><span class="p">]]</span>
+
+    <span class="k">return</span> <span class="n">gray</span><span class="p">[</span><span class="n">top</span><span class="p">:</span><span class="n">top</span><span class="o">+</span><span class="n">height</span><span class="p">,</span> <span class="n">left</span><span class="p">:</span><span class="n">left</span><span class="o">+</span><span class="n">width</span><span class="p">],</span> <span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_scale_line_ends"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.utils.get_scale_line_ends">[docs]</a><span class="k">def</span> <span class="nf">get_scale_line_ends</span><span class="p">(</span><span class="n">scale_marker</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+    <span class="n">roi</span> <span class="o">=</span> <span class="n">scale_marker</span>
+    <span class="n">height</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="n">scale_marker</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">scale_marker</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">inv_roi</span> <span class="o">=</span> <span class="mi">255</span> <span class="o">-</span> <span class="n">roi</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">inv_roi</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">threshold</span><span class="p">(</span><span class="n">inv_roi</span><span class="p">,</span> <span class="mi">245</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">THRESH_BINARY</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">height</span> <span class="o">&gt;</span> <span class="n">width</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;height &gt; width&#39;</span><span class="p">)</span>
+        <span class="n">only_line</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">morphologyEx</span><span class="p">(</span><span class="n">inv_roi</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">MORPH_OPEN</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">getStructuringElement</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">MORPH_RECT</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">15</span><span class="p">)),</span>
+                                     <span class="n">borderType</span><span class="o">=</span><span class="n">cv2</span><span class="o">.</span><span class="n">BORDER_CONSTANT</span><span class="p">,</span> <span class="n">borderValue</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">nonzero</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">only_line</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">nonzero</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+
+        <span class="n">p1_y</span><span class="p">,</span> <span class="n">p1_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">nonzero</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">nonzero</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">p2_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">nonzero</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">p2_x</span> <span class="o">=</span> <span class="n">p1_x</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;width &gt; height&#39;</span><span class="p">)</span>
+        <span class="n">only_line</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">morphologyEx</span><span class="p">(</span><span class="n">inv_roi</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">MORPH_OPEN</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">getStructuringElement</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">MORPH_RECT</span><span class="p">,</span> <span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">1</span><span class="p">)),</span>
+                                     <span class="n">borderType</span><span class="o">=</span><span class="n">cv2</span><span class="o">.</span><span class="n">BORDER_CONSTANT</span><span class="p">,</span> <span class="n">borderValue</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">nonzero</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">only_line</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">nonzero</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Scale line not found&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span>
+
+        <span class="n">p1_y</span><span class="p">,</span> <span class="n">p1_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">nonzero</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">nonzero</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">p2_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">nonzero</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">p2_y</span> <span class="o">=</span> <span class="n">p1_y</span>
+
+    <span class="k">return</span> <span class="n">p1_x</span><span class="p">,</span> <span class="n">p1_y</span><span class="p">,</span> <span class="n">p2_x</span><span class="p">,</span> <span class="n">p2_y</span></div>
+
+
+<div class="viewcode-block" id="get_reference_length"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.utils.get_reference_length">[docs]</a><span class="k">def</span> <span class="nf">get_reference_length</span><span class="p">(</span><span class="n">img</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;Windows&#39;</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">importlib</span><span class="o">.</span><span class="n">resources</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="s1">&#39;arthropod_describer.bin&#39;</span><span class="p">,</span> <span class="s1">&#39;Tesseract-OCR&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">p</span><span class="p">:</span>
+            <span class="n">pytesseract</span><span class="o">.</span><span class="n">pytesseract</span><span class="o">.</span><span class="n">tesseract_cmd</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">p</span> <span class="o">/</span> <span class="s1">&#39;tesseract.exe&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;am on linux probably&#39;</span><span class="p">)</span>
+    <span class="n">rot</span> <span class="o">=</span> <span class="n">img</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
+        <span class="n">rot</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">rot</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">ROTATE_90_CLOCKWISE</span><span class="p">)</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">pytesseract</span><span class="o">.</span><span class="n">image_to_string</span><span class="p">(</span><span class="n">rot</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">text</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()</span> <span class="ow">and</span> <span class="n">rot</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">rot</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="n">text</span><span class="p">,</span> <span class="n">rot</span>
+    <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">img</span></div>
+
+
+<div class="viewcode-block" id="vector_to_img"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.utils.vector_to_img">[docs]</a><span class="k">def</span> <span class="nf">vector_to_img</span><span class="p">(</span><span class="n">vec</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span> <span class="n">size</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="n">vec_min</span><span class="p">,</span> <span class="n">vec_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">vec</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="n">vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span>
+
+    <span class="n">stretched</span> <span class="o">=</span> <span class="p">(</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">((</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">((</span><span class="n">vec</span> <span class="o">-</span> <span class="n">vec_min</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">vec_max</span> <span class="o">-</span> <span class="n">vec_min</span> <span class="o">+</span> <span class="mf">1e-6</span><span class="p">)))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint16</span><span class="p">)</span>
+
+    <span class="n">img</span> <span class="o">=</span> <span class="mi">255</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">size</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+    <span class="n">step</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">vec</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">vec</span><span class="p">)):</span>
+        <span class="n">img</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="p">(</span><span class="n">step</span> <span class="o">*</span> <span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">stretched</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span> <span class="p">(</span><span class="n">step</span> <span class="o">*</span> <span class="n">i</span><span class="p">,</span> <span class="n">stretched</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">img</span></div>
+
+
+<div class="viewcode-block" id="vector_to_img2"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.utils.vector_to_img2">[docs]</a><span class="k">def</span> <span class="nf">vector_to_img2</span><span class="p">(</span><span class="n">vec</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span> <span class="n">size</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="n">vec_min</span><span class="p">,</span> <span class="n">vec_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">vec</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span>
+
+    <span class="n">vec_min</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">vec_min</span><span class="p">)</span>
+    <span class="n">vec_max</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">vec_max</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="n">vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span>
+
+    <span class="n">stretched</span> <span class="o">=</span> <span class="p">(</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">((</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">((</span><span class="n">vec</span> <span class="o">-</span> <span class="n">vec_min</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">vec_max</span> <span class="o">-</span> <span class="n">vec_min</span> <span class="o">+</span> <span class="mf">1e-6</span><span class="p">)))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint16</span><span class="p">)</span>
+
+    <span class="n">height</span> <span class="o">=</span> <span class="n">vec_max</span> <span class="o">-</span> <span class="n">vec_min</span>
+
+    <span class="c1"># img = 255 * np.ones(size[::-1], np.uint8)</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="mi">255</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">height</span><span class="p">,</span> <span class="mi">256</span><span class="p">))</span>
+    <span class="n">step</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="mi">256</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">vec</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">vec</span><span class="p">)):</span>
+        <span class="n">img</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="p">(</span><span class="n">step</span> <span class="o">*</span> <span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="nb">round</span><span class="p">(</span><span class="n">vec</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">])),</span> <span class="p">(</span><span class="n">step</span> <span class="o">*</span> <span class="n">i</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">vec</span><span class="p">[</span><span class="n">i</span><span class="p">])),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">img</span></div>
+
+
+<div class="viewcode-block" id="is_cursor_inside"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.utils.is_cursor_inside">[docs]</a><span class="k">def</span> <span class="nf">is_cursor_inside</span><span class="p">(</span><span class="n">widget</span><span class="p">:</span> <span class="n">QWidget</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="n">rect</span> <span class="o">=</span> <span class="n">widget</span><span class="o">.</span><span class="n">rect</span><span class="p">()</span>
+    <span class="n">rect</span><span class="o">.</span><span class="n">moveTo</span><span class="p">(</span><span class="n">widget</span><span class="o">.</span><span class="n">mapToGlobal</span><span class="p">(</span><span class="n">QPoint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">rect</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">QCursor</span><span class="o">.</span><span class="n">pos</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="ScaleLineInfo"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.utils.ScaleLineInfo">[docs]</a><span class="nd">@dataclasses</span><span class="o">.</span><span class="n">dataclass</span>
+<span class="k">class</span> <span class="nc">ScaleLineInfo</span><span class="p">:</span>
+    <span class="n">p1</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
+    <span class="n">p2</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
+    <span class="n">length</span><span class="p">:</span> <span class="n">Value</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;ScaleLineInfo(p1=</span><span class="si">{</span><span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p1</span><span class="p">)</span><span class="si">}</span><span class="s1">, p2=</span><span class="si">{</span><span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p2</span><span class="p">)</span><span class="si">}</span><span class="s1">, length=</span><span class="si">{</span><span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">)</span><span class="si">}</span><span class="s1">)&#39;</span>
+
+<div class="viewcode-block" id="ScaleLineInfo.rotate"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.utils.ScaleLineInfo.rotate">[docs]</a>    <span class="k">def</span> <span class="nf">rotate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ccw</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">origin</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]):</span>
+        <span class="n">p1_c</span> <span class="o">=</span> <span class="nb">complex</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">origin</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">p1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">origin</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">p2_c</span> <span class="o">=</span> <span class="nb">complex</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">origin</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">p2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">origin</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="n">p1_c</span> <span class="o">=</span> <span class="n">p1_c</span> <span class="o">*</span> <span class="nb">complex</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span> <span class="k">if</span> <span class="n">ccw</span> <span class="k">else</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">p2_c</span> <span class="o">=</span> <span class="n">p2_c</span> <span class="o">*</span> <span class="nb">complex</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span> <span class="k">if</span> <span class="n">ccw</span> <span class="k">else</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">p1</span> <span class="o">=</span> <span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">p1_c</span><span class="o">.</span><span class="n">real</span><span class="p">),</span> <span class="nb">round</span><span class="p">(</span><span class="n">p1_c</span><span class="o">.</span><span class="n">imag</span><span class="p">))</span>
+        <span class="n">p1</span> <span class="o">=</span> <span class="p">(</span><span class="n">p1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">origin</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">p1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">origin</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="n">p2</span> <span class="o">=</span> <span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">p2_c</span><span class="o">.</span><span class="n">real</span><span class="p">),</span> <span class="nb">round</span><span class="p">(</span><span class="n">p2_c</span><span class="o">.</span><span class="n">imag</span><span class="p">))</span>
+        <span class="n">p2</span> <span class="o">=</span> <span class="p">(</span><span class="n">p2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">origin</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">p2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">origin</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">p1</span> <span class="o">=</span> <span class="n">p1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p2</span> <span class="o">=</span> <span class="n">p2</span></div>
+
+<div class="viewcode-block" id="ScaleLineInfo.scale"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.utils.ScaleLineInfo.scale">[docs]</a>    <span class="k">def</span> <span class="nf">scale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">o</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]):</span>
+        <span class="n">p1_</span> <span class="o">=</span> <span class="p">(</span><span class="n">f</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">f</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">o</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">p2_</span> <span class="o">=</span> <span class="p">(</span><span class="n">f</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">f</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">o</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">p1</span> <span class="o">=</span> <span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">p1_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">f</span> <span class="o">*</span> <span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">round</span><span class="p">(</span><span class="n">p1_</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">f</span> <span class="o">*</span> <span class="n">o</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p2</span> <span class="o">=</span> <span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">p2_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">f</span> <span class="o">*</span> <span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">round</span><span class="p">(</span><span class="n">p2_</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">f</span> <span class="o">*</span> <span class="n">o</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span></div></div>
+
+
+<div class="viewcode-block" id="ScaleSetting"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.utils.ScaleSetting">[docs]</a><span class="nd">@dataclasses</span><span class="o">.</span><span class="n">dataclass</span>
+<span class="k">class</span> <span class="nc">ScaleSetting</span><span class="p">:</span>
+    <span class="n">reference_length</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Value</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">scale</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Value</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">scale_line</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">ScaleLineInfo</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">scale_marker_bbox</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">scale_marker_img</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">QImage</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="ScaleSetting.from_dict"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.utils.ScaleSetting.from_dict">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj_dict</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s1">&#39;ScaleSetting&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">maybe_ref_l</span> <span class="o">:=</span> <span class="n">obj_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;reference_length&#39;</span><span class="p">))</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ref_l</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">maybe_ref_l</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ref_l</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">maybe_scale</span> <span class="o">:=</span> <span class="n">obj_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;scale&#39;</span><span class="p">))</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">scale</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">maybe_scale</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">scale</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">maybe_scale_line</span> <span class="o">:=</span> <span class="n">obj_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;scale_line&#39;</span><span class="p">))</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">scale_line</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">maybe_scale_line</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">scale_line</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">maybe_bbox</span> <span class="o">:=</span> <span class="n">obj_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;scale_marker_bbox&#39;</span><span class="p">))</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">scale_marker_bbox</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">maybe_bbox</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">scale_marker_bbox</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">return</span> <span class="n">ScaleSetting</span><span class="p">(</span><span class="n">reference_length</span><span class="o">=</span><span class="n">ref_l</span><span class="p">,</span>
+                            <span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">,</span>
+                            <span class="n">scale_line</span><span class="o">=</span><span class="n">scale_line</span><span class="p">,</span>
+                            <span class="n">scale_marker_bbox</span><span class="o">=</span><span class="n">scale_marker_bbox</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ScaleSetting.scale_by_factor"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.utils.ScaleSetting.scale_by_factor">[docs]</a>    <span class="k">def</span> <span class="nf">scale_by_factor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fac</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">o</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="o">.</span><span class="n">value</span> <span class="o">*=</span> <span class="n">fac</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale_line</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scale_line</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">fac</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__deepcopy__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">memodict</span><span class="o">=</span><span class="p">{}):</span>
+        <span class="n">sc_setting</span> <span class="o">=</span> <span class="n">ScaleSetting</span><span class="p">(</span><span class="n">reference_length</span><span class="o">=</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reference_length</span><span class="p">),</span>
+                                  <span class="n">scale</span><span class="o">=</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">),</span>
+                                  <span class="n">scale_line</span><span class="o">=</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scale_line</span><span class="p">),</span>
+                                  <span class="n">scale_marker_bbox</span><span class="o">=</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scale_marker_bbox</span><span class="p">),</span>
+                                  <span class="n">scale_marker_img</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">scale_marker_img</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sc_setting</span></div>
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, CBIA @ FI MUNI.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

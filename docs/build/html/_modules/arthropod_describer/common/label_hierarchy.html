@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arthropod_describer.common.label_hierarchy &mdash; MAPHIS 0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> MAPHIS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">arthropod_describer</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">MAPHIS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>arthropod_describer.common.label_hierarchy</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for arthropod_describer.common.label_hierarchy</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">operator</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Set</span>
+
+
+<div class="viewcode-block" id="Node"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_hierarchy.Node">[docs]</a><span class="k">class</span> <span class="nc">Node</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Label representation.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Node</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Node</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">code</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">color</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span>  <span class="c1"># for now</span>
+
+<div class="viewcode-block" id="Node.to_dict"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_hierarchy.Node.to_dict">[docs]</a>    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="s1">&#39;code&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">code</span><span class="p">,</span>
+            <span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;red&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">color</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="s1">&#39;green&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">color</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                <span class="s1">&#39;blue&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">color</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="p">}</span>
+        <span class="p">}</span></div></div>
+
+
+<div class="viewcode-block" id="LabelHierarchy"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_hierarchy.LabelHierarchy">[docs]</a><span class="k">class</span> <span class="nc">LabelHierarchy</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Class representing a particular hierarchy of labels.</span>
+
+<span class="sd">    Lorem ipsum dolor sit amet all the waaaaaaaaaaaay.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">ROOT</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">masks</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># bit masks for all label levels, len(self.masks) = number of levels in hierarchy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_bits</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># how many bits are allocated for each label in the hierarchy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">named_masks</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># a mapping; mask_name -&gt; mask; self.named_masks[mask_name] = mask, where mask_name from self.mask_names, mask from self.masks</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mask_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># human-friendly names of masks, eg. Animal, Segments, corresponding to label levels</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">masks_names</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># a mapping; mask -&gt; mask_name, reverse of self.named_masks</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">counts_of_bits</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># a distribution of `n_bits` to `len(self.masks)` levels, self.counts_of_bits[i] = x means, x bits are allocated to i-th mask/level</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shifts</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># bit shifts for each mask, `self.shifts[0] = self.n_bits`, self.shifts[i] = self.shifts[i-1] - self.counts_of_bits[i-1]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">whole_mask</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># this should be 2^self.n_bits - 1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sep</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;:&#39;</span>  <span class="c1"># separator for code representation of labels, e.g. 1:1:2:0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># list of labels that are defined, ie. that make sense to use for a specific case</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># a mapping; label -&gt; list of label&#39;s children</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parents</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># a mappping; label -&gt; label&#39;s parent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Node</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># a mapping; label -&gt; label&#39;s node representation</span>
+        <span class="c1">#self.colormap: Optional[Colormap] = None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">colormap</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_level_groups</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Set</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mask_label</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Node</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="LabelHierarchy.are_valid_masks"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_hierarchy.LabelHierarchy.are_valid_masks">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">are_valid_masks</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">masks</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">n_bits</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks whether `masks` represents a valid distribution of masks for `n_bits`-bit labels</span>
+<span class="sd">        For `masks` to be a valid list of masks:</span>
+
+<span class="sd">        1. each mask must have only one sequence of ones, e.g. 11110000 is valid, 11110011 is not valid</span>
+<span class="sd">        2. no two distinct masks can overlap, e.g. 11110000, 00001111 is a valid distribution;</span>
+<span class="sd">                   11110000, 00111111  is not a valid mask distribution</span>
+<span class="sd">        3. `masks[i]` and `masks[i+1]` must have their one-bit sequences adjacent, ie. 11110000 00001111 is valid</span>
+<span class="sd">                    11110000, 00000111 is not valid</span>
+<span class="sd">        4. bit-wise union of all masks must equal to `2^n_bits - 1`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">has_unique_sequence_of_ones</span><span class="p">,</span> <span class="n">n_bits</span><span class="o">=</span><span class="n">n_bits</span><span class="p">),</span> <span class="n">masks</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">cls</span><span class="o">.</span><span class="n">masks_overlap</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">masks</span><span class="p">)))</span> <span class="ow">and</span> <span class="bp">cls</span><span class="o">.</span><span class="n">masks_are_adjacent</span><span class="p">(</span><span class="n">masks</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">cls</span><span class="o">.</span><span class="n">masks_cover_nbits</span><span class="p">(</span>
+            <span class="n">masks</span><span class="p">,</span> <span class="n">n_bits</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LabelHierarchy.masks_overlap"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_hierarchy.LabelHierarchy.masks_overlap">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">masks_overlap</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">masks</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Checks whether the sorted masks in `masks` have nonempty bitwise intersection.&quot;&quot;&quot;</span>
+        <span class="n">masks_</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">masks</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">masks_</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">masks_</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&amp;</span> <span class="n">masks_</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="LabelHierarchy.masks_are_adjacent"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_hierarchy.LabelHierarchy.masks_are_adjacent">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">masks_are_adjacent</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">masks</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Checks whether the neighboring masks in sorted(`masks`) are adjacent w.r.t. to their one-bit sequences.</span>
+<span class="sd">        see 3. in the docstring of `are_valid_masks`&quot;&quot;&quot;</span>
+        <span class="n">masks_</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">masks</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">masks_</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">masks_</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">masks_</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span><span class="p">)):</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="LabelHierarchy.has_unique_sequence_of_ones"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_hierarchy.LabelHierarchy.has_unique_sequence_of_ones">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">has_unique_sequence_of_ones</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">mask</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">n_bits</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Checks whether `mask` contains a single contiguous run of `1`-s.&quot;&quot;&quot;</span>
+        <span class="n">found_seq_already</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># is True when 0 bit is encountered after a sequence of 1 bits</span>
+        <span class="n">ones</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># is switched to True when encountered the first 1 bit</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_bits</span><span class="p">):</span>
+            <span class="n">bit</span> <span class="o">=</span> <span class="p">(</span><span class="n">mask</span> <span class="o">&gt;&gt;</span> <span class="n">i</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">bit</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">found_seq_already</span><span class="p">:</span> <span class="c1"># The first 1bit encountered, marking the first sequence of 1bits</span>
+                    <span class="n">ones</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="n">found_seq_already</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">ones</span><span class="p">:</span> <span class="c1"># This means we encountered a second sequence of 1bits, making the mask an invalid one</span>
+                        <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ones</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="LabelHierarchy.create"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_hierarchy.LabelHierarchy.create">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">masks</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">mask_names</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">n_bits</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32</span><span class="p">)</span> <span class="o">-&gt;</span> \
+            <span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;LabelHierarchy&#39;</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Creates a new label hierarchy with the given masks in `masks`, named by `mask_names` and with a total of</span>
+<span class="sd">        `n_bits` bits per mask.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">cls</span><span class="o">.</span><span class="n">are_valid_masks</span><span class="p">(</span><span class="n">masks</span><span class="p">,</span> <span class="n">n_bits</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>  <span class="c1"># TODO raise Exception?</span>
+        <span class="k">if</span> <span class="n">mask_names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">mask_names</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;level </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">masks</span><span class="p">))]</span>
+
+        <span class="n">hier</span> <span class="o">=</span> <span class="n">LabelHierarchy</span><span class="p">()</span>
+        <span class="n">hier</span><span class="o">.</span><span class="n">whole_mask</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="n">n_bits</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">hier</span><span class="o">.</span><span class="n">masks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">masks</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>  <span class="c1"># sort the masks in DESC</span>
+        <span class="n">hier</span><span class="o">.</span><span class="n">counts_of_bits</span> <span class="o">=</span> <span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">_bit_count</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span> <span class="k">for</span> <span class="n">mask</span> <span class="ow">in</span> <span class="n">hier</span><span class="o">.</span><span class="n">masks</span><span class="p">]</span>  <span class="c1"># infer the count of bits of each mask</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">n_bits</span>
+        <span class="k">for</span> <span class="n">bit_count</span> <span class="ow">in</span> <span class="n">hier</span><span class="o">.</span><span class="n">counts_of_bits</span><span class="p">:</span>  <span class="c1"># derive the bit shift for each mask.</span>
+            <span class="n">start</span> <span class="o">-=</span> <span class="n">bit_count</span>
+            <span class="n">hier</span><span class="o">.</span><span class="n">shifts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">start</span><span class="p">)</span>
+        <span class="n">hier</span><span class="o">.</span><span class="n">named_masks</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">mask</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">mask</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">mask_names</span><span class="p">,</span> <span class="n">hier</span><span class="o">.</span><span class="n">masks</span><span class="p">)}</span>
+        <span class="n">hier</span><span class="o">.</span><span class="n">n_bits</span> <span class="o">=</span> <span class="n">n_bits</span>
+        <span class="n">hier</span><span class="o">.</span><span class="n">mask_names</span> <span class="o">=</span> <span class="n">mask_names</span>
+        <span class="n">hier</span><span class="o">.</span><span class="n">masks_names</span> <span class="o">=</span> <span class="p">{</span><span class="n">mask</span><span class="p">:</span> <span class="n">name</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">mask</span> <span class="ow">in</span> <span class="n">hier</span><span class="o">.</span><span class="n">named_masks</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">masks</span><span class="p">)):</span>
+            <span class="n">hier</span><span class="o">.</span><span class="n">_level_groups</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">set</span><span class="p">())</span>
+
+        <span class="k">return</span> <span class="n">hier</span></div>
+
+<div class="viewcode-block" id="LabelHierarchy.designate_bits"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_hierarchy.LabelHierarchy.designate_bits">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">designate_bits</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">counts_of_bits</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">mask_names</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">n_bits</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32</span><span class="p">)</span> <span class="o">-&gt;</span> \
+            <span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;LabelHierarchy&#39;</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Generates `len(counts_of_bits)` masks and designates each of them its corresponding number of bits as specified</span>
+<span class="sd">        in `counts_of_bits` out of total number of bits as specified in `n_bits`.</span>
+<span class="sd">        Optionally gives them names as specified in `mask_names`.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">mask_names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">mask_names</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;level </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">counts_of_bits</span><span class="p">))]</span>
+        <span class="n">masks</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">n_bits</span>
+        <span class="k">for</span> <span class="n">count_of_bits</span> <span class="ow">in</span> <span class="n">counts_of_bits</span><span class="p">:</span>
+            <span class="n">start</span> <span class="o">-=</span> <span class="n">count_of_bits</span>
+            <span class="n">masks</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="mi">2</span><span class="o">**</span><span class="n">count_of_bits</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">start</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">masks</span><span class="p">,</span> <span class="n">mask_names</span><span class="o">=</span><span class="n">mask_names</span><span class="p">,</span> <span class="n">n_bits</span><span class="o">=</span><span class="n">n_bits</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LabelHierarchy.masks_cover_nbits"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_hierarchy.LabelHierarchy.masks_cover_nbits">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">masks_cover_nbits</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">masks</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">n_bits</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Checks whether the total number of 1-bits in all masks in `masks` is equal to `n_bits`.&quot;&quot;&quot;</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">or_</span><span class="p">,</span> <span class="n">masks</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">mask</span> <span class="o">==</span> <span class="mi">2</span><span class="o">**</span><span class="n">n_bits</span> <span class="o">-</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="LabelHierarchy.load"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_hierarchy.LabelHierarchy.load">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">path_to_json</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;LabelHierarchy&#39;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">path_to_json</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path_to_json</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">label_hier_info</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="c1">#counts_of_bits = label_hier_info[&#39;counts_of_bits&#39;]</span>
+        <span class="c1">#mask_names = label_hier_info[&#39;mask_names&#39;]</span>
+        <span class="c1">#return cls.designate_bits(counts_of_bits, mask_names=mask_names, n_bits=sum(counts_of_bits))</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">label_hier_info</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LabelHierarchy.save"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_hierarchy.LabelHierarchy.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path_to_json</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path_to_json</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">({</span><span class="s1">&#39;counts_of_bits&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">counts_of_bits</span><span class="p">,</span> <span class="s1">&#39;mask_names&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask_names</span><span class="p">},</span> <span class="n">f</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LabelHierarchy.get_level_name"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_hierarchy.LabelHierarchy.get_level_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_level_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label_or_code</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the name of the level that the `label` as specified by `label_or_code` belongs to.</span>
+
+<span class="sd">        :param label_or_code: either the integer representation of the label or its textual code.</span>
+<span class="sd">        :type label_or_code: int or str</span>
+<span class="sd">        :return: name of the level the input label belongs to</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">label_or_code</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="n">label_or_code</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="n">label_or_code</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask_names</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_level</span><span class="p">(</span><span class="n">label</span><span class="p">)]</span></div>
+        <span class="c1">#for level in range(len(self.masks) - 1, -1, -1):</span>
+        <span class="c1">#    if label &amp; self.masks[level]:</span>
+        <span class="c1">#        return self.mask_names[level]</span>
+
+<div class="viewcode-block" id="LabelHierarchy.get_level"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_hierarchy.LabelHierarchy.get_level">[docs]</a>    <span class="k">def</span> <span class="nf">get_level</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the level the label `label` belongs to in this hierarchy.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">label</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">label</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">for</span> <span class="n">level</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">masks</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">label</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">masks</span><span class="p">[</span><span class="n">level</span><span class="p">]:</span>
+                <span class="k">return</span> <span class="n">level</span></div>
+
+<div class="viewcode-block" id="LabelHierarchy.get_mask"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_hierarchy.LabelHierarchy.get_mask">[docs]</a>    <span class="k">def</span> <span class="nf">get_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the mask of the level that the `label` belongs to.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">masks</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_level</span><span class="p">(</span><span class="n">label</span><span class="p">)]</span></div>
+
+<div class="viewcode-block" id="LabelHierarchy.label_mask"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_hierarchy.LabelHierarchy.label_mask">[docs]</a>    <span class="k">def</span> <span class="nf">label_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the union of self.masks[0],...,self.masks[self.get_level(label)]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">level</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_level</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">level</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">masks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">mask</span></div>
+
+<div class="viewcode-block" id="LabelHierarchy.get_parent"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_hierarchy.LabelHierarchy.get_parent">[docs]</a>    <span class="k">def</span> <span class="nf">get_parent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label_or_code</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the parent label of the label represented by `label_or_code`.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">label_or_code</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="n">label_or_code</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="n">label_or_code</span>
+        <span class="c1"># #mask = self.get_mask(label)</span>
+        <span class="c1"># #index = self.masks.index(mask)</span>
+        <span class="c1"># return self.get_level(label) - 1  # For top level mask (index 0), -1 is correct, meaning it does not have a parent</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="n">label</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="LabelHierarchy.get_ancestors"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_hierarchy.LabelHierarchy.get_ancestors">[docs]</a>    <span class="k">def</span> <span class="nf">get_ancestors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the list of ancestor labels for `label`.&quot;&quot;&quot;</span>
+        <span class="n">parents</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">curr_label</span> <span class="o">=</span> <span class="n">label</span>
+        <span class="k">while</span> <span class="p">(</span><span class="n">parent</span> <span class="o">:=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="n">curr_label</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">parents</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+            <span class="n">curr_label</span> <span class="o">=</span> <span class="n">parent</span>
+        <span class="c1"># parents.append(-1)</span>
+        <span class="k">return</span> <span class="n">parents</span></div>
+
+<div class="viewcode-block" id="LabelHierarchy.code"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_hierarchy.LabelHierarchy.code">[docs]</a>    <span class="k">def</span> <span class="nf">code</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the textual code representation of `label`.&quot;&quot;&quot;</span>
+        <span class="n">str_code</span> <span class="o">=</span> <span class="nb">str</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">masks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&amp;</span> <span class="n">label</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">shifts</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">sep</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">masks</span><span class="p">)):</span>
+            <span class="n">str_code</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">masks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&amp;</span> <span class="n">label</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">shifts</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">sep</span>
+        <span class="k">return</span> <span class="n">str_code</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="LabelHierarchy.label"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_hierarchy.LabelHierarchy.label">[docs]</a>    <span class="k">def</span> <span class="nf">label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the `label` that is represented by `code`.&quot;&quot;&quot;</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">code</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sep</span><span class="p">)</span>
+        <span class="n">bits</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">label</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">shift</span> <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">shift</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">shifts</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">or_</span><span class="p">,</span> <span class="n">bits</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LabelHierarchy.level_mask"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_hierarchy.LabelHierarchy.level_mask">[docs]</a>    <span class="k">def</span> <span class="nf">level_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the union of self.masks[0],...,self.masks[level].</span>
+<span class="sd">        :param level: Number indicating the level a level mask should be returned for.</span>
+<span class="sd">        :type level: int</span>
+<span class="sd">        :return: The mask for the level.</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">mask</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">level</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">mask</span> <span class="o">|=</span> <span class="bp">self</span><span class="o">.</span><span class="n">masks</span><span class="p">[</span><span class="n">l</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">mask</span></div>
+
+<div class="viewcode-block" id="LabelHierarchy.get_label_mask_up_to"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_hierarchy.LabelHierarchy.get_label_mask_up_to">[docs]</a>    <span class="k">def</span> <span class="nf">get_label_mask_up_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the bitwise AND of `level_mask(level) and `label`.&quot;&quot;&quot;</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">level</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">mask</span> <span class="o">|=</span> <span class="bp">self</span><span class="o">.</span><span class="n">masks</span><span class="p">[</span><span class="n">l</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">mask</span> <span class="o">&amp;</span> <span class="n">label</span></div>
+
+<div class="viewcode-block" id="LabelHierarchy.set_labels"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_hierarchy.LabelHierarchy.set_labels">[docs]</a>    <span class="k">def</span> <span class="nf">set_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labels</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="p">:</span>
+            <span class="n">node</span> <span class="o">=</span> <span class="n">Node</span><span class="p">()</span>
+            <span class="n">node</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">label</span>
+            <span class="n">node</span><span class="o">.</span><span class="n">code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">code</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">node</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_level_groups</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_level</span><span class="p">(</span><span class="n">label</span><span class="p">)]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">compute_children</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="LabelHierarchy.compute_children"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_hierarchy.LabelHierarchy.compute_children">[docs]</a>    <span class="k">def</span> <span class="nf">compute_children</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Establishes descendant relations between label nodes.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_create_root_node</span><span class="p">()</span>
+        <span class="k">if</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c1">#first_idx = 1 if self.labels[0] == 0 else 0</span>
+        <span class="n">parent_label</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="n">parent_label</span>
+        <span class="n">depth</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>  <span class="c1"># on depth 1 we look for children of `label` which is on level 0</span>
+        <span class="n">stack</span> <span class="o">=</span> <span class="p">[</span><span class="n">parent_label</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">curr_label</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="p">:</span>
+            <span class="n">curr_depth</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_level</span><span class="p">(</span><span class="n">curr_label</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">curr_label</span><span class="p">,</span> <span class="p">[])</span>
+            <span class="k">if</span> <span class="n">curr_depth</span> <span class="o">==</span> <span class="n">depth</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">parent_label</span><span class="p">]</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">curr_label</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">curr_label</span><span class="p">]</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">parent_label</span><span class="p">]</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">parent_label</span><span class="p">,</span> <span class="nb">list</span><span class="p">())</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">curr_label</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="n">curr_label</span><span class="p">]</span> <span class="o">=</span> <span class="n">parent_label</span>
+                <span class="n">label</span> <span class="o">=</span> <span class="n">curr_label</span>
+            <span class="k">elif</span> <span class="n">curr_depth</span> <span class="o">&gt;</span> <span class="n">depth</span><span class="p">:</span>
+                <span class="n">parent_label</span> <span class="o">=</span> <span class="n">label</span>
+                <span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">parent_label</span><span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">parent_label</span><span class="p">]</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">curr_label</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">curr_label</span><span class="p">]</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">parent_label</span><span class="p">]</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">parent_label</span><span class="p">,</span> <span class="nb">list</span><span class="p">())</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">curr_label</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="n">curr_label</span><span class="p">]</span> <span class="o">=</span> <span class="n">parent_label</span>
+                <span class="n">label</span> <span class="o">=</span> <span class="n">curr_label</span>
+                <span class="n">depth</span> <span class="o">=</span> <span class="n">curr_depth</span>
+            <span class="k">elif</span> <span class="n">curr_depth</span> <span class="o">&lt;</span> <span class="n">depth</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">depth</span> <span class="o">-</span> <span class="n">curr_depth</span><span class="p">):</span>
+                    <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+                <span class="n">parent_label</span> <span class="o">=</span> <span class="n">stack</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">parent_label</span><span class="p">]</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">curr_label</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">curr_label</span><span class="p">]</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">parent_label</span><span class="p">]</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">parent_label</span><span class="p">,</span> <span class="nb">list</span><span class="p">())</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">curr_label</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="n">curr_label</span><span class="p">]</span> <span class="o">=</span> <span class="n">parent_label</span>
+                <span class="n">label</span> <span class="o">=</span> <span class="n">curr_label</span>
+                <span class="n">depth</span> <span class="o">=</span> <span class="n">curr_depth</span></div>
+
+    <span class="k">def</span> <span class="nf">_create_root_node</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Creates a root node. This label node is not used by the user and should not appear anywhere visible.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">root</span> <span class="o">=</span> <span class="n">Node</span><span class="p">()</span>
+        <span class="n">root</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">root</span><span class="o">.</span><span class="n">code</span> <span class="o">=</span> <span class="s1">&#39;-1:0:0:0&#39;</span>  <span class="c1"># whatever, this node won&#39;t be ever used for anything useful, just to have a proper rooted tree</span>
+        <span class="n">root</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;invalid&#39;</span>
+        <span class="n">root</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">root</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">root</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+<div class="viewcode-block" id="LabelHierarchy.is_descendant_of"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_hierarchy.LabelHierarchy.is_descendant_of">[docs]</a>    <span class="k">def</span> <span class="nf">is_descendant_of</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">desc</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">ance</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Checks whether the label `desc` is actually a descendant of the label `ance`.&quot;&quot;&quot;</span>
+        <span class="n">ance_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_mask</span><span class="p">(</span><span class="n">ance</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">desc</span> <span class="o">&amp;</span> <span class="n">ance_mask</span><span class="p">)</span> <span class="o">==</span> <span class="n">ance</span></div>
+
+<div class="viewcode-block" id="LabelHierarchy.is_ancestor_of"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_hierarchy.LabelHierarchy.is_ancestor_of">[docs]</a>    <span class="k">def</span> <span class="nf">is_ancestor_of</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ance</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Checks whether the label `ance` is actually the ancestor of the label `label`.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_descendant_of</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">ance</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LabelHierarchy.add_label"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_hierarchy.LabelHierarchy.add_label">[docs]</a>    <span class="k">def</span> <span class="nf">add_label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">color</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">)):</span>
+        <span class="sd">&quot;&quot;&quot;Adds a new label to the hierarchy.&quot;&quot;&quot;</span>
+        <span class="c1"># TODO check that `label` is not present already</span>
+        <span class="n">parent_label</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_parent</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+        <span class="n">parent</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">parent_label</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">parent_label</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">parent_label</span>
+
+        <span class="n">label_node</span> <span class="o">=</span> <span class="n">Node</span><span class="p">()</span>
+        <span class="n">label_node</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">label</span>
+        <span class="n">label_node</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span>
+        <span class="n">label_node</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="n">label_node</span><span class="o">.</span><span class="n">code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">code</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+        <span class="n">label_node</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">label_node</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">color</span>
+
+        <span class="k">if</span> <span class="n">parent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">parent_label</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+            <span class="n">parent</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">label_node</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">label_node</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">colormap</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">color</span></div>
+
+<div class="viewcode-block" id="LabelHierarchy.add_child_label"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_hierarchy.LabelHierarchy.add_child_label">[docs]</a>    <span class="k">def</span> <span class="nf">add_child_label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">color</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Node</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Adds a new child label to the label `parent`.&quot;&quot;&quot;</span>
+        <span class="n">last_child</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">parent</span><span class="p">],</span> <span class="n">default</span><span class="o">=</span><span class="n">parent</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">last_child</span> <span class="o">!=</span> <span class="n">parent</span><span class="p">:</span>
+            <span class="n">level</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_level</span><span class="p">(</span><span class="n">last_child</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">level</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_level</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">masks</span><span class="p">[</span><span class="n">level</span><span class="p">]</span>
+        <span class="n">child_num</span> <span class="o">=</span> <span class="n">last_child</span>
+        <span class="n">one</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">shifts</span><span class="p">[</span><span class="n">level</span><span class="p">]</span>
+        <span class="n">child_num</span> <span class="o">+=</span> <span class="n">one</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="n">child_num</span>
+
+        <span class="n">parent_node</span><span class="p">:</span> <span class="n">Node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">parent</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">parent</span>
+
+        <span class="n">label_node</span> <span class="o">=</span> <span class="n">Node</span><span class="p">()</span>
+        <span class="n">label_node</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">label</span>
+        <span class="n">label_node</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">parent_node</span>
+        <span class="n">label_node</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="n">label_node</span><span class="o">.</span><span class="n">code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">code</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+        <span class="n">label_node</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">label_node</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">color</span>
+
+        <span class="k">if</span> <span class="n">parent_node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">parent</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+            <span class="n">parent_node</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">label_node</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">label_node</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">colormap</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">color</span>
+
+        <span class="k">return</span> <span class="n">label_node</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">level_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Set</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns sets of labels grouped by level, so `level_groups[1]` is a set of labels that are on level 1 in the hierarchy.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_level_groups</span>
+
+<div class="viewcode-block" id="LabelHierarchy.group_by_level"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_hierarchy.LabelHierarchy.group_by_level">[docs]</a>    <span class="k">def</span> <span class="nf">group_by_level</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">Set</span><span class="p">[</span><span class="nb">int</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Set</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Groups the `labels` based on their level in the hierarchy.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">groups</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Set</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">:</span>
+            <span class="n">groups</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_level</span><span class="p">(</span><span class="n">label</span><span class="p">),</span> <span class="nb">set</span><span class="p">())</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">groups</span></div>
+
+<div class="viewcode-block" id="LabelHierarchy.get_available_label"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_hierarchy.LabelHierarchy.get_available_label">[docs]</a>    <span class="k">def</span> <span class="nf">get_available_label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the next available child label for `parent`.&quot;&quot;&quot;</span>
+        <span class="n">last_child</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">parent</span><span class="p">],</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_mask</span><span class="p">(</span><span class="n">last_child</span><span class="p">)</span>
+        <span class="n">child_num</span> <span class="o">=</span> <span class="n">last_child</span> <span class="o">&amp;</span> <span class="n">mask</span>
+        <span class="n">one</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">shifts</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_level</span><span class="p">(</span><span class="n">last_child</span><span class="p">)]</span>
+        <span class="n">child_num</span> <span class="o">+=</span> <span class="n">one</span>
+
+        <span class="k">return</span> <span class="n">parent</span> <span class="o">|</span> <span class="n">child_num</span></div>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_bit_count</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">mask</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the number of `1-bits` in `mask`.&quot;&quot;&quot;</span>
+        <span class="n">bit</span> <span class="o">=</span> <span class="n">mask</span> <span class="o">&amp;</span> <span class="mi">1</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">bit</span><span class="p">:</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span>
+            <span class="n">bit</span> <span class="o">=</span> <span class="n">mask</span> <span class="o">&amp;</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">mask</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+
+<div class="viewcode-block" id="LabelHierarchy.from_dict"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_hierarchy.LabelHierarchy.from_dict">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">label_hier_info</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s1">&#39;LabelHierarchy&#39;</span><span class="p">:</span>
+        <span class="n">counts_of_bits</span> <span class="o">=</span> <span class="n">label_hier_info</span><span class="p">[</span><span class="s1">&#39;counts_of_bits&#39;</span><span class="p">]</span>
+        <span class="n">mask_names</span> <span class="o">=</span> <span class="n">label_hier_info</span><span class="p">[</span><span class="s1">&#39;mask_names&#39;</span><span class="p">]</span>
+        <span class="n">lab_hier</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">designate_bits</span><span class="p">(</span><span class="n">counts_of_bits</span><span class="p">,</span> <span class="n">mask_names</span><span class="o">=</span><span class="n">mask_names</span><span class="p">,</span> <span class="n">n_bits</span><span class="o">=</span><span class="nb">sum</span><span class="p">(</span><span class="n">counts_of_bits</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">label_dict</span> <span class="ow">in</span> <span class="n">label_hier_info</span><span class="p">[</span><span class="s1">&#39;labels&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">node</span> <span class="o">=</span> <span class="n">Node</span><span class="p">()</span>
+            <span class="n">node</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+            <span class="n">node</span><span class="o">.</span><span class="n">code</span> <span class="o">=</span> <span class="n">label_dict</span><span class="p">[</span><span class="s1">&#39;code&#39;</span><span class="p">]</span>
+            <span class="n">node</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">label_dict</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+            <span class="n">color</span> <span class="o">=</span> <span class="n">label_dict</span><span class="p">[</span><span class="s1">&#39;color&#39;</span><span class="p">]</span>
+            <span class="n">node</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">color</span><span class="p">[</span><span class="s1">&#39;red&#39;</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">color</span><span class="p">[</span><span class="s1">&#39;green&#39;</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">color</span><span class="p">[</span><span class="s1">&#39;blue&#39;</span><span class="p">]))</span>
+            <span class="n">lab_hier</span><span class="o">.</span><span class="n">colormap</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">color</span>
+            <span class="n">lab_hier</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">node</span>
+            <span class="n">lab_hier</span><span class="o">.</span><span class="n">labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
+        <span class="n">lab_hier</span><span class="o">.</span><span class="n">labels</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="n">lab_hier</span><span class="o">.</span><span class="n">compute_children</span><span class="p">()</span>
+        <span class="n">lab_hier</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">label_hier_info</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">mask_label</span> <span class="o">:=</span> <span class="n">label_hier_info</span><span class="p">[</span><span class="s1">&#39;constraint_mask_label&#39;</span><span class="p">])</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">lab_hier</span><span class="o">.</span><span class="n">mask_label</span> <span class="o">=</span> <span class="n">lab_hier</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">mask_label</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">lab_hier</span></div>
+
+<div class="viewcode-block" id="LabelHierarchy.to_dict"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_hierarchy.LabelHierarchy.to_dict">[docs]</a>    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="n">json_dict</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="s1">&#39;counts_of_bits&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">counts_of_bits</span><span class="p">,</span>
+            <span class="s1">&#39;mask_names&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask_names</span><span class="p">,</span>
+            <span class="s1">&#39;constraint_mask_label&#39;</span><span class="p">:</span> <span class="kc">None</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask_label</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask_label</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
+            <span class="s1">&#39;labels&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="n">label</span><span class="p">:</span> <span class="n">node</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span> <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">json_dict</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, CBIA @ FI MUNI.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

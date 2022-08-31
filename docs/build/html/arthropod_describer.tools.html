@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arthropod_describer.tools package &mdash; MAPHIS 0.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="arthropod_describer.tools.icons package" href="arthropod_describer.tools.icons.html" />
+    <link rel="prev" title="arthropod_describer.resources package" href="arthropod_describer.resources.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> MAPHIS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">arthropod_describer</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="arthropod_describer.html">arthropod_describer package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="arthropod_describer.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="arthropod_describer.bin.html">arthropod_describer.bin package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="arthropod_describer.common.html">arthropod_describer.common package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="arthropod_describer.label_editor.html">arthropod_describer.label_editor package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="arthropod_describer.measurements_viewer.html">arthropod_describer.measurements_viewer package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="arthropod_describer.plugins.html">arthropod_describer.plugins package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="arthropod_describer.resources.html">arthropod_describer.resources package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">arthropod_describer.tools package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.app">arthropod_describer.app module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.color_tolerance_dialog">arthropod_describer.color_tolerance_dialog module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.custom_graphics_view">arthropod_describer.custom_graphics_view module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.dbg_utils">arthropod_describer.dbg_utils module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.image_controls">arthropod_describer.image_controls module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.image_list_delegate">arthropod_describer.image_list_delegate module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.image_list_model">arthropod_describer.image_list_model module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.image_viewer">arthropod_describer.image_viewer module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.import_dialog">arthropod_describer.import_dialog module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.import_utils">arthropod_describer.import_utils module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.plugin_manager">arthropod_describer.plugin_manager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.resources">arthropod_describer.resources module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.tag_filter_widget">arthropod_describer.tag_filter_widget module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.tags_widget">arthropod_describer.tags_widget module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.thumbnail_gui">arthropod_describer.thumbnail_gui module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.thumbnail_storage">arthropod_describer.thumbnail_storage module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.ui_arthropod_describer">arthropod_describer.ui_arthropod_describer module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.ui_color_tolerance_dialog">arthropod_describer.ui_color_tolerance_dialog module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.ui_image_controls">arthropod_describer.ui_image_controls module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.ui_image_viewer">arthropod_describer.ui_image_viewer module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.ui_import_dialog">arthropod_describer.ui_import_dialog module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.ui_plugins_widget">arthropod_describer.ui_plugins_widget module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.ui_progress_dialog">arthropod_describer.ui_progress_dialog module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.ui_thumbnail_gui">arthropod_describer.ui_thumbnail_gui module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MAPHIS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="modules.html">arthropod_describer</a> &raquo;</li>
+          <li><a href="arthropod_describer.html">arthropod_describer package</a> &raquo;</li>
+      <li>arthropod_describer.tools package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/arthropod_describer.tools.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="arthropod-describer-tools-package">
+<h1>arthropod_describer.tools package<a class="headerlink" href="#arthropod-describer-tools-package" title="Permalink to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="arthropod_describer.tools.icons.html">arthropod_describer.tools.icons package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="arthropod_describer.tools.icons.html#module-arthropod_describer.tools.icons">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-arthropod_describer.tools.brush">
+<span id="arthropod-describer-tools-brush-module"></span><h2>arthropod_describer.tools.brush module<a class="headerlink" href="#module-arthropod_describer.tools.brush" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="arthropod_describer.tools.brush.Tool_Brush">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Tool_Brush</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.state.State" title="arthropod_describer.common.state.State"><span class="pre">State</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/tools/brush.html#Tool_Brush"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.brush.Tool_Brush" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.tool.Tool" title="arthropod_describer.common.tool.Tool"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tool</span></code></a></p>
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.tools.brush.Tool_Brush.active">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">active</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#arthropod_describer.tools.brush.Tool_Brush.active" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.brush.Tool_Brush.color_map_changed">
+<span class="sig-name descname"><span class="pre">color_map_changed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/tools/brush.html#Tool_Brush.color_map_changed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.brush.Tool_Brush.color_map_changed" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.tools.brush.Tool_Brush.cursor_image">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cursor_image</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">QImage</span></em><a class="headerlink" href="#arthropod_describer.tools.brush.Tool_Brush.cursor_image" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.brush.Tool_Brush.get_auto_scroll_distance">
+<span class="sig-name descname"><span class="pre">get_auto_scroll_distance</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/tools/brush.html#Tool_Brush.get_auto_scroll_distance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.brush.Tool_Brush.get_auto_scroll_distance" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.brush.Tool_Brush.get_command">
+<span class="sig-name descname"><span class="pre">get_command</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lab_img</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.label_image.LabelImg" title="arthropod_describer.common.label_image.LabelImg"><span class="pre">LabelImg</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.label_change.CommandEntry" title="arthropod_describer.common.label_change.CommandEntry"><span class="pre">CommandEntry</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/arthropod_describer/tools/brush.html#Tool_Brush.get_command"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.brush.Tool_Brush.get_command" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.brush.Tool_Brush.get_label_changes">
+<span class="sig-name descname"><span class="pre">get_label_changes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lab_img</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.label_image.LabelImg" title="arthropod_describer.common.label_image.LabelImg"><span class="pre">LabelImg</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.label_change.LabelChange" title="arthropod_describer.common.label_change.LabelChange"><span class="pre">LabelChange</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/arthropod_describer/tools/brush.html#Tool_Brush.get_label_changes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.brush.Tool_Brush.get_label_changes" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.brush.Tool_Brush.left_press">
+<span class="sig-name descname"><span class="pre">left_press</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">painter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPainter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.tool.EditContext" title="arthropod_describer.common.tool.EditContext"><span class="pre">EditContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.label_change.CommandEntry" title="arthropod_describer.common.label_change.CommandEntry"><span class="pre">CommandEntry</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">QRect</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/arthropod_describer/tools/brush.html#Tool_Brush.left_press"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.brush.Tool_Brush.left_press" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.brush.Tool_Brush.left_release">
+<span class="sig-name descname"><span class="pre">left_release</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">painter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPainter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.tool.EditContext" title="arthropod_describer.common.tool.EditContext"><span class="pre">EditContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.label_change.CommandEntry" title="arthropod_describer.common.label_change.CommandEntry"><span class="pre">CommandEntry</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">QRect</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/arthropod_describer/tools/brush.html#Tool_Brush.left_release"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.brush.Tool_Brush.left_release" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.brush.Tool_Brush.mouse_move">
+<span class="sig-name descname"><span class="pre">mouse_move</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">painter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPainter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old_pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.tool.EditContext" title="arthropod_describer.common.tool.EditContext"><span class="pre">EditContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.label_change.CommandEntry" title="arthropod_describer.common.label_change.CommandEntry"><span class="pre">CommandEntry</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">QRect</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/arthropod_describer/tools/brush.html#Tool_Brush.mouse_move"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.brush.Tool_Brush.mouse_move" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.brush.Tool_Brush.mouse_wheel">
+<span class="sig-name descname"><span class="pre">mouse_wheel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">delta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">painter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPainter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.tool.EditContext" title="arthropod_describer.common.tool.EditContext"><span class="pre">EditContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.label_change.CommandEntry" title="arthropod_describer.common.label_change.CommandEntry"><span class="pre">CommandEntry</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">QRect</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/arthropod_describer/tools/brush.html#Tool_Brush.mouse_wheel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.brush.Tool_Brush.mouse_wheel" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.brush.Tool_Brush.paint_on">
+<span class="sig-name descname"><span class="pre">paint_on</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">canvas</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPaintDevice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPen</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">brush</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QBrush</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clip_mask</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">QRegion</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/tools/brush.html#Tool_Brush.paint_on"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.brush.Tool_Brush.paint_on" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.brush.Tool_Brush.set_user_param">
+<span class="sig-name descname"><span class="pre">set_user_param</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="_modules/arthropod_describer/tools/brush.html#Tool_Brush.set_user_param"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.brush.Tool_Brush.set_user_param" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arthropod_describer.tools.brush.Tool_Brush.staticMetaObject">
+<span class="sig-name descname"><span class="pre">staticMetaObject</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;PySide2.QtCore.QMetaObject</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#arthropod_describer.tools.brush.Tool_Brush.staticMetaObject" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.tools.brush.Tool_Brush.tool_name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tool_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#arthropod_describer.tools.brush.Tool_Brush.tool_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.brush.Tool_Brush.update_primary_label">
+<span class="sig-name descname"><span class="pre">update_primary_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/tools/brush.html#Tool_Brush.update_primary_label"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.brush.Tool_Brush.update_primary_label" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.brush.Tool_Brush.update_secondary_label">
+<span class="sig-name descname"><span class="pre">update_secondary_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/tools/brush.html#Tool_Brush.update_secondary_label"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.brush.Tool_Brush.update_secondary_label" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.tools.brush.Tool_Brush.user_params">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">user_params</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.user_params.UserParam" title="arthropod_describer.common.user_params.UserParam"><span class="pre">UserParam</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#arthropod_describer.tools.brush.Tool_Brush.user_params" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.tools.brush.Tool_Brush.viz_active">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">viz_active</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#arthropod_describer.tools.brush.Tool_Brush.viz_active" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-arthropod_describer.tools.bucket">
+<span id="arthropod-describer-tools-bucket-module"></span><h2>arthropod_describer.tools.bucket module<a class="headerlink" href="#module-arthropod_describer.tools.bucket" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="arthropod_describer.tools.bucket.Tool_Bucket">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Tool_Bucket</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.state.State" title="arthropod_describer.common.state.State"><span class="pre">State</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/tools/bucket.html#Tool_Bucket"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.bucket.Tool_Bucket" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.tool.Tool" title="arthropod_describer.common.tool.Tool"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tool</span></code></a></p>
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.tools.bucket.Tool_Bucket.active">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">active</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#arthropod_describer.tools.bucket.Tool_Bucket.active" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.bucket.Tool_Bucket.color_map_changed">
+<span class="sig-name descname"><span class="pre">color_map_changed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/tools/bucket.html#Tool_Bucket.color_map_changed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.bucket.Tool_Bucket.color_map_changed" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.tools.bucket.Tool_Bucket.cursor_image">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cursor_image</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">CursorShape'&gt;]]</span></em><a class="headerlink" href="#arthropod_describer.tools.bucket.Tool_Bucket.cursor_image" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.bucket.Tool_Bucket.left_release">
+<span class="sig-name descname"><span class="pre">left_release</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">painter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPainter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.tool.EditContext" title="arthropod_describer.common.tool.EditContext"><span class="pre">EditContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.label_change.CommandEntry" title="arthropod_describer.common.label_change.CommandEntry"><span class="pre">CommandEntry</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">QRect</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/arthropod_describer/tools/bucket.html#Tool_Bucket.left_release"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.bucket.Tool_Bucket.left_release" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.bucket.Tool_Bucket.set_user_param">
+<span class="sig-name descname"><span class="pre">set_user_param</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/tools/bucket.html#Tool_Bucket.set_user_param"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.bucket.Tool_Bucket.set_user_param" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arthropod_describer.tools.bucket.Tool_Bucket.staticMetaObject">
+<span class="sig-name descname"><span class="pre">staticMetaObject</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;PySide2.QtCore.QMetaObject</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#arthropod_describer.tools.bucket.Tool_Bucket.staticMetaObject" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.tools.bucket.Tool_Bucket.tool_name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tool_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#arthropod_describer.tools.bucket.Tool_Bucket.tool_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.bucket.Tool_Bucket.update_primary_label">
+<span class="sig-name descname"><span class="pre">update_primary_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/tools/bucket.html#Tool_Bucket.update_primary_label"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.bucket.Tool_Bucket.update_primary_label" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.bucket.Tool_Bucket.update_secondary_label">
+<span class="sig-name descname"><span class="pre">update_secondary_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/tools/bucket.html#Tool_Bucket.update_secondary_label"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.bucket.Tool_Bucket.update_secondary_label" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.tools.bucket.Tool_Bucket.user_params">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">user_params</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.user_params.UserParam" title="arthropod_describer.common.user_params.UserParam"><span class="pre">UserParam</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#arthropod_describer.tools.bucket.Tool_Bucket.user_params" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-arthropod_describer.tools.contour_features">
+<span id="arthropod-describer-tools-contour-features-module"></span><h2>arthropod_describer.tools.contour_features module<a class="headerlink" href="#module-arthropod_describer.tools.contour_features" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="arthropod_describer.tools.contour_features.Too_Contour">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Too_Contour</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.state.State" title="arthropod_describer.common.state.State"><span class="pre">State</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">QObject</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/tools/contour_features.html#Too_Contour"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.contour_features.Too_Contour" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.tool.Tool" title="arthropod_describer.common.tool.Tool"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tool</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arthropod_describer.tools.contour_features.Too_Contour.staticMetaObject">
+<span class="sig-name descname"><span class="pre">staticMetaObject</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;PySide2.QtCore.QMetaObject</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#arthropod_describer.tools.contour_features.Too_Contour.staticMetaObject" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.tools.contour_features.Too_Contour.tool_name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tool_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#arthropod_describer.tools.contour_features.Too_Contour.tool_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.tools.contour_features.Too_Contour.viz_active">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">viz_active</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#arthropod_describer.tools.contour_features.Too_Contour.viz_active" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.contour_features.Too_Contour.viz_hover_move">
+<span class="sig-name descname"><span class="pre">viz_hover_move</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old_pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPoint</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">QPainter</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/arthropod_describer/tools/contour_features.html#Too_Contour.viz_hover_move"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.contour_features.Too_Contour.viz_hover_move" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.contour_features.Too_Contour.viz_left_press">
+<span class="sig-name descname"><span class="pre">viz_left_press</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPoint</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">QPainter</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/arthropod_describer/tools/contour_features.html#Too_Contour.viz_left_press"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.contour_features.Too_Contour.viz_left_press" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.contour_features.Too_Contour.viz_left_release">
+<span class="sig-name descname"><span class="pre">viz_left_release</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPoint</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">QPainter</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/arthropod_describer/tools/contour_features.html#Too_Contour.viz_left_release"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.contour_features.Too_Contour.viz_left_release" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.contour_features.Too_Contour.viz_right_release">
+<span class="sig-name descname"><span class="pre">viz_right_release</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPoint</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">QPainter</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/arthropod_describer/tools/contour_features.html#Too_Contour.viz_right_release"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.contour_features.Too_Contour.viz_right_release" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-arthropod_describer.tools.knife">
+<span id="arthropod-describer-tools-knife-module"></span><h2>arthropod_describer.tools.knife module<a class="headerlink" href="#module-arthropod_describer.tools.knife" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="arthropod_describer.tools.knife.Tool_Knife">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Tool_Knife</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.state.State" title="arthropod_describer.common.state.State"><span class="pre">State</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/tools/knife.html#Tool_Knife"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.knife.Tool_Knife" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.tool.Tool" title="arthropod_describer.common.tool.Tool"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tool</span></code></a></p>
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.tools.knife.Tool_Knife.active">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">active</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#arthropod_describer.tools.knife.Tool_Knife.active" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.knife.Tool_Knife.left_press">
+<span class="sig-name descname"><span class="pre">left_press</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">painter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPainter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.tool.EditContext" title="arthropod_describer.common.tool.EditContext"><span class="pre">EditContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.label_change.CommandEntry" title="arthropod_describer.common.label_change.CommandEntry"><span class="pre">CommandEntry</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">QRect</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/arthropod_describer/tools/knife.html#Tool_Knife.left_press"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.knife.Tool_Knife.left_press" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.knife.Tool_Knife.left_release">
+<span class="sig-name descname"><span class="pre">left_release</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">painter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPainter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.tool.EditContext" title="arthropod_describer.common.tool.EditContext"><span class="pre">EditContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.label_change.CommandEntry" title="arthropod_describer.common.label_change.CommandEntry"><span class="pre">CommandEntry</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">QRect</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/arthropod_describer/tools/knife.html#Tool_Knife.left_release"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.knife.Tool_Knife.left_release" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.knife.Tool_Knife.mouse_move">
+<span class="sig-name descname"><span class="pre">mouse_move</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">painter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPainter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old_pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.tool.EditContext" title="arthropod_describer.common.tool.EditContext"><span class="pre">EditContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.label_change.LabelChange" title="arthropod_describer.common.label_change.LabelChange"><span class="pre">LabelChange</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/arthropod_describer/tools/knife.html#Tool_Knife.mouse_move"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.knife.Tool_Knife.mouse_move" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arthropod_describer.tools.knife.Tool_Knife.staticMetaObject">
+<span class="sig-name descname"><span class="pre">staticMetaObject</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;PySide2.QtCore.QMetaObject</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#arthropod_describer.tools.knife.Tool_Knife.staticMetaObject" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.tools.knife.Tool_Knife.tool_name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tool_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#arthropod_describer.tools.knife.Tool_Knife.tool_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.tools.knife.Tool_Knife.user_params">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">user_params</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.user_params.UserParam" title="arthropod_describer.common.user_params.UserParam"><span class="pre">UserParam</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#arthropod_describer.tools.knife.Tool_Knife.user_params" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.tools.knife.Tool_Knife.viz_active">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">viz_active</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#arthropod_describer.tools.knife.Tool_Knife.viz_active" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.knife.Tool_Knife.viz_left_press">
+<span class="sig-name descname"><span class="pre">viz_left_press</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPoint</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">QPainter</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/arthropod_describer/tools/knife.html#Tool_Knife.viz_left_press"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.knife.Tool_Knife.viz_left_press" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.knife.Tool_Knife.viz_left_release">
+<span class="sig-name descname"><span class="pre">viz_left_release</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPoint</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">QPainter</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/arthropod_describer/tools/knife.html#Tool_Knife.viz_left_release"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.knife.Tool_Knife.viz_left_release" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.knife.Tool_Knife.viz_mouse_move">
+<span class="sig-name descname"><span class="pre">viz_mouse_move</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old_pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPoint</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">QPainter</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/arthropod_describer/tools/knife.html#Tool_Knife.viz_mouse_move"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.knife.Tool_Knife.viz_mouse_move" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="arthropod_describer.tools.knife.draw_line">
+<span class="sig-name descname"><span class="pre">draw_line</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.tool.EditContext" title="arthropod_describer.common.tool.EditContext"><span class="pre">EditContext</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/tools/knife.html#draw_line"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.knife.draw_line" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-arthropod_describer.tools.polygon">
+<span id="arthropod-describer-tools-polygon-module"></span><h2>arthropod_describer.tools.polygon module<a class="headerlink" href="#module-arthropod_describer.tools.polygon" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="arthropod_describer.tools.polygon.Tool_Polygon">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Tool_Polygon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.state.State" title="arthropod_describer.common.state.State"><span class="pre">State</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">QObject</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/tools/polygon.html#Tool_Polygon"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.polygon.Tool_Polygon" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.tool.Tool" title="arthropod_describer.common.tool.Tool"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tool</span></code></a></p>
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.tools.polygon.Tool_Polygon.active">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">active</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#arthropod_describer.tools.polygon.Tool_Polygon.active" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.polygon.Tool_Polygon.left_press">
+<span class="sig-name descname"><span class="pre">left_press</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">painter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPainter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.tool.EditContext" title="arthropod_describer.common.tool.EditContext"><span class="pre">EditContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.label_change.CommandEntry" title="arthropod_describer.common.label_change.CommandEntry"><span class="pre">CommandEntry</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">QRect</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/arthropod_describer/tools/polygon.html#Tool_Polygon.left_press"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.polygon.Tool_Polygon.left_press" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.polygon.Tool_Polygon.mouse_double_click">
+<span class="sig-name descname"><span class="pre">mouse_double_click</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">painter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPainter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.tool.EditContext" title="arthropod_describer.common.tool.EditContext"><span class="pre">EditContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.label_change.CommandEntry" title="arthropod_describer.common.label_change.CommandEntry"><span class="pre">CommandEntry</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">QRect</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/arthropod_describer/tools/polygon.html#Tool_Polygon.mouse_double_click"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.polygon.Tool_Polygon.mouse_double_click" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.polygon.Tool_Polygon.mouse_move">
+<span class="sig-name descname"><span class="pre">mouse_move</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">painter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPainter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old_pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.tool.EditContext" title="arthropod_describer.common.tool.EditContext"><span class="pre">EditContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.label_change.CommandEntry" title="arthropod_describer.common.label_change.CommandEntry"><span class="pre">CommandEntry</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">QRect</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/arthropod_describer/tools/polygon.html#Tool_Polygon.mouse_move"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.polygon.Tool_Polygon.mouse_move" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.polygon.Tool_Polygon.reset_tool">
+<span class="sig-name descname"><span class="pre">reset_tool</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/tools/polygon.html#Tool_Polygon.reset_tool"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.polygon.Tool_Polygon.reset_tool" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.polygon.Tool_Polygon.right_release">
+<span class="sig-name descname"><span class="pre">right_release</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">painter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPainter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.tool.EditContext" title="arthropod_describer.common.tool.EditContext"><span class="pre">EditContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.label_change.CommandEntry" title="arthropod_describer.common.label_change.CommandEntry"><span class="pre">CommandEntry</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">QRect</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/arthropod_describer/tools/polygon.html#Tool_Polygon.right_release"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.polygon.Tool_Polygon.right_release" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.polygon.Tool_Polygon.should_auto_scroll_with_left_button_released">
+<span class="sig-name descname"><span class="pre">should_auto_scroll_with_left_button_released</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/tools/polygon.html#Tool_Polygon.should_auto_scroll_with_left_button_released"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.polygon.Tool_Polygon.should_auto_scroll_with_left_button_released" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arthropod_describer.tools.polygon.Tool_Polygon.staticMetaObject">
+<span class="sig-name descname"><span class="pre">staticMetaObject</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;PySide2.QtCore.QMetaObject</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#arthropod_describer.tools.polygon.Tool_Polygon.staticMetaObject" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.tools.polygon.Tool_Polygon.tool_name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tool_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#arthropod_describer.tools.polygon.Tool_Polygon.tool_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.tools.polygon.Tool_Polygon.user_params">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">user_params</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.user_params.UserParam" title="arthropod_describer.common.user_params.UserParam"><span class="pre">UserParam</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#arthropod_describer.tools.polygon.Tool_Polygon.user_params" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.tools.polygon.Tool_Polygon.viz_active">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">viz_active</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#arthropod_describer.tools.polygon.Tool_Polygon.viz_active" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.tools.polygon.Tool_Polygon.viz_commands">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">viz_commands</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">QPainter</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#arthropod_describer.tools.polygon.Tool_Polygon.viz_commands" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.polygon.Tool_Polygon.viz_hover_move">
+<span class="sig-name descname"><span class="pre">viz_hover_move</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old_pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPoint</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">QPainter</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/arthropod_describer/tools/polygon.html#Tool_Polygon.viz_hover_move"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.polygon.Tool_Polygon.viz_hover_move" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.polygon.Tool_Polygon.viz_left_press">
+<span class="sig-name descname"><span class="pre">viz_left_press</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPoint</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">QPainter</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/arthropod_describer/tools/polygon.html#Tool_Polygon.viz_left_press"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.polygon.Tool_Polygon.viz_left_press" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.polygon.Tool_Polygon.viz_left_release">
+<span class="sig-name descname"><span class="pre">viz_left_release</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPoint</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">QPainter</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/arthropod_describer/tools/polygon.html#Tool_Polygon.viz_left_release"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.polygon.Tool_Polygon.viz_left_release" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.polygon.Tool_Polygon.viz_mouse_double_click">
+<span class="sig-name descname"><span class="pre">viz_mouse_double_click</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPoint</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">QPainter</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/arthropod_describer/tools/polygon.html#Tool_Polygon.viz_mouse_double_click"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.polygon.Tool_Polygon.viz_mouse_double_click" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.polygon.Tool_Polygon.viz_mouse_move">
+<span class="sig-name descname"><span class="pre">viz_mouse_move</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old_pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPoint</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">QPainter</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/arthropod_describer/tools/polygon.html#Tool_Polygon.viz_mouse_move"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.polygon.Tool_Polygon.viz_mouse_move" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.polygon.Tool_Polygon.viz_right_release">
+<span class="sig-name descname"><span class="pre">viz_right_release</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPoint</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">QPainter</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/arthropod_describer/tools/polygon.html#Tool_Polygon.viz_right_release"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.polygon.Tool_Polygon.viz_right_release" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-arthropod_describer.tools.ruler">
+<span id="arthropod-describer-tools-ruler-module"></span><h2>arthropod_describer.tools.ruler module<a class="headerlink" href="#module-arthropod_describer.tools.ruler" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="arthropod_describer.tools.ruler.Tool_Ruler">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Tool_Ruler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.state.State" title="arthropod_describer.common.state.State"><span class="pre">State</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/tools/ruler.html#Tool_Ruler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.ruler.Tool_Ruler" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.tool.Tool" title="arthropod_describer.common.tool.Tool"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tool</span></code></a></p>
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.tools.ruler.Tool_Ruler.active">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">active</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#arthropod_describer.tools.ruler.Tool_Ruler.active" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.ruler.Tool_Ruler.regenerate_real_measurements">
+<span class="sig-name descname"><span class="pre">regenerate_real_measurements</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/tools/ruler.html#Tool_Ruler.regenerate_real_measurements"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.ruler.Tool_Ruler.regenerate_real_measurements" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.ruler.Tool_Ruler.regenerate_viz">
+<span class="sig-name descname"><span class="pre">regenerate_viz</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/tools/ruler.html#Tool_Ruler.regenerate_viz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.ruler.Tool_Ruler.regenerate_viz" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.ruler.Tool_Ruler.reset_tool">
+<span class="sig-name descname"><span class="pre">reset_tool</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/tools/ruler.html#Tool_Ruler.reset_tool"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.ruler.Tool_Ruler.reset_tool" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.ruler.Tool_Ruler.right_press">
+<span class="sig-name descname"><span class="pre">right_press</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">painter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPainter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.tool.EditContext" title="arthropod_describer.common.tool.EditContext"><span class="pre">EditContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.label_change.CommandEntry" title="arthropod_describer.common.label_change.CommandEntry"><span class="pre">CommandEntry</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">QRect</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/arthropod_describer/tools/ruler.html#Tool_Ruler.right_press"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.ruler.Tool_Ruler.right_press" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.ruler.Tool_Ruler.rotate">
+<span class="sig-name descname"><span class="pre">rotate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ccw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/tools/ruler.html#Tool_Ruler.rotate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.ruler.Tool_Ruler.rotate" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.ruler.Tool_Ruler.set_line">
+<span class="sig-name descname"><span class="pre">set_line</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset_others</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/tools/ruler.html#Tool_Ruler.set_line"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.ruler.Tool_Ruler.set_line" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.ruler.Tool_Ruler.set_out_widget">
+<span class="sig-name descname"><span class="pre">set_out_widget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">widg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">QGroupBox</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/arthropod_describer/tools/ruler.html#Tool_Ruler.set_out_widget"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.ruler.Tool_Ruler.set_out_widget" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.ruler.Tool_Ruler.set_scale">
+<span class="sig-name descname"><span class="pre">set_scale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.units.Value" title="arthropod_describer.common.units.Value"><span class="pre">Value</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/tools/ruler.html#Tool_Ruler.set_scale"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.ruler.Tool_Ruler.set_scale" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.ruler.Tool_Ruler.show_real_units">
+<span class="sig-name descname"><span class="pre">show_real_units</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/tools/ruler.html#Tool_Ruler.show_real_units"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.ruler.Tool_Ruler.show_real_units" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arthropod_describer.tools.ruler.Tool_Ruler.staticMetaObject">
+<span class="sig-name descname"><span class="pre">staticMetaObject</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;PySide2.QtCore.QMetaObject</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#arthropod_describer.tools.ruler.Tool_Ruler.staticMetaObject" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.tools.ruler.Tool_Ruler.tool_name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tool_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#arthropod_describer.tools.ruler.Tool_Ruler.tool_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.tools.ruler.Tool_Ruler.user_params">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">user_params</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.user_params.UserParam" title="arthropod_describer.common.user_params.UserParam"><span class="pre">UserParam</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#arthropod_describer.tools.ruler.Tool_Ruler.user_params" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.tools.ruler.Tool_Ruler.value_storage">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">value_storage</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#arthropod_describer.tools.ruler.Tool_Ruler.value_storage" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.tools.ruler.Tool_Ruler.viz_active">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">viz_active</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#arthropod_describer.tools.ruler.Tool_Ruler.viz_active" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.tools.ruler.Tool_Ruler.viz_commands">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">viz_commands</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">QPainter</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#arthropod_describer.tools.ruler.Tool_Ruler.viz_commands" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.ruler.Tool_Ruler.viz_hover_move">
+<span class="sig-name descname"><span class="pre">viz_hover_move</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old_pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPoint</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">QPainter</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/arthropod_describer/tools/ruler.html#Tool_Ruler.viz_hover_move"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.ruler.Tool_Ruler.viz_hover_move" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.ruler.Tool_Ruler.viz_left_press">
+<span class="sig-name descname"><span class="pre">viz_left_press</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPoint</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">QPainter</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/arthropod_describer/tools/ruler.html#Tool_Ruler.viz_left_press"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.ruler.Tool_Ruler.viz_left_press" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.ruler.Tool_Ruler.viz_left_release">
+<span class="sig-name descname"><span class="pre">viz_left_release</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPoint</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">QPainter</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/arthropod_describer/tools/ruler.html#Tool_Ruler.viz_left_release"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.ruler.Tool_Ruler.viz_left_release" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.ruler.Tool_Ruler.viz_mouse_move">
+<span class="sig-name descname"><span class="pre">viz_mouse_move</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old_pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPoint</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">QPainter</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/arthropod_describer/tools/ruler.html#Tool_Ruler.viz_mouse_move"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.ruler.Tool_Ruler.viz_mouse_move" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.tools.ruler.Tool_Ruler.viz_right_release">
+<span class="sig-name descname"><span class="pre">viz_right_release</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPoint</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">QPainter</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/arthropod_describer/tools/ruler.html#Tool_Ruler.viz_right_release"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.tools.ruler.Tool_Ruler.viz_right_release" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-arthropod_describer.tools">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-arthropod_describer.tools" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="arthropod_describer.resources.html" class="btn btn-neutral float-left" title="arthropod_describer.resources package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="arthropod_describer.tools.icons.html" class="btn btn-neutral float-right" title="arthropod_describer.tools.icons package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, CBIA @ FI MUNI.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

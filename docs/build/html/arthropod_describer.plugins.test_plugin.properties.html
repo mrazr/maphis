@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arthropod_describer.plugins.test_plugin.properties package &mdash; MAPHIS 0.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="arthropod_describer.plugins.test_plugin.regions package" href="arthropod_describer.plugins.test_plugin.regions.html" />
+    <link rel="prev" title="arthropod_describer.plugins.test_plugin package" href="arthropod_describer.plugins.test_plugin.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> MAPHIS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">arthropod_describer</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="arthropod_describer.html">arthropod_describer package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="arthropod_describer.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="arthropod_describer.bin.html">arthropod_describer.bin package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="arthropod_describer.common.html">arthropod_describer.common package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="arthropod_describer.label_editor.html">arthropod_describer.label_editor package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="arthropod_describer.measurements_viewer.html">arthropod_describer.measurements_viewer package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="arthropod_describer.plugins.html">arthropod_describer.plugins package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="arthropod_describer.resources.html">arthropod_describer.resources package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="arthropod_describer.tools.html">arthropod_describer.tools package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.app">arthropod_describer.app module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.color_tolerance_dialog">arthropod_describer.color_tolerance_dialog module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.custom_graphics_view">arthropod_describer.custom_graphics_view module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.dbg_utils">arthropod_describer.dbg_utils module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.image_controls">arthropod_describer.image_controls module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.image_list_delegate">arthropod_describer.image_list_delegate module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.image_list_model">arthropod_describer.image_list_model module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.image_viewer">arthropod_describer.image_viewer module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.import_dialog">arthropod_describer.import_dialog module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.import_utils">arthropod_describer.import_utils module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.plugin_manager">arthropod_describer.plugin_manager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.resources">arthropod_describer.resources module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.tag_filter_widget">arthropod_describer.tag_filter_widget module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.tags_widget">arthropod_describer.tags_widget module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.thumbnail_gui">arthropod_describer.thumbnail_gui module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.thumbnail_storage">arthropod_describer.thumbnail_storage module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.ui_arthropod_describer">arthropod_describer.ui_arthropod_describer module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.ui_color_tolerance_dialog">arthropod_describer.ui_color_tolerance_dialog module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.ui_image_controls">arthropod_describer.ui_image_controls module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.ui_image_viewer">arthropod_describer.ui_image_viewer module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.ui_import_dialog">arthropod_describer.ui_import_dialog module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.ui_plugins_widget">arthropod_describer.ui_plugins_widget module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.ui_progress_dialog">arthropod_describer.ui_progress_dialog module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer.ui_thumbnail_gui">arthropod_describer.ui_thumbnail_gui module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arthropod_describer.html#module-arthropod_describer">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MAPHIS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="modules.html">arthropod_describer</a> &raquo;</li>
+          <li><a href="arthropod_describer.html">arthropod_describer package</a> &raquo;</li>
+          <li><a href="arthropod_describer.plugins.html">arthropod_describer.plugins package</a> &raquo;</li>
+          <li><a href="arthropod_describer.plugins.test_plugin.html">arthropod_describer.plugins.test_plugin package</a> &raquo;</li>
+      <li>arthropod_describer.plugins.test_plugin.properties package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/arthropod_describer.plugins.test_plugin.properties.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="arthropod-describer-plugins-test-plugin-properties-package">
+<h1>arthropod_describer.plugins.test_plugin.properties package<a class="headerlink" href="#arthropod-describer-plugins-test-plugin-properties-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-arthropod_describer.plugins.test_plugin.properties.area">
+<span id="arthropod-describer-plugins-test-plugin-properties-area-module"></span><h2>arthropod_describer.plugins.test_plugin.properties.area module<a class="headerlink" href="#module-arthropod_describer.plugins.test_plugin.properties.area" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.area.Area">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Area</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.common.Info" title="arthropod_describer.common.common.Info"><span class="pre">Info</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/area.html#Area"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.area.Area" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.plugin.PropertyComputation" title="arthropod_describer.common.plugin.PropertyComputation"><code class="xref py py-class docutils literal notranslate"><span class="pre">PropertyComputation</span></code></a></p>
+<p>GROUP: Basic properties
+NAME: Area
+DESCRIPTION: Area of the region (px or mm²)
+KEY: area</p>
+<dl>
+<dt>USER_PARAMS:</dt><dd><p>PARAM_NAME: Magic number
+PARAM_TYPE: INT
+PARAM_KEY: magic_number
+VALUE: 42
+MIN_VALUE: 40
+MAX_VALUE: 45</p>
+<p>PARAM_NAME: Magic word
+PARAM_TYPE: STR
+PARAM_KEY: magic_word
+VALUE: please</p>
+<p>PARAM_NAME: Yes/No
+PARAM_TYPE: BOOL
+PARAM_KEY: magic_bool
+VALUE: True</p>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.area.Area.computes">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">computes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.common.Info" title="arthropod_describer.common.common.Info"><span class="pre">Info</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.area.Area.computes" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.area.Area.example">
+<span class="sig-name descname"><span class="pre">example</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.label_image.RegionProperty" title="arthropod_describer.common.label_image.RegionProperty"><span class="pre">RegionProperty</span></a></span></span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/area.html#Area.example"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.area.Area.example" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.area.Area.group">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">group</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.area.Area.group" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.area.Area.region_restricted">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">region_restricted</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.area.Area.region_restricted" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.area.Area.target_worksheet">
+<span class="sig-name descname"><span class="pre">target_worksheet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/area.html#Area.target_worksheet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.area.Area.target_worksheet" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.area.Area.user_params">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">user_params</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.user_params.UserParam" title="arthropod_describer.common.user_params.UserParam"><span class="pre">UserParam</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.area.Area.user_params" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-arthropod_describer.plugins.test_plugin.properties.basic_props">
+<span id="arthropod-describer-plugins-test-plugin-properties-basic-props-module"></span><h2>arthropod_describer.plugins.test_plugin.properties.basic_props module<a class="headerlink" href="#module-arthropod_describer.plugins.test_plugin.properties.basic_props" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.basic_props.BasicProperties">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">BasicProperties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.common.Info" title="arthropod_describer.common.common.Info"><span class="pre">Info</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/basic_props.html#BasicProperties"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.basic_props.BasicProperties" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>NAME: Basic properties
+DESCRIPTION: Computes basic region properties.</p>
+<p>REGION_RESTRICTED</p>
+<dl class="simple">
+<dt>USER_PARAMS:</dt><dd><p>PARAM_NAME: ABC
+PARAM_KEY: abc
+PARAM_TYPE: INT
+VALUE: 10
+MIN_VALUE: 5
+MAX_VALUE: 25</p>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.basic_props.BasicProperties.computes">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">computes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.common.Info" title="arthropod_describer.common.common.Info"><span class="pre">Info</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.basic_props.BasicProperties.computes" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.basic_props.BasicProperties.example">
+<span class="sig-name descname"><span class="pre">example</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.label_image.RegionProperty" title="arthropod_describer.common.label_image.RegionProperty"><span class="pre">RegionProperty</span></a></span></span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/basic_props.html#BasicProperties.example"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.basic_props.BasicProperties.example" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.basic_props.BasicProperties.target_worksheet">
+<span class="sig-name descname"><span class="pre">target_worksheet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/basic_props.html#BasicProperties.target_worksheet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.basic_props.BasicProperties.target_worksheet" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-arthropod_describer.plugins.test_plugin.properties.circularity">
+<span id="arthropod-describer-plugins-test-plugin-properties-circularity-module"></span><h2>arthropod_describer.plugins.test_plugin.properties.circularity module<a class="headerlink" href="#module-arthropod_describer.plugins.test_plugin.properties.circularity" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.circularity.Circularity">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Circularity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.common.Info" title="arthropod_describer.common.common.Info"><span class="pre">Info</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/circularity.html#Circularity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.circularity.Circularity" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.plugin.PropertyComputation" title="arthropod_describer.common.plugin.PropertyComputation"><code class="xref py py-class docutils literal notranslate"><span class="pre">PropertyComputation</span></code></a></p>
+<p>GROUP: Basic properties
+NAME: Circularity
+DESCRIPTION: Circularity (0.0 to 1.0, where 1.0 = perfect circle)
+KEY: circularity</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.circularity.Circularity.computes">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">computes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.common.Info" title="arthropod_describer.common.common.Info"><span class="pre">Info</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.circularity.Circularity.computes" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.circularity.Circularity.example">
+<span class="sig-name descname"><span class="pre">example</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.label_image.RegionProperty" title="arthropod_describer.common.label_image.RegionProperty"><span class="pre">RegionProperty</span></a></span></span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/circularity.html#Circularity.example"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.circularity.Circularity.example" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.circularity.Circularity.group">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">group</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.circularity.Circularity.group" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.circularity.Circularity.region_restricted">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">region_restricted</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.circularity.Circularity.region_restricted" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.circularity.Circularity.target_worksheet">
+<span class="sig-name descname"><span class="pre">target_worksheet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/circularity.html#Circularity.target_worksheet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.circularity.Circularity.target_worksheet" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.circularity.Circularity.user_params">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">user_params</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.user_params.UserParam" title="arthropod_describer.common.user_params.UserParam"><span class="pre">UserParam</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.circularity.Circularity.user_params" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-arthropod_describer.plugins.test_plugin.properties.geodesic_length">
+<span id="arthropod-describer-plugins-test-plugin-properties-geodesic-length-module"></span><h2>arthropod_describer.plugins.test_plugin.properties.geodesic_length module<a class="headerlink" href="#module-arthropod_describer.plugins.test_plugin.properties.geodesic_length" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.geodesic_length.GeodesicLength">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GeodesicLength</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.common.Info" title="arthropod_describer.common.common.Info"><span class="pre">Info</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/geodesic_length.html#GeodesicLength"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.geodesic_length.GeodesicLength" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.plugin.PropertyComputation" title="arthropod_describer.common.plugin.PropertyComputation"><code class="xref py py-class docutils literal notranslate"><span class="pre">PropertyComputation</span></code></a></p>
+<p>GROUP: Basic properties
+NAME: Geodesic length
+DESCRIPTION: Geodesic length (px or mm)
+KEY: geodesic_length</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.geodesic_length.GeodesicLength.computes">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">computes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.common.Info" title="arthropod_describer.common.common.Info"><span class="pre">Info</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.geodesic_length.GeodesicLength.computes" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.geodesic_length.GeodesicLength.example">
+<span class="sig-name descname"><span class="pre">example</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.label_image.RegionProperty" title="arthropod_describer.common.label_image.RegionProperty"><span class="pre">RegionProperty</span></a></span></span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/geodesic_length.html#GeodesicLength.example"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.geodesic_length.GeodesicLength.example" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.geodesic_length.GeodesicLength.group">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">group</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.geodesic_length.GeodesicLength.group" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.geodesic_length.GeodesicLength.region_restricted">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">region_restricted</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.geodesic_length.GeodesicLength.region_restricted" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.geodesic_length.GeodesicLength.target_worksheet">
+<span class="sig-name descname"><span class="pre">target_worksheet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/geodesic_length.html#GeodesicLength.target_worksheet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.geodesic_length.GeodesicLength.target_worksheet" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.geodesic_length.GeodesicLength.user_params">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">user_params</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.user_params.UserParam" title="arthropod_describer.common.user_params.UserParam"><span class="pre">UserParam</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.geodesic_length.GeodesicLength.user_params" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-arthropod_describer.plugins.test_plugin.properties.geodesic_length_cpp">
+<span id="arthropod-describer-plugins-test-plugin-properties-geodesic-length-cpp-module"></span><h2>arthropod_describer.plugins.test_plugin.properties.geodesic_length_cpp module<a class="headerlink" href="#module-arthropod_describer.plugins.test_plugin.properties.geodesic_length_cpp" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.geodesic_length_cpp.GeodesicLength">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GeodesicLength</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.common.Info" title="arthropod_describer.common.common.Info"><span class="pre">Info</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/geodesic_length_cpp.html#GeodesicLength"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.geodesic_length_cpp.GeodesicLength" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.plugin.PropertyComputation" title="arthropod_describer.common.plugin.PropertyComputation"><code class="xref py py-class docutils literal notranslate"><span class="pre">PropertyComputation</span></code></a></p>
+<p>GROUP: Basic properties
+NAME: Geodesic length(cpp)
+DESCRIPTION: Geodesic length (px or mm)
+KEY: geodesic_length2</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.geodesic_length_cpp.GeodesicLength.computes">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">computes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.common.Info" title="arthropod_describer.common.common.Info"><span class="pre">Info</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.geodesic_length_cpp.GeodesicLength.computes" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.geodesic_length_cpp.GeodesicLength.example">
+<span class="sig-name descname"><span class="pre">example</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.label_image.RegionProperty" title="arthropod_describer.common.label_image.RegionProperty"><span class="pre">RegionProperty</span></a></span></span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/geodesic_length_cpp.html#GeodesicLength.example"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.geodesic_length_cpp.GeodesicLength.example" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.geodesic_length_cpp.GeodesicLength.group">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">group</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.geodesic_length_cpp.GeodesicLength.group" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.geodesic_length_cpp.GeodesicLength.region_restricted">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">region_restricted</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.geodesic_length_cpp.GeodesicLength.region_restricted" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.geodesic_length_cpp.GeodesicLength.target_worksheet">
+<span class="sig-name descname"><span class="pre">target_worksheet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/geodesic_length_cpp.html#GeodesicLength.target_worksheet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.geodesic_length_cpp.GeodesicLength.target_worksheet" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.geodesic_length_cpp.GeodesicLength.user_params">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">user_params</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.user_params.UserParam" title="arthropod_describer.common.user_params.UserParam"><span class="pre">UserParam</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.geodesic_length_cpp.GeodesicLength.user_params" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-arthropod_describer.plugins.test_plugin.properties.geodesic_utils">
+<span id="arthropod-describer-plugins-test-plugin-properties-geodesic-utils-module"></span><h2>arthropod_describer.plugins.test_plugin.properties.geodesic_utils module<a class="headerlink" href="#module-arthropod_describer.plugins.test_plugin.properties.geodesic_utils" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.geodesic_utils.compute_longest_geodesic">
+<span class="sig-name descname"><span class="pre">compute_longest_geodesic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/geodesic_utils.html#compute_longest_geodesic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.geodesic_utils.compute_longest_geodesic" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.geodesic_utils.compute_longest_geodesic_perf">
+<span class="sig-name descname"><span class="pre">compute_longest_geodesic_perf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/geodesic_utils.html#compute_longest_geodesic_perf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.geodesic_utils.compute_longest_geodesic_perf" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.geodesic_utils.encode_bin_img">
+<span class="sig-name descname"><span class="pre">encode_bin_img</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bin_img</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/geodesic_utils.html#encode_bin_img"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.geodesic_utils.encode_bin_img" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.geodesic_utils.find_e">
+<span class="sig-name descname"><span class="pre">find_e</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encoded_bin_img</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_letter_code</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/geodesic_utils.html#find_e"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.geodesic_utils.find_e" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.geodesic_utils.find_shortest_path">
+<span class="sig-name descname"><span class="pre">find_shortest_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bin_img</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">src</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dst</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/geodesic_utils.html#find_shortest_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.geodesic_utils.find_shortest_path" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.geodesic_utils.find_skeleton_endpoints">
+<span class="sig-name descname"><span class="pre">find_skeleton_endpoints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">skeleton</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_letter_codes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/geodesic_utils.html#find_skeleton_endpoints"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.geodesic_utils.find_skeleton_endpoints" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.geodesic_utils.generate_nodes_edges">
+<span class="sig-name descname"><span class="pre">generate_nodes_edges</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bin_region</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/geodesic_utils.html#generate_nodes_edges"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.geodesic_utils.generate_nodes_edges" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.geodesic_utils.geodesic_distance_for_skeleton">
+<span class="sig-name descname"><span class="pre">geodesic_distance_for_skeleton</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sk</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">src</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/geodesic_utils.html#geodesic_distance_for_skeleton"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.geodesic_utils.geodesic_distance_for_skeleton" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.geodesic_utils.get_graph">
+<span class="sig-name descname"><span class="pre">get_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bin_region</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Graph</span></span></span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/geodesic_utils.html#get_graph"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.geodesic_utils.get_graph" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.geodesic_utils.get_graph2">
+<span class="sig-name descname"><span class="pre">get_graph2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bin_region</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Graph</span></span></span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/geodesic_utils.html#get_graph2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.geodesic_utils.get_graph2" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.geodesic_utils.get_longest_geodesic">
+<span class="sig-name descname"><span class="pre">get_longest_geodesic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lab_img</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/geodesic_utils.html#get_longest_geodesic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.geodesic_utils.get_longest_geodesic" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.geodesic_utils.get_longest_geodesic2">
+<span class="sig-name descname"><span class="pre">get_longest_geodesic2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/geodesic_utils.html#get_longest_geodesic2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.geodesic_utils.get_longest_geodesic2" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.geodesic_utils.get_node_with_longest_shortest_path">
+<span class="sig-name descname"><span class="pre">get_node_with_longest_shortest_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shortest_lengths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/geodesic_utils.html#get_node_with_longest_shortest_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.geodesic_utils.get_node_with_longest_shortest_path" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.geodesic_utils.neighbors">
+<span class="sig-name descname"><span class="pre">neighbors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/geodesic_utils.html#neighbors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.geodesic_utils.neighbors" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-arthropod_describer.plugins.test_plugin.properties.glcm_asm">
+<span id="arthropod-describer-plugins-test-plugin-properties-glcm-asm-module"></span><h2>arthropod_describer.plugins.test_plugin.properties.glcm_asm module<a class="headerlink" href="#module-arthropod_describer.plugins.test_plugin.properties.glcm_asm" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.glcm_asm.GLCMASM">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GLCMASM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.common.Info" title="arthropod_describer.common.common.Info"><span class="pre">Info</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/glcm_asm.html#GLCMASM"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.glcm_asm.GLCMASM" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.plugin.PropertyComputation" title="arthropod_describer.common.plugin.PropertyComputation"><code class="xref py py-class docutils literal notranslate"><span class="pre">PropertyComputation</span></code></a></p>
+<p>GROUP: GLCM properties
+NAME: ASM
+DESCRIPTION: GLCM ASM of the region
+KEY: ASM</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.glcm_asm.GLCMASM.computes">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">computes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.common.Info" title="arthropod_describer.common.common.Info"><span class="pre">Info</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.glcm_asm.GLCMASM.computes" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.glcm_asm.GLCMASM.example">
+<span class="sig-name descname"><span class="pre">example</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.label_image.RegionProperty" title="arthropod_describer.common.label_image.RegionProperty"><span class="pre">RegionProperty</span></a></span></span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/glcm_asm.html#GLCMASM.example"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.glcm_asm.GLCMASM.example" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.glcm_asm.GLCMASM.group">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">group</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.glcm_asm.GLCMASM.group" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.glcm_asm.GLCMASM.region_restricted">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">region_restricted</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.glcm_asm.GLCMASM.region_restricted" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.glcm_asm.GLCMASM.target_worksheet">
+<span class="sig-name descname"><span class="pre">target_worksheet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/glcm_asm.html#GLCMASM.target_worksheet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.glcm_asm.GLCMASM.target_worksheet" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.glcm_asm.GLCMASM.user_params">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">user_params</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.user_params.UserParam" title="arthropod_describer.common.user_params.UserParam"><span class="pre">UserParam</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.glcm_asm.GLCMASM.user_params" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-arthropod_describer.plugins.test_plugin.properties.glcm_contrast">
+<span id="arthropod-describer-plugins-test-plugin-properties-glcm-contrast-module"></span><h2>arthropod_describer.plugins.test_plugin.properties.glcm_contrast module<a class="headerlink" href="#module-arthropod_describer.plugins.test_plugin.properties.glcm_contrast" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.glcm_contrast.GLCMContrast">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GLCMContrast</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.common.Info" title="arthropod_describer.common.common.Info"><span class="pre">Info</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/glcm_contrast.html#GLCMContrast"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.glcm_contrast.GLCMContrast" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.plugin.PropertyComputation" title="arthropod_describer.common.plugin.PropertyComputation"><code class="xref py py-class docutils literal notranslate"><span class="pre">PropertyComputation</span></code></a></p>
+<p>GROUP: GLCM properties
+NAME: Contrast
+DESCRIPTION: GLCM contrast of the region
+KEY: contrast</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.glcm_contrast.GLCMContrast.computes">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">computes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.common.Info" title="arthropod_describer.common.common.Info"><span class="pre">Info</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.glcm_contrast.GLCMContrast.computes" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.glcm_contrast.GLCMContrast.example">
+<span class="sig-name descname"><span class="pre">example</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.label_image.RegionProperty" title="arthropod_describer.common.label_image.RegionProperty"><span class="pre">RegionProperty</span></a></span></span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/glcm_contrast.html#GLCMContrast.example"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.glcm_contrast.GLCMContrast.example" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.glcm_contrast.GLCMContrast.group">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">group</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.glcm_contrast.GLCMContrast.group" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.glcm_contrast.GLCMContrast.region_restricted">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">region_restricted</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.glcm_contrast.GLCMContrast.region_restricted" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.glcm_contrast.GLCMContrast.target_worksheet">
+<span class="sig-name descname"><span class="pre">target_worksheet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/glcm_contrast.html#GLCMContrast.target_worksheet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.glcm_contrast.GLCMContrast.target_worksheet" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.glcm_contrast.GLCMContrast.user_params">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">user_params</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.user_params.UserParam" title="arthropod_describer.common.user_params.UserParam"><span class="pre">UserParam</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.glcm_contrast.GLCMContrast.user_params" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-arthropod_describer.plugins.test_plugin.properties.glcm_correlation">
+<span id="arthropod-describer-plugins-test-plugin-properties-glcm-correlation-module"></span><h2>arthropod_describer.plugins.test_plugin.properties.glcm_correlation module<a class="headerlink" href="#module-arthropod_describer.plugins.test_plugin.properties.glcm_correlation" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.glcm_correlation.GLCMCorrelation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GLCMCorrelation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.common.Info" title="arthropod_describer.common.common.Info"><span class="pre">Info</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/glcm_correlation.html#GLCMCorrelation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.glcm_correlation.GLCMCorrelation" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.plugin.PropertyComputation" title="arthropod_describer.common.plugin.PropertyComputation"><code class="xref py py-class docutils literal notranslate"><span class="pre">PropertyComputation</span></code></a></p>
+<p>GROUP: GLCM properties
+NAME: Correlation
+DESCRIPTION: GLCM correlation of the region
+KEY: correlation</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.glcm_correlation.GLCMCorrelation.computes">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">computes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.common.Info" title="arthropod_describer.common.common.Info"><span class="pre">Info</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.glcm_correlation.GLCMCorrelation.computes" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.glcm_correlation.GLCMCorrelation.example">
+<span class="sig-name descname"><span class="pre">example</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.label_image.RegionProperty" title="arthropod_describer.common.label_image.RegionProperty"><span class="pre">RegionProperty</span></a></span></span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/glcm_correlation.html#GLCMCorrelation.example"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.glcm_correlation.GLCMCorrelation.example" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.glcm_correlation.GLCMCorrelation.group">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">group</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.glcm_correlation.GLCMCorrelation.group" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.glcm_correlation.GLCMCorrelation.region_restricted">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">region_restricted</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.glcm_correlation.GLCMCorrelation.region_restricted" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.glcm_correlation.GLCMCorrelation.target_worksheet">
+<span class="sig-name descname"><span class="pre">target_worksheet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/glcm_correlation.html#GLCMCorrelation.target_worksheet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.glcm_correlation.GLCMCorrelation.target_worksheet" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.glcm_correlation.GLCMCorrelation.user_params">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">user_params</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.user_params.UserParam" title="arthropod_describer.common.user_params.UserParam"><span class="pre">UserParam</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.glcm_correlation.GLCMCorrelation.user_params" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-arthropod_describer.plugins.test_plugin.properties.glcm_dissimilarity">
+<span id="arthropod-describer-plugins-test-plugin-properties-glcm-dissimilarity-module"></span><h2>arthropod_describer.plugins.test_plugin.properties.glcm_dissimilarity module<a class="headerlink" href="#module-arthropod_describer.plugins.test_plugin.properties.glcm_dissimilarity" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.glcm_dissimilarity.GLCMDissimilarity">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GLCMDissimilarity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.common.Info" title="arthropod_describer.common.common.Info"><span class="pre">Info</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/glcm_dissimilarity.html#GLCMDissimilarity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.glcm_dissimilarity.GLCMDissimilarity" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.plugin.PropertyComputation" title="arthropod_describer.common.plugin.PropertyComputation"><code class="xref py py-class docutils literal notranslate"><span class="pre">PropertyComputation</span></code></a></p>
+<p>GROUP: GLCM properties
+NAME: Dissimilarity
+DESCRIPTION: GLCM dissimilarity of the region
+KEY: dissimilarity</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.glcm_dissimilarity.GLCMDissimilarity.computes">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">computes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.common.Info" title="arthropod_describer.common.common.Info"><span class="pre">Info</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.glcm_dissimilarity.GLCMDissimilarity.computes" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.glcm_dissimilarity.GLCMDissimilarity.example">
+<span class="sig-name descname"><span class="pre">example</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.label_image.RegionProperty" title="arthropod_describer.common.label_image.RegionProperty"><span class="pre">RegionProperty</span></a></span></span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/glcm_dissimilarity.html#GLCMDissimilarity.example"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.glcm_dissimilarity.GLCMDissimilarity.example" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.glcm_dissimilarity.GLCMDissimilarity.group">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">group</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.glcm_dissimilarity.GLCMDissimilarity.group" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.glcm_dissimilarity.GLCMDissimilarity.region_restricted">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">region_restricted</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.glcm_dissimilarity.GLCMDissimilarity.region_restricted" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.glcm_dissimilarity.GLCMDissimilarity.target_worksheet">
+<span class="sig-name descname"><span class="pre">target_worksheet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/glcm_dissimilarity.html#GLCMDissimilarity.target_worksheet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.glcm_dissimilarity.GLCMDissimilarity.target_worksheet" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.glcm_dissimilarity.GLCMDissimilarity.user_params">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">user_params</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.user_params.UserParam" title="arthropod_describer.common.user_params.UserParam"><span class="pre">UserParam</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.glcm_dissimilarity.GLCMDissimilarity.user_params" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-arthropod_describer.plugins.test_plugin.properties.glcm_energy">
+<span id="arthropod-describer-plugins-test-plugin-properties-glcm-energy-module"></span><h2>arthropod_describer.plugins.test_plugin.properties.glcm_energy module<a class="headerlink" href="#module-arthropod_describer.plugins.test_plugin.properties.glcm_energy" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.glcm_energy.GLCMEnergy">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GLCMEnergy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.common.Info" title="arthropod_describer.common.common.Info"><span class="pre">Info</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/glcm_energy.html#GLCMEnergy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.glcm_energy.GLCMEnergy" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.plugin.PropertyComputation" title="arthropod_describer.common.plugin.PropertyComputation"><code class="xref py py-class docutils literal notranslate"><span class="pre">PropertyComputation</span></code></a></p>
+<p>GROUP: GLCM properties
+NAME: Energy
+DESCRIPTION: GLCM energy of the region
+KEY: energy</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.glcm_energy.GLCMEnergy.computes">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">computes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.common.Info" title="arthropod_describer.common.common.Info"><span class="pre">Info</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.glcm_energy.GLCMEnergy.computes" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.glcm_energy.GLCMEnergy.example">
+<span class="sig-name descname"><span class="pre">example</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.label_image.RegionProperty" title="arthropod_describer.common.label_image.RegionProperty"><span class="pre">RegionProperty</span></a></span></span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/glcm_energy.html#GLCMEnergy.example"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.glcm_energy.GLCMEnergy.example" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.glcm_energy.GLCMEnergy.group">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">group</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.glcm_energy.GLCMEnergy.group" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.glcm_energy.GLCMEnergy.region_restricted">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">region_restricted</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.glcm_energy.GLCMEnergy.region_restricted" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.glcm_energy.GLCMEnergy.target_worksheet">
+<span class="sig-name descname"><span class="pre">target_worksheet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/glcm_energy.html#GLCMEnergy.target_worksheet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.glcm_energy.GLCMEnergy.target_worksheet" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.glcm_energy.GLCMEnergy.user_params">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">user_params</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.user_params.UserParam" title="arthropod_describer.common.user_params.UserParam"><span class="pre">UserParam</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.glcm_energy.GLCMEnergy.user_params" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-arthropod_describer.plugins.test_plugin.properties.glcm_homogeneity">
+<span id="arthropod-describer-plugins-test-plugin-properties-glcm-homogeneity-module"></span><h2>arthropod_describer.plugins.test_plugin.properties.glcm_homogeneity module<a class="headerlink" href="#module-arthropod_describer.plugins.test_plugin.properties.glcm_homogeneity" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.glcm_homogeneity.GLCMHomogeneity">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GLCMHomogeneity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.common.Info" title="arthropod_describer.common.common.Info"><span class="pre">Info</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/glcm_homogeneity.html#GLCMHomogeneity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.glcm_homogeneity.GLCMHomogeneity" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.plugin.PropertyComputation" title="arthropod_describer.common.plugin.PropertyComputation"><code class="xref py py-class docutils literal notranslate"><span class="pre">PropertyComputation</span></code></a></p>
+<p>GROUP: GLCM properties
+NAME: Homogeneity
+DESCRIPTION: GLCM homogeneity of the region
+KEY: homogeneity</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.glcm_homogeneity.GLCMHomogeneity.computes">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">computes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.common.Info" title="arthropod_describer.common.common.Info"><span class="pre">Info</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.glcm_homogeneity.GLCMHomogeneity.computes" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.glcm_homogeneity.GLCMHomogeneity.example">
+<span class="sig-name descname"><span class="pre">example</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.label_image.RegionProperty" title="arthropod_describer.common.label_image.RegionProperty"><span class="pre">RegionProperty</span></a></span></span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/glcm_homogeneity.html#GLCMHomogeneity.example"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.glcm_homogeneity.GLCMHomogeneity.example" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.glcm_homogeneity.GLCMHomogeneity.group">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">group</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.glcm_homogeneity.GLCMHomogeneity.group" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.glcm_homogeneity.GLCMHomogeneity.region_restricted">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">region_restricted</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.glcm_homogeneity.GLCMHomogeneity.region_restricted" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.glcm_homogeneity.GLCMHomogeneity.target_worksheet">
+<span class="sig-name descname"><span class="pre">target_worksheet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/glcm_homogeneity.html#GLCMHomogeneity.target_worksheet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.glcm_homogeneity.GLCMHomogeneity.target_worksheet" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.glcm_homogeneity.GLCMHomogeneity.user_params">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">user_params</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.user_params.UserParam" title="arthropod_describer.common.user_params.UserParam"><span class="pre">UserParam</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.glcm_homogeneity.GLCMHomogeneity.user_params" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-arthropod_describer.plugins.test_plugin.properties.glcm_props">
+<span id="arthropod-describer-plugins-test-plugin-properties-glcm-props-module"></span><h2>arthropod_describer.plugins.test_plugin.properties.glcm_props module<a class="headerlink" href="#module-arthropod_describer.plugins.test_plugin.properties.glcm_props" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.glcm_props.GLCMProperties">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GLCMProperties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.common.Info" title="arthropod_describer.common.common.Info"><span class="pre">Info</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/glcm_props.html#GLCMProperties"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.glcm_props.GLCMProperties" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>NAME: GLCM properties
+DESCRIPTION: Computes properties from grey level co-occurrence matrix.</p>
+<p>REGION_RESTRICTED</p>
+<dl class="simple">
+<dt>USER_PARAMS:</dt><dd><p>PARAM_NAME: ABC
+PARAM_KEY: abc
+PARAM_TYPE: INT
+VALUE: 10
+MIN_VALUE: 5
+MAX_VALUE: 25</p>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.glcm_props.GLCMProperties.computes">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">computes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.common.Info" title="arthropod_describer.common.common.Info"><span class="pre">Info</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.glcm_props.GLCMProperties.computes" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.glcm_props.GLCMProperties.example">
+<span class="sig-name descname"><span class="pre">example</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.label_image.RegionProperty" title="arthropod_describer.common.label_image.RegionProperty"><span class="pre">RegionProperty</span></a></span></span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/glcm_props.html#GLCMProperties.example"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.glcm_props.GLCMProperties.example" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.glcm_props.GLCMProperties.target_worksheet">
+<span class="sig-name descname"><span class="pre">target_worksheet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/glcm_props.html#GLCMProperties.target_worksheet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.glcm_props.GLCMProperties.target_worksheet" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-arthropod_describer.plugins.test_plugin.properties.max_feret">
+<span id="arthropod-describer-plugins-test-plugin-properties-max-feret-module"></span><h2>arthropod_describer.plugins.test_plugin.properties.max_feret module<a class="headerlink" href="#module-arthropod_describer.plugins.test_plugin.properties.max_feret" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.max_feret.MaxFeret">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MaxFeret</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.common.Info" title="arthropod_describer.common.common.Info"><span class="pre">Info</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/max_feret.html#MaxFeret"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.max_feret.MaxFeret" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.plugin.PropertyComputation" title="arthropod_describer.common.plugin.PropertyComputation"><code class="xref py py-class docutils literal notranslate"><span class="pre">PropertyComputation</span></code></a></p>
+<p>GROUP: Basic properties
+NAME: Max feret diameter
+DESCRIPTION: Maximum Feret diameter (px or mm)
+KEY: max_feret</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.max_feret.MaxFeret.computes">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">computes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.common.Info" title="arthropod_describer.common.common.Info"><span class="pre">Info</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.max_feret.MaxFeret.computes" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.max_feret.MaxFeret.example">
+<span class="sig-name descname"><span class="pre">example</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.label_image.RegionProperty" title="arthropod_describer.common.label_image.RegionProperty"><span class="pre">RegionProperty</span></a></span></span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/max_feret.html#MaxFeret.example"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.max_feret.MaxFeret.example" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.max_feret.MaxFeret.group">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">group</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.max_feret.MaxFeret.group" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.max_feret.MaxFeret.region_restricted">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">region_restricted</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.max_feret.MaxFeret.region_restricted" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.max_feret.MaxFeret.target_worksheet">
+<span class="sig-name descname"><span class="pre">target_worksheet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/max_feret.html#MaxFeret.target_worksheet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.max_feret.MaxFeret.target_worksheet" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.max_feret.MaxFeret.user_params">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">user_params</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.user_params.UserParam" title="arthropod_describer.common.user_params.UserParam"><span class="pre">UserParam</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.max_feret.MaxFeret.user_params" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-arthropod_describer.plugins.test_plugin.properties.mean_hsv">
+<span id="arthropod-describer-plugins-test-plugin-properties-mean-hsv-module"></span><h2>arthropod_describer.plugins.test_plugin.properties.mean_hsv module<a class="headerlink" href="#module-arthropod_describer.plugins.test_plugin.properties.mean_hsv" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.mean_hsv.MeanHSV">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MeanHSV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.common.Info" title="arthropod_describer.common.common.Info"><span class="pre">Info</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/mean_hsv.html#MeanHSV"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.mean_hsv.MeanHSV" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.plugin.PropertyComputation" title="arthropod_describer.common.plugin.PropertyComputation"><code class="xref py py-class docutils literal notranslate"><span class="pre">PropertyComputation</span></code></a></p>
+<p>GROUP: Basic properties
+NAME: Mean HSV
+DESCRIPTION: Mean HSV of a region
+KEY: mean_hsv</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.mean_hsv.MeanHSV.computes">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">computes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.common.Info" title="arthropod_describer.common.common.Info"><span class="pre">Info</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.mean_hsv.MeanHSV.computes" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.mean_hsv.MeanHSV.example">
+<span class="sig-name descname"><span class="pre">example</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.label_image.RegionProperty" title="arthropod_describer.common.label_image.RegionProperty"><span class="pre">RegionProperty</span></a></span></span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/mean_hsv.html#MeanHSV.example"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.mean_hsv.MeanHSV.example" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.mean_hsv.MeanHSV.group">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">group</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.mean_hsv.MeanHSV.group" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.mean_hsv.MeanHSV.region_restricted">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">region_restricted</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.mean_hsv.MeanHSV.region_restricted" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.mean_hsv.MeanHSV.target_worksheet">
+<span class="sig-name descname"><span class="pre">target_worksheet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/mean_hsv.html#MeanHSV.target_worksheet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.mean_hsv.MeanHSV.target_worksheet" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.mean_hsv.MeanHSV.user_params">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">user_params</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.user_params.UserParam" title="arthropod_describer.common.user_params.UserParam"><span class="pre">UserParam</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.mean_hsv.MeanHSV.user_params" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-arthropod_describer.plugins.test_plugin.properties.mean_intensity">
+<span id="arthropod-describer-plugins-test-plugin-properties-mean-intensity-module"></span><h2>arthropod_describer.plugins.test_plugin.properties.mean_intensity module<a class="headerlink" href="#module-arthropod_describer.plugins.test_plugin.properties.mean_intensity" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.mean_intensity.MeanIntensity">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MeanIntensity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.common.Info" title="arthropod_describer.common.common.Info"><span class="pre">Info</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/mean_intensity.html#MeanIntensity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.mean_intensity.MeanIntensity" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.plugin.PropertyComputation" title="arthropod_describer.common.plugin.PropertyComputation"><code class="xref py py-class docutils literal notranslate"><span class="pre">PropertyComputation</span></code></a></p>
+<p>GROUP: Basic properties
+NAME: Mean intensity
+DESCRIPTION: Mean intensity (R, G, B)
+KEY: mean_intensity</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.mean_intensity.MeanIntensity.computes">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">computes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.common.Info" title="arthropod_describer.common.common.Info"><span class="pre">Info</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.mean_intensity.MeanIntensity.computes" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.mean_intensity.MeanIntensity.example">
+<span class="sig-name descname"><span class="pre">example</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.label_image.RegionProperty" title="arthropod_describer.common.label_image.RegionProperty"><span class="pre">RegionProperty</span></a></span></span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/mean_intensity.html#MeanIntensity.example"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.mean_intensity.MeanIntensity.example" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.mean_intensity.MeanIntensity.group">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">group</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.mean_intensity.MeanIntensity.group" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.mean_intensity.MeanIntensity.region_restricted">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">region_restricted</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.mean_intensity.MeanIntensity.region_restricted" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.mean_intensity.MeanIntensity.target_worksheet">
+<span class="sig-name descname"><span class="pre">target_worksheet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/mean_intensity.html#MeanIntensity.target_worksheet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.mean_intensity.MeanIntensity.target_worksheet" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.mean_intensity.MeanIntensity.user_params">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">user_params</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.user_params.UserParam" title="arthropod_describer.common.user_params.UserParam"><span class="pre">UserParam</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.mean_intensity.MeanIntensity.user_params" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-arthropod_describer.plugins.test_plugin.properties.mean_width">
+<span id="arthropod-describer-plugins-test-plugin-properties-mean-width-module"></span><h2>arthropod_describer.plugins.test_plugin.properties.mean_width module<a class="headerlink" href="#module-arthropod_describer.plugins.test_plugin.properties.mean_width" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.mean_width.MeanWidth">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MeanWidth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.common.Info" title="arthropod_describer.common.common.Info"><span class="pre">Info</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/mean_width.html#MeanWidth"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.mean_width.MeanWidth" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.plugin.PropertyComputation" title="arthropod_describer.common.plugin.PropertyComputation"><code class="xref py py-class docutils literal notranslate"><span class="pre">PropertyComputation</span></code></a></p>
+<p>GROUP: Basic properties
+NAME: Mean width
+DESCRIPTION: Mean width of a region (px or mm)
+KEY: mean_width</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.mean_width.MeanWidth.computes">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">computes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.common.Info" title="arthropod_describer.common.common.Info"><span class="pre">Info</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.mean_width.MeanWidth.computes" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.mean_width.MeanWidth.example">
+<span class="sig-name descname"><span class="pre">example</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.label_image.RegionProperty" title="arthropod_describer.common.label_image.RegionProperty"><span class="pre">RegionProperty</span></a></span></span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/mean_width.html#MeanWidth.example"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.mean_width.MeanWidth.example" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.mean_width.MeanWidth.group">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">group</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.mean_width.MeanWidth.group" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.mean_width.MeanWidth.region_restricted">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">region_restricted</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.mean_width.MeanWidth.region_restricted" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.mean_width.MeanWidth.target_worksheet">
+<span class="sig-name descname"><span class="pre">target_worksheet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/mean_width.html#MeanWidth.target_worksheet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.mean_width.MeanWidth.target_worksheet" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.mean_width.MeanWidth.user_params">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">user_params</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.user_params.UserParam" title="arthropod_describer.common.user_params.UserParam"><span class="pre">UserParam</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.mean_width.MeanWidth.user_params" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-arthropod_describer.plugins.test_plugin.properties.mean_width_cpp">
+<span id="arthropod-describer-plugins-test-plugin-properties-mean-width-cpp-module"></span><h2>arthropod_describer.plugins.test_plugin.properties.mean_width_cpp module<a class="headerlink" href="#module-arthropod_describer.plugins.test_plugin.properties.mean_width_cpp" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.mean_width_cpp.MeanWidth">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MeanWidth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.common.Info" title="arthropod_describer.common.common.Info"><span class="pre">Info</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/mean_width_cpp.html#MeanWidth"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.mean_width_cpp.MeanWidth" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.plugin.PropertyComputation" title="arthropod_describer.common.plugin.PropertyComputation"><code class="xref py py-class docutils literal notranslate"><span class="pre">PropertyComputation</span></code></a></p>
+<p>GROUP: Basic properties
+NAME: Mean width (cpp)
+DESCRIPTION: Mean width of a region (px or mm)
+KEY: mean_width_cpp</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.mean_width_cpp.MeanWidth.computes">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">computes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.common.Info" title="arthropod_describer.common.common.Info"><span class="pre">Info</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.mean_width_cpp.MeanWidth.computes" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.mean_width_cpp.MeanWidth.example">
+<span class="sig-name descname"><span class="pre">example</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.label_image.RegionProperty" title="arthropod_describer.common.label_image.RegionProperty"><span class="pre">RegionProperty</span></a></span></span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/mean_width_cpp.html#MeanWidth.example"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.mean_width_cpp.MeanWidth.example" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.mean_width_cpp.MeanWidth.group">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">group</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.mean_width_cpp.MeanWidth.group" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.mean_width_cpp.MeanWidth.region_restricted">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">region_restricted</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.mean_width_cpp.MeanWidth.region_restricted" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.mean_width_cpp.MeanWidth.target_worksheet">
+<span class="sig-name descname"><span class="pre">target_worksheet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/arthropod_describer/plugins/test_plugin/properties/mean_width_cpp.html#MeanWidth.target_worksheet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.mean_width_cpp.MeanWidth.target_worksheet" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arthropod_describer.plugins.test_plugin.properties.mean_width_cpp.MeanWidth.user_params">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">user_params</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arthropod_describer.common.html#arthropod_describer.common.user_params.UserParam" title="arthropod_describer.common.user_params.UserParam"><span class="pre">UserParam</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#arthropod_describer.plugins.test_plugin.properties.mean_width_cpp.MeanWidth.user_params" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-arthropod_describer.plugins.test_plugin.properties">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-arthropod_describer.plugins.test_plugin.properties" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="arthropod_describer.plugins.test_plugin.html" class="btn btn-neutral float-left" title="arthropod_describer.plugins.test_plugin package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="arthropod_describer.plugins.test_plugin.regions.html" class="btn btn-neutral float-right" title="arthropod_describer.plugins.test_plugin.regions package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, CBIA @ FI MUNI.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

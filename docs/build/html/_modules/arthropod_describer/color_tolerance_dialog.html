@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arthropod_describer.color_tolerance_dialog &mdash; MAPHIS 0.1 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> MAPHIS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">arthropod_describer</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">MAPHIS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>arthropod_describer.color_tolerance_dialog</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for arthropod_describer.color_tolerance_dialog</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">colorsys</span>
+<span class="kn">import</span> <span class="nn">typing</span>
+
+<span class="kn">import</span> <span class="nn">PySide2</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtCore</span> <span class="kn">import</span> <span class="n">Qt</span><span class="p">,</span> <span class="n">QTimer</span><span class="p">,</span> <span class="n">Signal</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtGui</span> <span class="kn">import</span> <span class="n">QColor</span><span class="p">,</span> <span class="n">QPainter</span><span class="p">,</span> <span class="n">QPixmap</span><span class="p">,</span> <span class="n">QValidator</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtWidgets</span> <span class="kn">import</span> <span class="n">QWidget</span><span class="p">,</span> <span class="n">QColorDialog</span><span class="p">,</span> <span class="n">QDialogButtonBox</span><span class="p">,</span> <span class="n">QDialog</span>
+
+<span class="kn">from</span> <span class="nn">colorsys</span> <span class="kn">import</span> <span class="n">rgb_to_hsv</span><span class="p">,</span> <span class="n">hsv_to_rgb</span>
+
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.label_hierarchy</span> <span class="kn">import</span> <span class="n">Node</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.state</span> <span class="kn">import</span> <span class="n">State</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.ui_color_tolerance_dialog</span> <span class="kn">import</span> <span class="n">Ui_ColorToleranceDialog</span>
+
+
+<div class="viewcode-block" id="ColorToleranceDialog"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.color_tolerance_dialog.ColorToleranceDialog">[docs]</a><span class="k">class</span> <span class="nc">ColorToleranceDialog</span><span class="p">(</span><span class="n">QDialog</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">State</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">PySide2</span><span class="o">.</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QWidget</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">f</span><span class="p">:</span> <span class="n">PySide2</span><span class="o">.</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">WindowFlags</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">WindowFlags</span><span class="p">()):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">:</span> <span class="n">State</span> <span class="o">=</span> <span class="n">state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span> <span class="o">=</span> <span class="n">Ui_ColorToleranceDialog</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">setupUi</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lblColor_pixmap</span> <span class="o">=</span> <span class="n">QPixmap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">lblColor</span><span class="o">.</span><span class="n">minimumSize</span><span class="p">())</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lblVTolerancePreview_pixmap</span> <span class="o">=</span> <span class="n">QPixmap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">lblVTolerancePreview</span><span class="o">.</span><span class="n">minimumSize</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lblHSTolerancePreview_pixmap</span> <span class="o">=</span> <span class="n">QPixmap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">lblHSTolerancePreview</span><span class="o">.</span><span class="n">minimumSize</span><span class="p">())</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_selected_color</span><span class="p">:</span> <span class="n">QColor</span> <span class="o">=</span> <span class="n">QColor</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">btnSetColor</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pick_color</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parent_node</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Node</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">buttonBox</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="n">QDialogButtonBox</span><span class="o">.</span><span class="n">Ok</span><span class="p">)</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">accept</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">buttonBox</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="n">QDialogButtonBox</span><span class="o">.</span><span class="n">Cancel</span><span class="p">)</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reject</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">spinBoxHueTolerance</span><span class="o">.</span><span class="n">valueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_update_tolerance_preview</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">spinBoxSaturationTolerance</span><span class="o">.</span><span class="n">valueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_update_tolerance_preview</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">spinBoxValueTolerance</span><span class="o">.</span><span class="n">valueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_update_tolerance_preview</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">sliderPreviewV</span><span class="o">.</span><span class="n">valueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_update_tolerance_preview</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_float_v</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_animation_speed</span> <span class="o">=</span> <span class="mf">0.02</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_animation_direction</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_animation_timer</span> <span class="o">=</span> <span class="n">QTimer</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_animation_timer</span><span class="o">.</span><span class="n">setInterval</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_animation_timer</span><span class="o">.</span><span class="n">timeout</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_update_animation</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">setWindowModality</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">ApplicationModal</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_update_tolerance_preview</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Display the range of colors that falls within the selected tolerances.</span>
+        <span class="c1"># 2D projection with a Value slider (whose range also reflects the selected range),</span>
+
+        <span class="n">selected_hue</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_selected_color</span><span class="o">.</span><span class="n">hue</span><span class="p">()</span>
+        <span class="n">selected_saturation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_selected_color</span><span class="o">.</span><span class="n">saturation</span><span class="p">()</span>
+        <span class="n">selected_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_selected_color</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">lblSelectedColor</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;HSV == (</span><span class="si">{</span><span class="n">selected_hue</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">selected_saturation</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">selected_value</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+
+        <span class="n">min_hue</span> <span class="o">=</span> <span class="n">selected_hue</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">spinBoxHueTolerance</span><span class="o">.</span><span class="n">value</span><span class="p">()</span> <span class="o">+</span> <span class="mi">360</span>  <span class="c1"># Add 360 to ensure we never use negative values, but `min_hue &lt; max_hue` always holds. Later, using `% 360` may be required.</span>
+        <span class="n">max_hue</span> <span class="o">=</span> <span class="n">selected_hue</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">spinBoxHueTolerance</span><span class="o">.</span><span class="n">value</span><span class="p">()</span> <span class="o">+</span> <span class="mi">360</span>  <span class="c1"># Add 360 to ensure we never use negative values, but `min_hue &lt; max_hue` always holds. Later, using `% 360` may be required.</span>
+        <span class="n">min_saturation</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">selected_saturation</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">spinBoxSaturationTolerance</span><span class="o">.</span><span class="n">value</span><span class="p">())</span>
+        <span class="n">max_saturation</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="n">selected_saturation</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">spinBoxSaturationTolerance</span><span class="o">.</span><span class="n">value</span><span class="p">())</span>
+        <span class="n">min_value</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">selected_value</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">spinBoxValueTolerance</span><span class="o">.</span><span class="n">value</span><span class="p">())</span>
+        <span class="n">max_value</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="n">selected_value</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">spinBoxValueTolerance</span><span class="o">.</span><span class="n">value</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">lblSelectedRange</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;HSV range == (</span><span class="si">{</span><span class="n">min_hue</span><span class="si">}</span><span class="s2">..</span><span class="si">{</span><span class="n">max_hue</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">min_saturation</span><span class="si">}</span><span class="s2">..</span><span class="si">{</span><span class="n">max_saturation</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">min_value</span><span class="si">}</span><span class="s2">..</span><span class="si">{</span><span class="n">max_value</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">sliderPreviewV</span><span class="o">.</span><span class="n">setRange</span><span class="p">(</span><span class="n">min_value</span><span class="p">,</span> <span class="n">max_value</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">checkBoxAnimate</span><span class="o">.</span><span class="n">isChecked</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_float_v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">sliderPreviewV</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lblColor_pixmap</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_selected_color</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">lblColor</span><span class="o">.</span><span class="n">setPixmap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lblColor_pixmap</span><span class="p">)</span>
+
+        <span class="c1"># 1D gradient V</span>
+        <span class="n">painter</span> <span class="o">=</span> <span class="n">QPainter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lblVTolerancePreview_pixmap</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lblVTolerancePreview_pixmap</span><span class="o">.</span><span class="n">width</span><span class="p">()):</span>
+            <span class="n">current_color</span> <span class="o">=</span> <span class="n">QColor</span><span class="p">()</span>
+            <span class="n">current_color</span><span class="o">.</span><span class="n">setHsv</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">min_value</span> <span class="o">+</span> <span class="p">(</span><span class="n">max_value</span> <span class="o">-</span> <span class="n">min_value</span><span class="p">)</span> <span class="o">*</span> <span class="n">x</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lblVTolerancePreview_pixmap</span><span class="o">.</span><span class="n">width</span><span class="p">())</span>
+            <span class="n">painter</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">current_color</span><span class="p">)</span>
+            <span class="n">painter</span><span class="o">.</span><span class="n">drawLine</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lblVTolerancePreview_pixmap</span><span class="o">.</span><span class="n">height</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">lblVTolerancePreview</span><span class="o">.</span><span class="n">setPixmap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lblVTolerancePreview_pixmap</span><span class="p">)</span>
+
+        <span class="c1"># 2D gradient HS</span>
+        <span class="n">painter</span> <span class="o">=</span> <span class="n">QPainter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lblHSTolerancePreview_pixmap</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lblHSTolerancePreview_pixmap</span><span class="o">.</span><span class="n">width</span><span class="p">()):</span>
+            <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lblHSTolerancePreview_pixmap</span><span class="o">.</span><span class="n">height</span><span class="p">()):</span>
+                <span class="n">current_color</span> <span class="o">=</span> <span class="n">QColor</span><span class="p">()</span>
+                <span class="n">current_color</span><span class="o">.</span><span class="n">setHsv</span><span class="p">(</span><span class="n">min_hue</span> <span class="o">+</span> <span class="p">(</span><span class="n">max_hue</span> <span class="o">-</span> <span class="n">min_hue</span><span class="p">)</span> <span class="o">*</span> <span class="n">x</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lblHSTolerancePreview_pixmap</span><span class="o">.</span><span class="n">width</span><span class="p">(),</span>
+                                     <span class="n">max_saturation</span> <span class="o">-</span> <span class="p">(</span><span class="n">max_saturation</span> <span class="o">-</span> <span class="n">min_saturation</span><span class="p">)</span> <span class="o">*</span> <span class="n">y</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lblHSTolerancePreview_pixmap</span><span class="o">.</span><span class="n">height</span><span class="p">(),</span>
+                                     <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">sliderPreviewV</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+                                     <span class="p">)</span>
+                <span class="n">painter</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">current_color</span><span class="p">)</span>
+                <span class="n">painter</span><span class="o">.</span><span class="n">drawPoint</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">lblHSTolerancePreview</span><span class="o">.</span><span class="n">setPixmap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lblHSTolerancePreview_pixmap</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_update_animation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">checkBoxAnimate</span><span class="o">.</span><span class="n">isChecked</span><span class="p">()</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">sliderPreviewV</span><span class="o">.</span><span class="n">minimum</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">sliderPreviewV</span><span class="o">.</span><span class="n">maximum</span><span class="p">():</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Move the V slider, change the direction when at the beginning/end.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_float_v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_float_v</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">sliderPreviewV</span><span class="o">.</span><span class="n">maximum</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">sliderPreviewV</span><span class="o">.</span><span class="n">minimum</span><span class="p">())</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_animation_speed</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_animation_direction</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_float_v</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">sliderPreviewV</span><span class="o">.</span><span class="n">minimum</span><span class="p">()</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_float_v</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">sliderPreviewV</span><span class="o">.</span><span class="n">maximum</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_animation_direction</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_animation_direction</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_float_v</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">sliderPreviewV</span><span class="o">.</span><span class="n">maximum</span><span class="p">(),</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">sliderPreviewV</span><span class="o">.</span><span class="n">minimum</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_float_v</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">sliderPreviewV</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_float_v</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_tolerance_preview</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_pick_color</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="n">QColorDialog</span><span class="o">.</span><span class="n">getColor</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_selected_color</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">color</span><span class="o">.</span><span class="n">isValid</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_selected_color</span> <span class="o">=</span> <span class="n">color</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_tolerance_preview</span><span class="p">()</span>
+
+<div class="viewcode-block" id="ColorToleranceDialog.accept"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.color_tolerance_dialog.ColorToleranceDialog.accept">[docs]</a>    <span class="k">def</span> <span class="nf">accept</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_animation_timer</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ColorToleranceDialog.reject"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.color_tolerance_dialog.ColorToleranceDialog.reject">[docs]</a>    <span class="k">def</span> <span class="nf">reject</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">reject</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_animation_timer</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ColorToleranceDialog.get_color_and_tolerances"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.color_tolerance_dialog.ColorToleranceDialog.get_color_and_tolerances">[docs]</a>    <span class="k">def</span> <span class="nf">get_color_and_tolerances</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_tolerance_preview</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_animation_timer</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">exec_</span><span class="p">()</span> <span class="o">==</span> <span class="n">QDialog</span><span class="o">.</span><span class="n">Accepted</span><span class="p">:</span>
+            <span class="c1"># Return the selected color and tolerances</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;returning </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_selected_color</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">spinBoxHueTolerance</span><span class="o">.</span><span class="n">value</span><span class="p">()</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">spinBoxSaturationTolerance</span><span class="o">.</span><span class="n">value</span><span class="p">()</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">spinBoxValueTolerance</span><span class="o">.</span><span class="n">value</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_selected_color</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">spinBoxHueTolerance</span><span class="o">.</span><span class="n">value</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">spinBoxSaturationTolerance</span><span class="o">.</span><span class="n">value</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">spinBoxValueTolerance</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Return no color and tolerances</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;returning </span><span class="si">{</span><span class="kc">None</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="mi">0</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="mi">0</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="mi">0</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, CBIA @ FI MUNI.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

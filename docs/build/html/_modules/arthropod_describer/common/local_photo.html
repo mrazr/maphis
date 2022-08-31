@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arthropod_describer.common.local_photo &mdash; MAPHIS 0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> MAPHIS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">arthropod_describer</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">MAPHIS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>arthropod_describer.common.local_photo</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for arthropod_describer.common.local_photo</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span>
+
+<span class="kn">import</span> <span class="nn">typing</span>
+
+<span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtGui</span> <span class="kn">import</span> <span class="n">QImage</span>
+<span class="kn">from</span> <span class="nn">skimage</span> <span class="kn">import</span> <span class="n">io</span>
+
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.label_image</span> <span class="kn">import</span> <span class="n">LabelImgInfo</span><span class="p">,</span> <span class="n">LabelImg</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.photo</span> <span class="kn">import</span> <span class="n">Photo</span><span class="p">,</span> <span class="n">Subscriber</span><span class="p">,</span> <span class="n">UpdateContext</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.units</span> <span class="kn">import</span> <span class="n">Value</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.utils</span> <span class="kn">import</span> <span class="n">ScaleSetting</span>
+
+
+<div class="viewcode-block" id="LocalPhoto"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.local_photo.LocalPhoto">[docs]</a><span class="k">class</span> <span class="nc">LocalPhoto</span><span class="p">(</span><span class="n">Photo</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">folder</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">img_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">lbl_image_info</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">LabelImgInfo</span><span class="p">],</span> <span class="n">subs</span><span class="p">:</span> <span class="n">Subscriber</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tags</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dirty_flag</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_image</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_image_path</span> <span class="o">=</span> <span class="n">folder</span> <span class="o">/</span> <span class="n">img_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bug_bbox</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_label_images</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">LabelImg</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_label_image_info</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">LabelImgInfo</span><span class="p">]</span> <span class="o">=</span> <span class="n">lbl_image_info</span>
+        <span class="c1">#self._label_image_types = lbl_image_types</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Value</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scale_setting</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">ScaleSetting</span><span class="p">]</span> <span class="o">=</span> <span class="n">ScaleSetting</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lab_approvals</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span><span class="n">lbl_name</span><span class="p">:</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">lbl_name</span> <span class="ow">in</span> <span class="n">lbl_image_info</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
+        <span class="k">with</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_image_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">im</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_image_size</span> <span class="o">=</span> <span class="n">im</span><span class="o">.</span><span class="n">size</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_np_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_image_size</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">format</span> <span class="o">=</span> <span class="n">im</span><span class="o">.</span><span class="n">format</span>
+
+        <span class="c1"># create the label images</span>
+        <span class="k">for</span> <span class="n">lbl_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_image_info</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">lbl_img</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">lbl_name</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__subscriber</span><span class="p">:</span> <span class="n">Subscriber</span> <span class="o">=</span> <span class="n">subs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_thumbnail</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">QImage</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">image</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_image</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1">#self._image = io.imread(str(self._image_path))</span>
+            <span class="k">with</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_image_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">im</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">im</span><span class="p">)</span>
+                <span class="c1"># This is a workaround around RGBA images</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_image</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_image</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">image_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_image_path</span><span class="o">.</span><span class="n">name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">image_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_image_path</span>
+
+    <span class="nd">@image_path</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">image_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Changing path is not implemented&#39;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">image_size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_image_size</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lab_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">LabelImg</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">lab_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_images</span><span class="p">:</span>
+            <span class="n">lab_fname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_image_path</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;.tif&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_label_images</span><span class="p">[</span><span class="n">lab_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">LabelImg</span><span class="o">.</span><span class="n">create2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_image_path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="n">lab_name</span> <span class="o">/</span> <span class="n">lab_fname</span><span class="p">,</span>
+                                                            <span class="bp">self</span><span class="o">.</span><span class="n">image_size</span><span class="p">,</span> <span class="n">label_info</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">label_image_info</span><span class="p">[</span><span class="n">lab_name</span><span class="p">],</span>
+                                                            <span class="n">label_name</span><span class="o">=</span><span class="n">lab_name</span><span class="p">)</span>
+        <span class="n">lab</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_images</span><span class="p">[</span><span class="n">lab_name</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">lab</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">bug_bbox</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bug_bbox</span>
+
+<div class="viewcode-block" id="LocalPhoto.recompute_bbox"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.local_photo.LocalPhoto.recompute_bbox">[docs]</a>    <span class="k">def</span> <span class="nf">recompute_bbox</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+        <span class="c1">#coords = np.nonzero(self._regions_image.label_img)</span>
+        <span class="c1">#if len(coords[0]) == 0:</span>
+        <span class="c1">#    top, left = 0, 0</span>
+        <span class="c1">#    bottom, right = self.regions_image.label_img.shape</span>
+        <span class="c1">#else:</span>
+        <span class="c1">#    top, left = np.min(coords[0]), np.min(coords[1])</span>
+        <span class="c1">#    bottom, right = np.max(coords[0]), np.max(coords[1])</span>
+        <span class="c1">#self._bug_bbox = [left, top, right, bottom]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">label_images_</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">LabelImg</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_images</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">label_image_info</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">LabelImgInfo</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_image_info</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">image_scale</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Value</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale_setting</span><span class="o">.</span><span class="n">scale</span>
+
+    <span class="nd">@image_scale</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">image_scale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scale</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Value</span><span class="p">]):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scale_setting</span><span class="o">.</span><span class="n">scale</span> <span class="o">=</span> <span class="n">scale</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">scale_setting</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">ScaleSetting</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale_setting</span>
+
+    <span class="nd">@scale_setting</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">scale_setting</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">setting</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">ScaleSetting</span><span class="p">]):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scale_setting</span> <span class="o">=</span> <span class="n">setting</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_subscriber</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image_name</span><span class="p">,</span> <span class="n">UpdateContext</span><span class="o">.</span><span class="n">Photo</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;image_scale&#39;</span><span class="p">})</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">approved</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lab_approvals</span>
+
+<div class="viewcode-block" id="LocalPhoto.rotate"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.local_photo.LocalPhoto.rotate">[docs]</a>    <span class="k">def</span> <span class="nf">rotate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ccw</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="n">loaded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_image</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">loaded</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_image</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_image_path</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale_setting</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale_setting</span><span class="o">.</span><span class="n">scale_line</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">mid</span> <span class="o">=</span> <span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">),</span> <span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scale_setting</span><span class="o">.</span><span class="n">scale_line</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">ccw</span><span class="p">,</span> <span class="n">mid</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_image</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_image</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">ROTATE_90_COUNTERCLOCKWISE</span> <span class="k">if</span> <span class="n">ccw</span> <span class="k">else</span> <span class="n">cv2</span><span class="o">.</span><span class="n">ROTATE_90_CLOCKWISE</span><span class="p">)</span> <span class="c1">#skimage.transform.rotate(self._image, 90 * (-1 if ccw else 1), order=2)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_image</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_image</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dirty_flag</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_np_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_image</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_image_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_np_size</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">lab_img</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_images</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">lab_img</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">ccw</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">loaded</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_image</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__subscriber</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image_name</span><span class="p">,</span> <span class="n">UpdateContext</span><span class="o">.</span><span class="n">Photo</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;operation&#39;</span><span class="p">:</span>
+                                                                            <span class="s1">&#39;rot_90_ccw&#39;</span> <span class="k">if</span> <span class="n">ccw</span> <span class="k">else</span> <span class="s1">&#39;rot_90_cw&#39;</span><span class="p">})</span></div>
+
+<div class="viewcode-block" id="LocalPhoto.resize"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.local_photo.LocalPhoto.resize">[docs]</a>    <span class="k">def</span> <span class="nf">resize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">factor</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="n">loaded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_image</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;resizing with factor </span><span class="si">{</span><span class="n">factor</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="c1"># TODO adapt measurements, or at least signal that the measurements are not up-to-date anymore!</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale_setting</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale_setting</span><span class="o">.</span><span class="n">scale</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># print(f&#39;changing scale from {self._scale} to {self._scale * factor}&#39;)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_scale_setting</span><span class="o">.</span><span class="n">scale</span> <span class="o">*=</span> <span class="n">factor</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">loaded</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_image</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_image_path</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dirty_flag</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">im</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_image</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;old size is </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_image_size</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_image_size</span><span class="p">[</span><span class="mi">0</span><span class="p">])),</span>
+                <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_image_size</span><span class="p">[</span><span class="mi">1</span><span class="p">])))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_image_size</span> <span class="o">=</span> <span class="n">size</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;new size if </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_image_size</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_np_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_image_size</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">im</span> <span class="o">=</span> <span class="n">im</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_image_size</span><span class="p">,</span> <span class="n">resample</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">im</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">lbl_img</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_images</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">lbl_img</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">factor</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">loaded</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_image</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale_setting</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale_setting</span><span class="o">.</span><span class="n">scale_line</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">mid</span> <span class="o">=</span> <span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">),</span> <span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scale_setting</span><span class="o">.</span><span class="n">scale_line</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">factor</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__subscriber</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image_name</span><span class="p">,</span> <span class="n">UpdateContext</span><span class="o">.</span><span class="n">Photo</span><span class="p">,</span>
+                                 <span class="p">{</span><span class="s1">&#39;operation&#39;</span><span class="p">:</span> <span class="s1">&#39;resize&#39;</span><span class="p">,</span>
+                                  <span class="s1">&#39;factor&#39;</span><span class="p">:</span> <span class="n">factor</span><span class="p">})</span></div>
+
+<div class="viewcode-block" id="LocalPhoto.save"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.local_photo.LocalPhoto.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_unsaved_changes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dirty_flag</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_image</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="c1">#im = Image.fromarray(self._image)</span>
+                    <span class="c1">#im.save(self._image_path)</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">format</span> <span class="o">!=</span> <span class="s1">&#39;TIFF&#39;</span><span class="p">:</span>
+                        <span class="n">bgr</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_image</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2RGB</span><span class="p">)</span>
+                        <span class="n">cv2</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_image_path</span><span class="p">),</span> <span class="n">bgr</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">im</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_image</span><span class="p">)</span>
+                        <span class="n">im</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_image_path</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">lab_img</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_images</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="n">lab_img</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dirty_flag</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="LocalPhoto.unload"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.local_photo.LocalPhoto.unload">[docs]</a>    <span class="k">def</span> <span class="nf">unload</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_image</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">for</span> <span class="n">lab_img</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_images</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">lab_img</span><span class="o">.</span><span class="n">unload</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="LocalPhoto.has_segmentation_for"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.local_photo.LocalPhoto.has_segmentation_for">[docs]</a>    <span class="k">def</span> <span class="nf">has_segmentation_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_images</span><span class="p">[</span><span class="n">label_name</span><span class="p">]</span><span class="o">.</span><span class="n">is_segmented</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">has_unsaved_changes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dirty_flag</span> <span class="ow">or</span> <span class="nb">any</span><span class="p">([</span><span class="n">lab</span><span class="o">.</span><span class="n">has_unsaved_changed</span> <span class="k">for</span> <span class="n">lab</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_images</span><span class="o">.</span><span class="n">values</span><span class="p">()])</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_subscriber</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Subscriber</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__subscriber</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">tags</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tags</span>
+
+    <span class="nd">@tags</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">tags</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_tags</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tags</span> <span class="o">=</span> <span class="p">{</span><span class="n">tag</span> <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">_tags</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">tag</span><span class="o">.</span><span class="n">isspace</span><span class="p">()</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_subscriber</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image_name</span><span class="p">,</span> <span class="n">UpdateContext</span><span class="o">.</span><span class="n">Photo</span><span class="p">,</span>
+                                <span class="p">{</span><span class="s1">&#39;tags&#39;</span><span class="p">:</span> <span class="p">{</span>
+                                    <span class="s1">&#39;added&#39;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tags</span><span class="p">),</span>
+                                    <span class="s1">&#39;removed&#39;</span><span class="p">:</span> <span class="p">[]</span>
+                                <span class="p">}})</span>
+
+<div class="viewcode-block" id="LocalPhoto.add_tag"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.local_photo.LocalPhoto.add_tag">[docs]</a>    <span class="k">def</span> <span class="nf">add_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">tag</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tags</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">tag</span><span class="o">.</span><span class="n">isspace</span><span class="p">():</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tags</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_subscriber</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image_name</span><span class="p">,</span> <span class="n">UpdateContext</span><span class="o">.</span><span class="n">Photo</span><span class="p">,</span>
+                                <span class="p">{</span><span class="s1">&#39;tags&#39;</span><span class="p">:</span> <span class="p">{</span>
+                                    <span class="s1">&#39;added&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">tag</span><span class="p">],</span>
+                                    <span class="s1">&#39;removed&#39;</span><span class="p">:</span> <span class="p">[]</span>
+                                <span class="p">}})</span></div>
+
+<div class="viewcode-block" id="LocalPhoto.remove_tag"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.local_photo.LocalPhoto.remove_tag">[docs]</a>    <span class="k">def</span> <span class="nf">remove_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">tag</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tags</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tags</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_subscriber</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image_name</span><span class="p">,</span> <span class="n">UpdateContext</span><span class="o">.</span><span class="n">Photo</span><span class="p">,</span>
+                                <span class="p">{</span><span class="s1">&#39;tags&#39;</span><span class="p">:</span> <span class="p">{</span>
+                                    <span class="s1">&#39;added&#39;</span><span class="p">:</span> <span class="p">[],</span>
+                                    <span class="s1">&#39;removed&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">tag</span><span class="p">]</span>
+                                <span class="p">}})</span></div>
+
+<div class="viewcode-block" id="LocalPhoto.toggle_tag"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.local_photo.LocalPhoto.toggle_tag">[docs]</a>    <span class="k">def</span> <span class="nf">toggle_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">enabled</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">enabled</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_tag</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">remove_tag</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">thumbnail</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">QImage</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_thumbnail</span>
+
+    <span class="nd">@thumbnail</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">thumbnail</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thumbnail</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">QImage</span><span class="p">]):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_thumbnail</span> <span class="o">=</span> <span class="n">thumbnail</span></div>
+        <span class="c1"># TODO fire signal to notify of thumbnail change</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, CBIA @ FI MUNI.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

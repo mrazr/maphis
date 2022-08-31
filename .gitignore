@@ -1,0 +1,7 @@
+.idea
+*.pyc
+arthropod_logger.log
+arthropod_describer.egg-info/*
+arthropod_describer/plugins/pekar_unet/regions/pekar_unet/logs.txt
+arthropod_describer/config.json
+arthropod_describer/.thumbnails

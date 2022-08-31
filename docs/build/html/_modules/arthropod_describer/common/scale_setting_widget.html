@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arthropod_describer.common.scale_setting_widget &mdash; MAPHIS 0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> MAPHIS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">arthropod_describer</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">MAPHIS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>arthropod_describer.common.scale_setting_widget</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for arthropod_describer.common.scale_setting_widget</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">dataclasses</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">typing</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span> <span class="nn">PySide2</span>
+<span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">qimage2ndarray</span>
+<span class="kn">from</span> <span class="nn">PySide2</span> <span class="kn">import</span> <span class="n">QtGui</span><span class="p">,</span> <span class="n">QtCore</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtCore</span> <span class="kn">import</span> <span class="n">Qt</span><span class="p">,</span> <span class="n">Signal</span><span class="p">,</span> <span class="n">QPoint</span><span class="p">,</span> <span class="n">QObject</span><span class="p">,</span> <span class="n">QRect</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtGui</span> <span class="kn">import</span> <span class="n">QImage</span><span class="p">,</span> <span class="n">QPixmap</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtWidgets</span> <span class="kn">import</span> <span class="n">QWidget</span><span class="p">,</span> <span class="n">QHBoxLayout</span><span class="p">,</span> <span class="n">QLabel</span><span class="p">,</span> <span class="n">QSpinBox</span><span class="p">,</span> <span class="n">QPushButton</span><span class="p">,</span> <span class="n">QComboBox</span><span class="p">,</span> <span class="n">QDoubleSpinBox</span><span class="p">,</span> <span class="n">QDialog</span><span class="p">,</span> \
+    <span class="n">QDialogButtonBox</span><span class="p">,</span> <span class="n">QVBoxLayout</span><span class="p">,</span> <span class="n">QStyleOptionViewItem</span>
+
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.blocking_operation</span> <span class="kn">import</span> <span class="n">BlockingOperation</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.image_operation_binding</span> <span class="kn">import</span> <span class="n">ImageOperation</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.photo</span> <span class="kn">import</span> <span class="n">Photo</span><span class="p">,</span> <span class="n">UpdateContext</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.photo_layer</span> <span class="kn">import</span> <span class="n">PhotoLayer</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.state</span> <span class="kn">import</span> <span class="n">State</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.storage</span> <span class="kn">import</span> <span class="n">Storage</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.units</span> <span class="kn">import</span> <span class="n">SIPrefix</span><span class="p">,</span> <span class="n">Unit</span><span class="p">,</span> <span class="n">BaseUnit</span><span class="p">,</span> <span class="n">Value</span><span class="p">,</span> <span class="n">UnitStore</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.utils</span> <span class="kn">import</span> <span class="n">ScaleSetting</span><span class="p">,</span> <span class="n">ScaleLineInfo</span><span class="p">,</span> <span class="n">get_scale_marker_roi</span><span class="p">,</span> <span class="n">get_reference_length</span><span class="p">,</span> \
+    <span class="n">get_scale_line_ends</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.visualization_layer</span> <span class="kn">import</span> <span class="n">VisualizationLayer</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.image_viewer</span> <span class="kn">import</span> <span class="n">ImageViewer</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.thumbnail_storage</span> <span class="kn">import</span> <span class="n">ThumbnailDelegate</span><span class="p">,</span> <span class="n">ThumbnailStorage_</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.tools.ruler</span> <span class="kn">import</span> <span class="n">Tool_Ruler</span>
+
+
+<div class="viewcode-block" id="ScaleExtractionResult"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.scale_setting_widget.ScaleExtractionResult">[docs]</a><span class="nd">@dataclasses</span><span class="o">.</span><span class="n">dataclass</span>
+<span class="k">class</span> <span class="nc">ScaleExtractionResult</span><span class="p">:</span>
+    <span class="n">photo_idx</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">image_scale</span><span class="p">:</span> <span class="n">Value</span>
+    <span class="n">reference_length</span><span class="p">:</span> <span class="n">Value</span>
+    <span class="n">px_length</span><span class="p">:</span> <span class="n">Value</span>
+    <span class="n">scale_line_p1</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
+    <span class="n">scale_line_p2</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
+    <span class="n">scale_marker</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span>
+    <span class="n">scale_marker_bbox</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span></div>
+
+
+<div class="viewcode-block" id="ScaleSettingTuple"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.scale_setting_widget.ScaleSettingTuple">[docs]</a><span class="nd">@dataclasses</span><span class="o">.</span><span class="n">dataclass</span>
+<span class="k">class</span> <span class="nc">ScaleSettingTuple</span><span class="p">:</span>
+    <span class="n">old_scale_set</span><span class="p">:</span> <span class="n">ScaleSetting</span>
+    <span class="n">new_scale_set</span><span class="p">:</span> <span class="n">ScaleSetting</span></div>
+
+
+<div class="viewcode-block" id="ScaleSettingWidget"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.scale_setting_widget.ScaleSettingWidget">[docs]</a><span class="k">class</span> <span class="nc">ScaleSettingWidget</span><span class="p">(</span><span class="n">QWidget</span><span class="p">):</span>
+    <span class="n">scale_set</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">accepted</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">()</span>
+    <span class="n">cancelled</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">State</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">PySide2</span><span class="o">.</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QWidget</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">f</span><span class="p">:</span> <span class="n">PySide2</span><span class="o">.</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">WindowFlags</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">WindowFlags</span><span class="p">()):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">photo</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Photo</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Storage</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="n">UnitStore</span><span class="p">()</span>
+
+        <span class="c1"># self.setLayout(self._layout)</span>
+        <span class="c1"># self.line_length: Value = Value(0, self.state.units.units[&#39;px&#39;])</span>
+        <span class="c1"># self.ref_length: Value = Value(0, self._cmbUnits.itemData(self._cmbUnits.currentIndex()))</span>
+        <span class="c1"># self.scale: Value = Value(0, self.state.units.units[&#39;px&#39;] / self.ref_length.unit)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_setup_controls</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_setup_viewer</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_op</span><span class="p">:</span> <span class="n">ImageOperation</span> <span class="o">=</span> <span class="n">ImageOperation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">scale_settings</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="n">ScaleSettingTuple</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setWindowTitle</span><span class="p">(</span><span class="s1">&#39;Set scale&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setWindowModality</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">ApplicationModal</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_setup_controls</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_layout</span> <span class="o">=</span> <span class="n">QHBoxLayout</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ref_label</span> <span class="o">=</span> <span class="n">QLabel</span><span class="p">(</span><span class="s2">&quot;Reference length: &quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_spboxReference_mm</span> <span class="o">=</span> <span class="n">QSpinBox</span><span class="p">()</span>
+        <span class="c1"># self._spboxReference_mm.setSuffix(&#39; mm&#39;)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_spboxReference_mm</span><span class="o">.</span><span class="n">setMinimum</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_spboxReference_mm</span><span class="o">.</span><span class="n">setMaximum</span><span class="p">(</span><span class="mi">9999</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_spboxReference_mm</span><span class="o">.</span><span class="n">setMaximumWidth</span><span class="p">(</span><span class="mi">150</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_spboxReference_mm</span><span class="o">.</span><span class="n">setAlignment</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">AlignLeft</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_spboxReference_mm</span><span class="o">.</span><span class="n">valueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_new_reference_length</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cmbUnits</span> <span class="o">=</span> <span class="n">QComboBox</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cmbResUnits</span> <span class="o">=</span> <span class="n">QComboBox</span><span class="p">()</span>
+        <span class="n">default_idx</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">prefix</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">SIPrefix</span><span class="p">)):</span>
+            <span class="n">unit</span> <span class="o">=</span> <span class="n">Unit</span><span class="p">(</span><span class="n">BaseUnit</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cmbUnits</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">unit</span><span class="p">),</span> <span class="n">unit</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cmbResUnits</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">unit</span><span class="p">),</span> <span class="n">unit</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">prefix</span> <span class="o">==</span> <span class="n">SIPrefix</span><span class="o">.</span><span class="n">m</span><span class="p">:</span>
+                <span class="n">default_idx</span> <span class="o">=</span> <span class="n">i</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cmbUnits</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">(</span><span class="n">default_idx</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cmbUnits</span><span class="o">.</span><span class="n">currentIndexChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_handle_reference_unit_changed</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lblPixels</span> <span class="o">=</span> <span class="n">QLabel</span><span class="p">(</span><span class="s1">&#39;Line length: 0 px&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lblResolution</span> <span class="o">=</span> <span class="n">QLabel</span><span class="p">(</span><span class="s1">&#39;Scale:&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lblScaleValue</span> <span class="o">=</span> <span class="n">QLabel</span><span class="p">()</span>
+        <span class="c1"># self._spboxResolution.setRange(0, 9999)</span>
+        <span class="c1"># self._spboxResolution.setSuffix(f&#39; {self.units.units[&quot;px/mm&quot;]}&#39;)</span>
+        <span class="c1"># self._spboxResolution.setSpecialValueText(&#39;not set&#39;)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_btnExtractScales</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;Extract scale from selected&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_btnExtractScales</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_extract_scales</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_btnSetManually</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;Enter scale numerically&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_btnSetManually</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_scale_from_user</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_btnAccept</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;Accept&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_btnAccept</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">accepted</span><span class="o">.</span><span class="n">emit</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_btnAccept</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_btnResolutionGlobal</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_btnResolutionGlobal</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;Set globally&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_btnResolutionGlobal</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_set_global_resolution</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_btnResolutionGlobal</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_btnCancel</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;Cancel&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_btnCancel</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cancelled</span><span class="o">.</span><span class="n">emit</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_btnCancel</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ref_label</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spboxReference_mm</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cmbUnits</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lblPixels</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lblResolution</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lblScaleValue</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_btnExtractScales</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_btnSetManually</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_btnAccept</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_btnResolutionGlobal</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_btnCancel</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_setup_viewer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_viewer</span> <span class="o">=</span> <span class="n">ImageViewer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_viewer</span><span class="o">.</span><span class="n">first_photo_requested</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fetch_first_photo</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_viewer</span><span class="o">.</span><span class="n">prev_photo_requested</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fetch_prev_photo</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_viewer</span><span class="o">.</span><span class="n">next_photo_requested</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fetch_next_photo</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_viewer</span><span class="o">.</span><span class="n">last_photo_requested</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fetch_last_photo</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_viewer</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">tbtnRotateCW</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_viewer</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">tbtnRotateCCW</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+
+        <span class="c1">#self.image_viewer.rotate_cw_requested.connect(self._rotate_cw)</span>
+        <span class="c1">#self.image_viewer.rotate_ccw_requested.connect(self._rotate_ccw)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_viewer</span><span class="o">.</span><span class="n">rotate_cw_requested</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_op</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">clockwise</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_viewer</span><span class="o">.</span><span class="n">rotate_ccw_requested</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_op</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">clockwise</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_viewer</span><span class="o">.</span><span class="n">photo_view</span><span class="o">.</span><span class="n">setVerticalScrollBarPolicy</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">ScrollBarAsNeeded</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_viewer</span><span class="o">.</span><span class="n">photo_view</span><span class="o">.</span><span class="n">setHorizontalScrollBarPolicy</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">ScrollBarAsNeeded</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_viewer</span><span class="o">.</span><span class="n">photo_switched</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">set_photo</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_viewer</span><span class="o">.</span><span class="n">add_layer</span><span class="p">(</span><span class="n">PhotoLayer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">viz_layer</span> <span class="o">=</span> <span class="n">VisualizationLayer</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">viz_layer</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">viz_layer</span><span class="o">.</span><span class="n">setOpacity</span><span class="p">(</span><span class="mf">.90</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_viewer</span><span class="o">.</span><span class="n">add_layer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">viz_layer</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_viewer</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+
+        <span class="c1"># self.ruler_tool: typing.Optional[Tool_Ruler] = None  # Tool_Ruler(self._state)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ruler_tool</span><span class="p">:</span> <span class="n">Tool_Ruler</span> <span class="o">=</span> <span class="n">Tool_Ruler</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_state</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ruler_tool</span><span class="o">.</span><span class="n">show_real_units</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ruler_tool</span><span class="o">.</span><span class="n">current_value</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">compute_resolution</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ruler_tools</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">Tool_Ruler</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_viewer</span><span class="o">.</span><span class="n">set_tool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ruler_tool</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_viewer</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">controlBar</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_layout</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image_viewer</span><span class="o">.</span><span class="n">layout</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">_fetch_photo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="o">.</span><span class="n">image_count</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># TODO: Is there any difference between self.temp_storage and self._state.storage?</span>
+        <span class="c1"># _fetch_photo() now serves as a single image fetching function, but some</span>
+        <span class="c1"># of the functions it replaced seemed to use self.temp_storage, and some</span>
+        <span class="c1"># seemed to use self._state.storage in some places.</span>
+        <span class="c1"># if self.temp_storage == self._state.storage:</span>
+        <span class="c1">#     print(&#39;self.temp_storage == self._state.storage&#39;)</span>
+        <span class="c1"># else:</span>
+        <span class="c1">#     print(&#39;!!! self.temp_storage != self._state.storage&#39;)</span>
+        <span class="c1"># self.image_viewer.enable_navigation_buttons(idx) # TODO: or should this work with temp_storage? (in that case, pass the appropriate storage as a parameter of enable_navigation_buttons()?)</span>
+        <span class="n">photo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="o">.</span><span class="n">get_photo_by_idx</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+
+        <span class="n">scale_set</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale_settings</span><span class="p">[</span><span class="n">photo</span><span class="o">.</span><span class="n">image_path</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">setWindowTitle</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">photo</span><span class="o">.</span><span class="n">image_name</span><span class="si">}</span><span class="s1"> - Set scale&#39;</span><span class="p">)</span>
+
+        <span class="c1"># self.image_viewer.setWindowTitle(f&quot;Please delineate scale line for {photo.image_name}&quot;)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_viewer</span><span class="o">.</span><span class="n">set_photo</span><span class="p">(</span><span class="n">photo</span><span class="p">,</span> <span class="n">reset_view</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">reset_tool</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># self.ruler_tool = self.ruler_tools[idx]</span>
+        <span class="c1"># value_mm: Optional[int] = None</span>
+        <span class="c1"># dig_re = re.compile(r&#39;([0-9]+)\s*([a-zA-Z]m)&#39;)</span>
+        <span class="c1"># if self.ruler_tool._measurement &lt;= 0:</span>
+        <span class="c1">#     scale_marker, (left, top, width, height) = get_scale_marker_roi(photo.image)</span>
+        <span class="c1">#     p1x, p1y, p2x, p2y = get_scale_line_ends(scale_marker)</span>
+        <span class="c1">#     scale_text, scale_roi = get_reference_length(scale_marker)</span>
+        <span class="c1">#     print(scale_text)</span>
+        <span class="c1">#     if len(scale_text) &gt; 0:</span>
+        <span class="c1">#         match = dig_re.match(scale_text)</span>
+        <span class="c1">#         for group in match.groups():</span>
+        <span class="c1">#             print(group)</span>
+        <span class="c1">#         print(scale_text)</span>
+        <span class="c1">#     self.ruler_tool.set_line(QPoint(p1x+left, p1y+top), QPoint(p2x+left, p2y+top), reset_others=True)</span>
+
+        <span class="c1"># self.set_photo(photo)</span>
+
+
+        <span class="c1"># res = self.temp_storage.image_scales[idx]</span>
+        <span class="c1"># res = self.temp_storage.get_photo_by_idx(idx).image_scale</span>
+        <span class="c1"># if res is not None and res.value &gt; 0:</span>
+        <span class="c1">#     self._lblResolution.setText(f&#39;Scale: {res}&#39;)</span>
+        <span class="c1"># else:</span>
+        <span class="c1">#     self._lblResolution.setText(&#39;Scale: n/a&#39;)</span>
+        <span class="c1">#</span>
+        <span class="c1"># if self.ruler_tool.value_storage is not None and len(self.ruler_tool.value_storage) &gt; 0:</span>
+        <span class="c1">#     self._lblPixels.setText(f&#39;Line length: {self.ruler_tool.value_storage[0]} px&#39;)</span>
+        <span class="c1"># else:</span>
+        <span class="c1">#     self._lblPixels.setText(&#39;Line length: 0 px&#39;)</span>
+
+        <span class="c1"># self._scale_set_widget.set_photo(photo)</span>
+
+        <span class="c1"># if self.ruler_tool.value_storage is not None and len(self.ruler_tool.value_storage) &gt; 0:</span>
+        <span class="c1">#     # self._scale_set_widget.set_line_length(Value(self.ruler_tool.value_storage[0], self._state.units.units[&#39;px&#39;]))</span>
+        <span class="c1">#     self.set_line_length(self.ruler_tool.value_storage[0])</span>
+        <span class="c1"># else:</span>
+        <span class="c1">#     self.set_line_length(Value(0, self._state.units.units[&#39;px&#39;]))</span>
+
+    <span class="k">def</span> <span class="nf">_fetch_first_photo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_photo</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_fetch_prev_photo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_photo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_state</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">image_names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_state</span><span class="o">.</span><span class="n">current_photo</span><span class="o">.</span><span class="n">image_name</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="c1"># TODO: or should this work with temp_storage?</span>
+
+    <span class="k">def</span> <span class="nf">_fetch_next_photo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_photo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_state</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">image_names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_state</span><span class="o">.</span><span class="n">current_photo</span><span class="o">.</span><span class="n">image_name</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="c1"># TODO: or should this work with temp_storage?</span>
+
+    <span class="k">def</span> <span class="nf">_fetch_last_photo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_photo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_state</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">image_count</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="c1"># TODO: or should this work with temp_storage?</span>
+
+    <span class="k">def</span> <span class="nf">_new_reference_length</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compute_resolution</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scale_settings</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">photo</span><span class="o">.</span><span class="n">image_path</span><span class="p">]</span><span class="o">.</span><span class="n">new_scale_set</span><span class="o">.</span><span class="n">scale_line</span><span class="o">.</span><span class="n">length</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_set_global_resolution</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">image_names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">current_photo</span><span class="o">.</span><span class="n">image_name</span><span class="p">)</span>
+        <span class="n">photo_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">get_photo_by_idx</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">load_image</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># for i in range(self.state.storage.image_count):</span>
+        <span class="c1">#     photo = self.state.storage.get_photo_by_idx(i, load_image=False)</span>
+        <span class="c1">#     photo.image_scale = photo_.image_scale</span>
+
+        <span class="n">scale_setting</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale_settings</span><span class="p">[</span><span class="n">photo_</span><span class="o">.</span><span class="n">image_path</span><span class="p">]</span><span class="o">.</span><span class="n">new_scale_set</span>
+
+        <span class="k">for</span> <span class="n">img_path</span><span class="p">,</span> <span class="n">scale_tup</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale_settings</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">img_path</span> <span class="o">==</span> <span class="n">photo_</span><span class="o">.</span><span class="n">image_path</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">scale_tup</span><span class="o">.</span><span class="n">new_scale_set</span><span class="o">.</span><span class="n">scale</span> <span class="o">=</span> <span class="n">scale_setting</span><span class="o">.</span><span class="n">scale</span>
+            <span class="n">scale_tup</span><span class="o">.</span><span class="n">new_scale_set</span><span class="o">.</span><span class="n">scale_line</span> <span class="o">=</span> <span class="kc">None</span> <span class="c1">#ScaleLineInfo((0, 0), (0, 0), Value(0, self.ruler_tool._px_unit))</span>
+            <span class="n">scale_tup</span><span class="o">.</span><span class="n">new_scale_set</span><span class="o">.</span><span class="n">reference_length</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># self.scale_set.emit([i for i in range(self.state.storage.image_count)])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">accepted</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+
+<div class="viewcode-block" id="ScaleSettingWidget.compute_resolution"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.scale_setting_widget.ScaleSettingWidget.compute_resolution">[docs]</a>    <span class="k">def</span> <span class="nf">compute_resolution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pixels</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Value</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="n">pixels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">unset_line</span><span class="p">()</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">line_length</span> <span class="o">=</span> <span class="n">pixels</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lblPixels</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Line length: </span><span class="si">{</span><span class="n">pixels</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">pixels</span><span class="o">.</span><span class="n">value</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cmbUnits</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_spboxReference_mm</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">unset_line</span><span class="p">()</span>
+            <span class="k">return</span>
+
+        <span class="n">idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">image_names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">current_photo</span><span class="o">.</span><span class="n">image_name</span><span class="p">)</span>
+        <span class="n">photo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">get_photo_by_idx</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">load_image</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">ref_length</span> <span class="o">=</span> <span class="n">Value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spboxReference_mm</span><span class="o">.</span><span class="n">value</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cmbUnits</span><span class="o">.</span><span class="n">itemData</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cmbUnits</span><span class="o">.</span><span class="n">currentIndex</span><span class="p">()))</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">pixels</span> <span class="o">/</span> <span class="n">ref_length</span>
+        <span class="c1"># if photo.image_scale is None:</span>
+        <span class="c1">#     unit = self.state.units.units[&#39;px&#39;] / self._cmbUnits.itemData(self._cmbUnits.currentIndex())</span>
+        <span class="c1">#     photo.image_scale = Value(value=res, unit=unit)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scale</span> <span class="o">=</span> <span class="n">res</span>
+        <span class="n">scale_setting</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale_settings</span><span class="p">[</span><span class="n">photo</span><span class="o">.</span><span class="n">image_path</span><span class="p">]</span>
+        <span class="n">scale_setting</span><span class="o">.</span><span class="n">new_scale_set</span><span class="o">.</span><span class="n">scale</span> <span class="o">=</span> <span class="n">res</span>
+        <span class="k">if</span> <span class="n">pixels</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">scale_setting</span><span class="o">.</span><span class="n">new_scale_set</span><span class="o">.</span><span class="n">scale</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">scale_setting</span><span class="o">.</span><span class="n">new_scale_set</span><span class="o">.</span><span class="n">scale_line</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ruler_tool</span><span class="o">.</span><span class="n">endpoints</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">scale_setting</span><span class="o">.</span><span class="n">new_scale_set</span><span class="o">.</span><span class="n">scale_line</span> <span class="o">=</span> <span class="n">ScaleLineInfo</span><span class="p">(</span>
+                    <span class="n">p1</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ruler_tool</span><span class="o">.</span><span class="n">endpoints</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">toTuple</span><span class="p">(),</span>
+                    <span class="n">p2</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ruler_tool</span><span class="o">.</span><span class="n">endpoints</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">toTuple</span><span class="p">(),</span>
+                    <span class="n">length</span><span class="o">=</span><span class="n">pixels</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">scale_setting</span><span class="o">.</span><span class="n">new_scale_set</span><span class="o">.</span><span class="n">scale_line</span> <span class="o">=</span> <span class="n">ScaleLineInfo</span><span class="p">(</span>
+                    <span class="n">p1</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                    <span class="n">p2</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                    <span class="n">length</span><span class="o">=</span><span class="n">Value</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ruler_tool</span><span class="o">.</span><span class="n">_px_unit</span><span class="p">)</span>
+                <span class="p">)</span>
+        <span class="n">scale_setting</span><span class="o">.</span><span class="n">new_scale_set</span><span class="o">.</span><span class="n">scale_line</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="n">pixels</span>
+        <span class="n">scale_setting</span><span class="o">.</span><span class="n">new_scale_set</span><span class="o">.</span><span class="n">reference_length</span> <span class="o">=</span> <span class="n">ref_length</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ruler_tool</span><span class="o">.</span><span class="n">set_scale</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ruler_tool</span><span class="o">.</span><span class="n">endpoints</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">scale_setting</span><span class="o">.</span><span class="n">new_scale_set</span><span class="o">.</span><span class="n">scale_line</span><span class="o">.</span><span class="n">p1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ruler_tool</span><span class="o">.</span><span class="n">endpoints</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">toTuple</span><span class="p">()</span>
+            <span class="n">scale_setting</span><span class="o">.</span><span class="n">new_scale_set</span><span class="o">.</span><span class="n">scale_line</span><span class="o">.</span><span class="n">p2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ruler_tool</span><span class="o">.</span><span class="n">endpoints</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">toTuple</span><span class="p">()</span>
+
+        <span class="c1"># photo.image_scale = res</span>
+        <span class="c1"># photo.image_scale.unit = self.state.units.units[&#39;px&#39;] / self._cmbUnits.itemData(self._cmbUnits.currentIndex())</span>
+        <span class="c1"># self._lblResolution.setText(f&#39;Scale: {scale_setting.new_scale_set.scale}&#39;)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lblScaleValue</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">scale_setting</span><span class="o">.</span><span class="n">new_scale_set</span><span class="o">.</span><span class="n">scale</span><span class="p">))</span>
+        <span class="c1"># self._lblScaleValue.setSuffix(f&#39; {res.unit}&#39;)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_btnAccept</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_btnResolutionGlobal</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_line</span><span class="p">(</span><span class="n">scale_setting</span><span class="o">.</span><span class="n">new_scale_set</span><span class="o">.</span><span class="n">scale_line</span><span class="p">,</span> <span class="n">scale_setting</span><span class="o">.</span><span class="n">new_scale_set</span><span class="o">.</span><span class="n">reference_length</span><span class="p">)</span></div>
+        <span class="c1"># self.scale_set.emit([idx])</span>
+
+<div class="viewcode-block" id="ScaleSettingWidget.set_photo"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.scale_setting_widget.ScaleSettingWidget.set_photo">[docs]</a>    <span class="k">def</span> <span class="nf">set_photo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">photo</span><span class="p">:</span> <span class="n">Photo</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">photo</span> <span class="o">=</span> <span class="n">photo</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_op</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">photo</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_state</span><span class="o">.</span><span class="n">current_photo</span> <span class="o">=</span> <span class="n">photo</span>
+
+        <span class="n">res</span> <span class="o">=</span> <span class="n">photo</span><span class="o">.</span><span class="n">scale_setting</span><span class="o">.</span><span class="n">scale</span>
+        <span class="n">scale_setting</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale_settings</span><span class="p">[</span><span class="n">photo</span><span class="o">.</span><span class="n">image_path</span><span class="p">]</span><span class="o">.</span><span class="n">new_scale_set</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ruler_tool</span><span class="o">.</span><span class="n">set_scale</span><span class="p">(</span><span class="n">scale_setting</span><span class="o">.</span><span class="n">scale</span><span class="p">)</span>
+        <span class="n">scale_line</span> <span class="o">=</span> <span class="n">scale_setting</span><span class="o">.</span><span class="n">scale_line</span>
+        <span class="k">if</span> <span class="n">scale_line</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># self.ruler_tool.set_line(QPoint(*scale_line.p1),</span>
+            <span class="c1">#                          QPoint(*scale_line.p2),</span>
+            <span class="c1">#                          reset_others=True)</span>
+            <span class="c1"># self.set_line_length(scale_line.length)</span>
+            <span class="c1"># self._spboxReference_mm.setEnabled(True)</span>
+            <span class="c1"># self._cmbUnits.setEnabled(True)</span>
+            <span class="c1"># if (ref_length := scale_setting.reference_length) is not None:</span>
+            <span class="c1">#     self._spboxReference_mm.setValue(ref_length.value)</span>
+            <span class="c1">#     self._cmbUnits.setCurrentIndex(list(SIPrefix).index(ref_length.unit.prefix))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_line</span><span class="p">(</span><span class="n">scale_line</span><span class="p">,</span> <span class="n">scale_setting</span><span class="o">.</span><span class="n">reference_length</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">unset_line</span><span class="p">()</span>
+            <span class="c1"># self.ruler_tool.reset_tool()</span>
+            <span class="c1"># self._lblPixels.setText(&#39;Line length: no line drawn&#39;)</span>
+            <span class="c1"># # if there is not scale line yet, disable referene length spinner and units combobox</span>
+            <span class="c1"># # self.set_line_length(Value(0, self.state.units.units[&#39;px&#39;]))</span>
+            <span class="c1"># self._spboxReference_mm.setEnabled(False)</span>
+            <span class="c1"># self._cmbUnits.setEnabled(False)</span>
+        <span class="k">if</span> <span class="n">res</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">res</span><span class="o">.</span><span class="n">value</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># self._lblResolution.setText(f&#39;Scale: {scale_setting.scale}&#39;)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_lblScaleValue</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">scale_setting</span><span class="o">.</span><span class="n">scale</span><span class="p">))</span>
+            <span class="c1"># self._lblScaleValue.setSuffix(f&#39; {scale_setting.scale.unit}&#39;)</span>
+            <span class="c1"># idx = list(SIPrefix).index(scale_setting.reference_length.unit.prefix)</span>
+            <span class="c1"># self._cmbUnits.setCurrentIndex(idx)</span>
+            <span class="c1"># ref_length = scale_setting.reference_length</span>
+            <span class="c1"># self._spboxReference_mm.setValue(ref_length.value)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># self._lblResolution.setText(&#39;Scale&#39;)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_lblScaleValue</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s1">&#39;not set&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setWindowTitle</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">photo</span><span class="o">.</span><span class="n">image_name</span><span class="si">}</span><span class="s1"> - Set scale&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_viewer</span><span class="o">.</span><span class="n">set_tool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ruler_tool</span><span class="p">,</span> <span class="n">reset_current</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">viz_layer</span><span class="o">.</span><span class="n">paint_commands</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ruler_tool</span><span class="o">.</span><span class="n">viz_commands</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">viz_layer</span><span class="o">.</span><span class="n">update</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ScaleSettingWidget.set_line_length"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.scale_setting_widget.ScaleSettingWidget.set_line_length">[docs]</a>    <span class="k">def</span> <span class="nf">set_line_length</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="p">:</span> <span class="n">Value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">line_length</span> <span class="o">=</span> <span class="n">length</span>
+        <span class="k">if</span> <span class="n">length</span><span class="o">.</span><span class="n">value</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cmbUnits</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_spboxReference_mm</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lblPixels</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Line length: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">line_length</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">photo</span><span class="o">.</span><span class="n">scale_setting</span><span class="o">.</span><span class="n">reference_length</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_spboxReference_mm</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">photo</span><span class="o">.</span><span class="n">scale_setting</span><span class="o">.</span><span class="n">reference_length</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">length</span><span class="o">.</span><span class="n">value</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">photo</span><span class="o">.</span><span class="n">image_scale</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">photo</span><span class="o">.</span><span class="n">image_scale</span><span class="o">.</span><span class="n">value</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_spboxReference_mm</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">length</span><span class="o">.</span><span class="n">value</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">photo</span><span class="o">.</span><span class="n">image_scale</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compute_resolution</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">line_length</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_handle_reference_unit_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="c1"># self._lblScaleValue.setSuffix(f&#39; px / {self._cmbUnits.itemData(idx)}&#39;)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compute_resolution</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">line_length</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lblScaleValue</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scale_settings</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">photo</span><span class="o">.</span><span class="n">image_path</span><span class="p">]</span><span class="o">.</span><span class="n">new_scale_set</span><span class="o">.</span><span class="n">scale</span><span class="p">))</span>
+
+<div class="viewcode-block" id="ScaleSettingWidget.initialize"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.scale_setting_widget.ScaleSettingWidget.initialize">[docs]</a>    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">storage</span><span class="p">:</span> <span class="n">Storage</span><span class="p">):</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Scale setting: initializing storage </span><span class="si">{</span><span class="n">storage</span><span class="o">.</span><span class="n">location</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_viewer</span><span class="o">.</span><span class="n">set_storage</span><span class="p">(</span><span class="n">storage</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="o">.</span><span class="n">update_photo</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_handle_update_photo</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span> <span class="o">=</span> <span class="n">storage</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="o">.</span><span class="n">update_photo</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_handle_update_photo</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="o">.</span><span class="n">storage_update</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_handle_storage_update</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scale_settings</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ruler_tool</span><span class="o">.</span><span class="n">reset_tool</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="o">.</span><span class="n">image_count</span><span class="p">):</span>
+            <span class="n">photo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="o">.</span><span class="n">get_photo_by_idx</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">load_image</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scale_settings</span><span class="p">[</span><span class="n">photo</span><span class="o">.</span><span class="n">image_path</span><span class="p">]</span> <span class="o">=</span> <span class="n">ScaleSettingTuple</span><span class="p">(</span>
+                <span class="n">old_scale_set</span><span class="o">=</span><span class="n">photo</span><span class="o">.</span><span class="n">scale_setting</span><span class="p">,</span>
+                <span class="n">new_scale_set</span><span class="o">=</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">photo</span><span class="o">.</span><span class="n">scale_setting</span><span class="p">)</span>
+            <span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_handle_update_photo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ctx</span><span class="p">:</span> <span class="n">UpdateContext</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">photo</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">img_name</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">photo</span><span class="o">.</span><span class="n">image_name</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">photo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="o">.</span><span class="n">get_photo_by_name</span><span class="p">(</span><span class="n">img_name</span><span class="p">)</span>
+        <span class="n">scale_setting</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale_settings</span><span class="p">[</span><span class="n">photo</span><span class="o">.</span><span class="n">image_path</span><span class="p">]</span><span class="o">.</span><span class="n">new_scale_set</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ruler_tool</span><span class="o">.</span><span class="n">set_scale</span><span class="p">(</span><span class="n">scale_setting</span><span class="o">.</span><span class="n">scale</span><span class="p">)</span>
+        <span class="n">scale_line</span> <span class="o">=</span> <span class="n">scale_setting</span><span class="o">.</span><span class="n">scale_line</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">ref_length</span> <span class="o">:=</span> <span class="n">scale_setting</span><span class="o">.</span><span class="n">reference_length</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_spboxReference_mm</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">ref_length</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cmbUnits</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">SIPrefix</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">ref_length</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">prefix</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">scale_line</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="s1">&#39;operation&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;operation&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;rot&#39;</span><span class="p">):</span>
+                <span class="n">scale_line</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;operation&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;rot_90_ccw&#39;</span><span class="p">,</span> <span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">photo</span><span class="o">.</span><span class="n">image_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+                                                                      <span class="nb">round</span><span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">photo</span><span class="o">.</span><span class="n">image_size</span><span class="p">[</span><span class="mi">0</span><span class="p">])))</span>
+            <span class="k">elif</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;operation&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;resize&#39;</span><span class="p">:</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;factor&#39;</span><span class="p">]</span>
+                <span class="c1"># scale_line.p1 = (round(f * scale_line.p1[0]),</span>
+                <span class="c1">#                  round(f * scale_line.p1[1]))</span>
+                <span class="c1"># scale_line.p2 = (round(f * scale_line.p2[0]),</span>
+                <span class="c1">#                  round(f * scale_line.p2[1]))</span>
+                <span class="c1"># scale_line.scale(f, (round(0.5 * photo.image_size[0]),</span>
+                <span class="c1">#                      round(0.5 * photo.image_size[1])))</span>
+                <span class="k">pass</span>
+            <span class="c1"># self.ruler_tool.set_line(QPoint(*scale_line.p1),</span>
+            <span class="c1">#                          QPoint(*scale_line.p2),</span>
+            <span class="c1">#                          reset_others=True)</span>
+            <span class="c1"># self.set_line_length(scale_line.length)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_line</span><span class="p">(</span><span class="n">scale_line</span><span class="p">,</span> <span class="n">scale_setting</span><span class="o">.</span><span class="n">reference_length</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># self.set_line_length(Value(0, self.state.units.units[&#39;px&#39;]))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">unset_line</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">viz_layer</span><span class="o">.</span><span class="n">paint_commands</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ruler_tool</span><span class="o">.</span><span class="n">viz_commands</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">viz_layer</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_handle_storage_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="s1">&#39;photos&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="s1">&#39;included&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;photos&#39;</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">photo_name</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;photos&#39;</span><span class="p">][</span><span class="s1">&#39;included&#39;</span><span class="p">]:</span>
+                <span class="n">photo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="o">.</span><span class="n">get_photo_by_name</span><span class="p">(</span><span class="n">photo_name</span><span class="p">,</span> <span class="n">load_image</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">scale_settings</span><span class="p">[</span><span class="n">photo</span><span class="o">.</span><span class="n">image_path</span><span class="p">]</span> <span class="o">=</span> <span class="n">ScaleSettingTuple</span><span class="p">(</span>
+                    <span class="n">old_scale_set</span><span class="o">=</span><span class="n">photo</span><span class="o">.</span><span class="n">scale_setting</span><span class="p">,</span>
+                    <span class="n">new_scale_set</span><span class="o">=</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">photo</span><span class="o">.</span><span class="n">scale_setting</span><span class="p">)</span>
+                <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_set_unit_to_cmbUnits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="p">:</span> <span class="n">Unit</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cmbUnits</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">SIPrefix</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">unit</span><span class="o">.</span><span class="n">prefix</span><span class="p">))</span>
+
+<div class="viewcode-block" id="ScaleSettingWidget.set_line"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.scale_setting_widget.ScaleSettingWidget.set_line">[docs]</a>    <span class="k">def</span> <span class="nf">set_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scale_line</span><span class="p">:</span> <span class="n">ScaleLineInfo</span><span class="p">,</span> <span class="n">ref_length</span><span class="p">:</span> <span class="n">Value</span><span class="p">):</span>
+        <span class="n">scale_setting</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale_settings</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">photo</span><span class="o">.</span><span class="n">image_path</span><span class="p">]</span><span class="o">.</span><span class="n">new_scale_set</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_spboxReference_mm</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_spboxReference_mm</span><span class="o">.</span><span class="n">blockSignals</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_spboxReference_mm</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">ref_length</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_spboxReference_mm</span><span class="o">.</span><span class="n">blockSignals</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cmbUnits</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_unit_to_cmbUnits</span><span class="p">(</span><span class="n">ref_length</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ruler_tool</span><span class="o">.</span><span class="n">set_line</span><span class="p">(</span><span class="n">QPoint</span><span class="p">(</span><span class="o">*</span><span class="n">scale_line</span><span class="o">.</span><span class="n">p1</span><span class="p">),</span> <span class="n">QPoint</span><span class="p">(</span><span class="o">*</span><span class="n">scale_line</span><span class="o">.</span><span class="n">p2</span><span class="p">),</span> <span class="n">reset_others</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># self.set_line_length(scale_line.length)</span>
+        <span class="c1"># self._lblScaleValue.setValue((scale_line.length / ref_length).value)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lblScaleValue</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">scale_line</span><span class="o">.</span><span class="n">length</span> <span class="o">/</span> <span class="n">ref_length</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lblPixels</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Line length: </span><span class="si">{</span><span class="n">scale_line</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">viz_layer</span><span class="o">.</span><span class="n">paint_commands</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ruler_tool</span><span class="o">.</span><span class="n">viz_commands</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">viz_layer</span><span class="o">.</span><span class="n">update</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ScaleSettingWidget.unset_line"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.scale_setting_widget.ScaleSettingWidget.unset_line">[docs]</a>    <span class="k">def</span> <span class="nf">unset_line</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_spboxReference_mm</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cmbUnits</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lblPixels</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s1">&#39;Line length: no line drawn&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lblScaleValue</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s1">&#39;not set&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ruler_tool</span><span class="o">.</span><span class="n">reset_tool</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_scale_from_user</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">dialog</span> <span class="o">=</span> <span class="n">QDialog</span><span class="p">()</span>
+        <span class="n">dialog</span><span class="o">.</span><span class="n">setWindowTitle</span><span class="p">(</span><span class="s2">&quot;Enter scale numerically&quot;</span><span class="p">)</span>
+        <span class="n">spbox</span> <span class="o">=</span> <span class="n">QDoubleSpinBox</span><span class="p">()</span>
+        <span class="n">spbox</span><span class="o">.</span><span class="n">setRange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">999</span><span class="p">)</span>
+        <span class="n">spbox</span><span class="o">.</span><span class="n">setSpecialValueText</span><span class="p">(</span><span class="s1">&#39;0 (invalid value)&#39;</span><span class="p">)</span>
+        <span class="n">spbox</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scale_settings</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">photo</span><span class="o">.</span><span class="n">image_path</span><span class="p">]</span><span class="o">.</span><span class="n">new_scale_set</span><span class="o">.</span><span class="n">scale</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+        <span class="n">cmbUnits</span> <span class="o">=</span> <span class="n">QComboBox</span><span class="p">()</span>
+        <span class="n">scale_setting</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale_settings</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">photo</span><span class="o">.</span><span class="n">image_path</span><span class="p">]</span><span class="o">.</span><span class="n">new_scale_set</span>
+        <span class="n">default_idx</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">prefix</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">SIPrefix</span><span class="p">)):</span>
+            <span class="n">unit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">units</span><span class="o">.</span><span class="n">units</span><span class="p">[</span><span class="s1">&#39;px&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">Unit</span><span class="p">(</span><span class="n">BaseUnit</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">cmbUnits</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">unit</span><span class="p">),</span> <span class="n">unit</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">scale_setting</span><span class="o">.</span><span class="n">scale</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">scale_setting</span><span class="o">.</span><span class="n">scale</span><span class="o">.</span><span class="n">unit</span> <span class="o">==</span> <span class="n">unit</span><span class="p">:</span>
+                <span class="n">default_idx</span> <span class="o">=</span> <span class="n">i</span>
+
+        <span class="n">cmbUnits</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">(</span><span class="n">default_idx</span><span class="p">)</span>
+
+        <span class="n">diag_buttons</span> <span class="o">=</span> <span class="n">QDialogButtonBox</span><span class="p">(</span><span class="n">QDialogButtonBox</span><span class="o">.</span><span class="n">Ok</span> <span class="o">|</span> <span class="n">QDialogButtonBox</span><span class="o">.</span><span class="n">Cancel</span><span class="p">)</span>
+        <span class="n">diag_buttons</span><span class="o">.</span><span class="n">accepted</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">dialog</span><span class="o">.</span><span class="n">accept</span><span class="p">)</span>
+        <span class="n">diag_buttons</span><span class="o">.</span><span class="n">rejected</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">dialog</span><span class="o">.</span><span class="n">reject</span><span class="p">)</span>
+
+        <span class="n">vbox</span> <span class="o">=</span> <span class="n">QVBoxLayout</span><span class="p">()</span>
+
+        <span class="n">hbox</span> <span class="o">=</span> <span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="n">hbox</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QLabel</span><span class="p">(</span><span class="s1">&#39;Scale: &#39;</span><span class="p">))</span>
+        <span class="n">hbox</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">spbox</span><span class="p">)</span>
+        <span class="n">hbox</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">cmbUnits</span><span class="p">)</span>
+
+        <span class="n">vbox</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">hbox</span><span class="p">)</span>
+        <span class="n">vbox</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">diag_buttons</span><span class="p">)</span>
+
+        <span class="n">dialog</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">vbox</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">dialog</span><span class="o">.</span><span class="n">exec_</span><span class="p">()</span> <span class="o">==</span> <span class="n">QDialog</span><span class="o">.</span><span class="n">Accepted</span><span class="p">:</span>
+            <span class="n">scale_setting</span><span class="o">.</span><span class="n">scale</span> <span class="o">=</span> <span class="n">Value</span><span class="p">(</span><span class="n">spbox</span><span class="o">.</span><span class="n">value</span><span class="p">(),</span> <span class="n">cmbUnits</span><span class="o">.</span><span class="n">currentData</span><span class="p">())</span>
+            <span class="n">scale_setting</span><span class="o">.</span><span class="n">scale_line</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">scale_setting</span><span class="o">.</span><span class="n">reference_length</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">unset_line</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_lblScaleValue</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">scale_setting</span><span class="o">.</span><span class="n">scale</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_extract_scales</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">block_op</span> <span class="o">=</span> <span class="n">BlockingOperation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">storage</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">image_count</span><span class="p">)),</span>
+                                     <span class="n">operation</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_scale_extraction_operation</span><span class="p">,</span>
+                                     <span class="n">result_handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_scale_extraction_result_processing</span><span class="p">,</span>
+                                     <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">block_op</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_scale_extraction_operation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">storage</span><span class="p">:</span> <span class="n">Storage</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">ScaleExtractionResult</span><span class="p">]:</span>
+        <span class="n">dig_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;([0-9]+)\s*([a-zA-Z]m)&#39;</span><span class="p">)</span>
+        <span class="n">unit_store</span> <span class="o">=</span> <span class="n">UnitStore</span><span class="p">()</span>
+
+        <span class="n">img_path</span> <span class="o">=</span> <span class="n">storage</span><span class="o">.</span><span class="n">image_paths</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+        <span class="n">image</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">img_path</span><span class="p">))</span>
+        <span class="n">scale_marker</span><span class="p">,</span> <span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span> <span class="o">=</span> <span class="n">get_scale_marker_roi</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+        <span class="n">ref_length</span><span class="p">,</span> <span class="n">scale_rotated</span> <span class="o">=</span> <span class="n">get_reference_length</span><span class="p">(</span><span class="n">scale_marker</span><span class="p">)</span>
+        <span class="n">p1x</span><span class="p">,</span> <span class="n">p1y</span><span class="p">,</span> <span class="n">p2x</span><span class="p">,</span> <span class="n">p2y</span> <span class="o">=</span> <span class="n">get_scale_line_ends</span><span class="p">(</span><span class="n">scale_marker</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">p1x</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ref_length</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">dig_re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">ref_length</span><span class="p">)</span>
+            <span class="n">length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">groups</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">unit_str</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">groups</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">unit</span> <span class="o">=</span> <span class="n">unit_store</span><span class="o">.</span><span class="n">units</span><span class="p">[</span><span class="n">unit_str</span><span class="p">]</span>
+            <span class="n">ref_length</span> <span class="o">=</span> <span class="n">Value</span><span class="p">(</span><span class="n">length</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span>
+            <span class="n">px_length</span> <span class="o">=</span> <span class="n">Value</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(((</span><span class="n">p1x</span> <span class="o">-</span> <span class="n">p2x</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">p1x</span> <span class="o">-</span> <span class="n">p2x</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">p1y</span> <span class="o">-</span> <span class="n">p2y</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">p1y</span> <span class="o">-</span> <span class="n">p2y</span><span class="p">)))),</span>
+                              <span class="n">unit_store</span><span class="o">.</span><span class="n">units</span><span class="p">[</span><span class="s1">&#39;px&#39;</span><span class="p">])</span>
+            <span class="n">image_scale</span> <span class="o">=</span> <span class="n">px_length</span> <span class="o">/</span> <span class="n">ref_length</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ref_length</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">image_scale</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">px_length</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">p1x_</span><span class="p">,</span> <span class="n">p1y_</span><span class="p">,</span> <span class="n">p2x_</span><span class="p">,</span> <span class="n">p2y_</span> <span class="o">=</span> <span class="n">get_scale_line_ends</span><span class="p">(</span><span class="n">scale_rotated</span><span class="p">)</span>
+        <span class="n">scale_rotated</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">scale_rotated</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_GRAY2RGB</span><span class="p">)</span>
+        <span class="n">scale_rotated</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">scale_rotated</span><span class="p">,</span> <span class="p">(</span><span class="n">p1x_</span><span class="p">,</span> <span class="n">p1y_</span> <span class="o">-</span> <span class="mi">10</span><span class="p">),</span> <span class="p">(</span><span class="n">p1x_</span><span class="p">,</span> <span class="n">p1y_</span> <span class="o">+</span> <span class="mi">10</span><span class="p">),</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">thickness</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">scale_rotated</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">scale_rotated</span><span class="p">,</span> <span class="p">(</span><span class="n">p2x_</span><span class="p">,</span> <span class="n">p1y_</span> <span class="o">-</span> <span class="mi">10</span><span class="p">),</span> <span class="p">(</span><span class="n">p2x_</span><span class="p">,</span> <span class="n">p1y_</span> <span class="o">+</span> <span class="mi">10</span><span class="p">),</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">thickness</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">scale_rotated</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">scale_rotated</span><span class="p">,</span> <span class="p">(</span><span class="mi">154</span><span class="p">,</span> <span class="mi">26</span><span class="p">),</span> <span class="n">interpolation</span><span class="o">=</span><span class="n">cv2</span><span class="o">.</span><span class="n">INTER_LINEAR</span><span class="p">)</span>
+        <span class="c1"># pixmap = QPixmap.fromImage(qimage2ndarray.array2qimage(scale_rotated))</span>
+        <span class="n">scale_marker</span> <span class="o">=</span> <span class="n">scale_rotated</span>
+
+        <span class="k">return</span> <span class="n">ScaleExtractionResult</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">image_scale</span><span class="p">,</span> <span class="n">ref_length</span><span class="p">,</span> <span class="n">px_length</span><span class="p">,</span>
+                                     <span class="p">(</span><span class="n">p1x</span><span class="o">+</span><span class="n">left</span><span class="p">,</span> <span class="n">p1y</span><span class="o">+</span><span class="n">top</span><span class="p">),</span>
+                                     <span class="p">(</span><span class="n">p2x</span><span class="o">+</span><span class="n">left</span><span class="p">,</span> <span class="n">p2y</span><span class="o">+</span><span class="n">top</span><span class="p">),</span>
+                                     <span class="n">scale_marker</span><span class="p">,</span>
+                                     <span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_scale_extraction_result_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">storage</span><span class="p">:</span> <span class="n">Storage</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">ScaleExtractionResult</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">storage</span><span class="o">.</span><span class="n">image_paths</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+        <span class="n">sc_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale_settings</span><span class="p">[</span><span class="n">path</span><span class="p">]</span><span class="o">.</span><span class="n">new_scale_set</span>
+        <span class="n">sc_info</span><span class="o">.</span><span class="n">scale</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">image_scale</span>
+        <span class="k">if</span> <span class="n">sc_info</span><span class="o">.</span><span class="n">scale_line</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">sc_info</span><span class="o">.</span><span class="n">scale_line</span> <span class="o">=</span> <span class="n">ScaleLineInfo</span><span class="p">(</span><span class="n">p1</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">p2</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">length</span><span class="o">=</span><span class="n">Value</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">units</span><span class="o">.</span><span class="n">units</span><span class="p">[</span><span class="s1">&#39;px&#39;</span><span class="p">]))</span>
+        <span class="n">sc_info</span><span class="o">.</span><span class="n">reference_length</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">reference_length</span>
+        <span class="n">sc_info</span><span class="o">.</span><span class="n">scale_line</span><span class="o">.</span><span class="n">p1</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">scale_line_p1</span>
+        <span class="n">sc_info</span><span class="o">.</span><span class="n">scale_line</span><span class="o">.</span><span class="n">p2</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">scale_line_p2</span>
+        <span class="n">sc_info</span><span class="o">.</span><span class="n">scale_line</span><span class="o">.</span><span class="n">length</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sc_info</span><span class="o">.</span><span class="n">scale_line</span><span class="o">.</span><span class="n">p1</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sc_info</span><span class="o">.</span><span class="n">scale_line</span><span class="o">.</span><span class="n">p2</span><span class="p">))))</span>
+        <span class="n">sc_info</span><span class="o">.</span><span class="n">scale_marker_bbox</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">scale_marker_bbox</span>
+        <span class="n">sc_info</span><span class="o">.</span><span class="n">scale_marker_img</span> <span class="o">=</span> <span class="n">QPixmap</span><span class="o">.</span><span class="n">fromImage</span><span class="p">(</span><span class="n">qimage2ndarray</span><span class="o">.</span><span class="n">array2qimage</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">scale_marker</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">path</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">current_photo</span><span class="o">.</span><span class="n">image_path</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_line</span><span class="p">(</span><span class="n">sc_info</span><span class="o">.</span><span class="n">scale_line</span><span class="p">,</span> <span class="n">sc_info</span><span class="o">.</span><span class="n">reference_length</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_btnAccept</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ScaleSettingWidget.closeEvent"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.scale_setting_widget.ScaleSettingWidget.closeEvent">[docs]</a>    <span class="k">def</span> <span class="nf">closeEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span><span class="n">PySide2</span><span class="o">.</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QCloseEvent</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">closeEvent</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cancelled</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="ScaleItemDelegate"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.scale_setting_widget.ScaleItemDelegate">[docs]</a><span class="k">class</span> <span class="nc">ScaleItemDelegate</span><span class="p">(</span><span class="n">ThumbnailDelegate</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thumbnails</span><span class="p">:</span> <span class="n">ThumbnailStorage_</span><span class="p">,</span> <span class="n">scale_set_widget</span><span class="p">:</span> <span class="n">ScaleSettingWidget</span><span class="p">,</span>
+                 <span class="n">parent</span><span class="p">:</span> <span class="n">QObject</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">thumbnails</span><span class="p">,</span> <span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scale_set_widget</span> <span class="o">=</span> <span class="n">scale_set_widget</span>
+
+<div class="viewcode-block" id="ScaleItemDelegate.paint"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.scale_setting_widget.ScaleItemDelegate.paint">[docs]</a>    <span class="k">def</span> <span class="nf">paint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">painter</span><span class="p">:</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QPainter</span><span class="p">,</span> <span class="n">option</span><span class="p">:</span> <span class="n">QStyleOptionViewItem</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QModelIndex</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">paint</span><span class="p">(</span><span class="n">painter</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">data</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">UserRole</span> <span class="o">+</span> <span class="mi">8</span><span class="p">)</span>
+        <span class="n">scale_marker</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">QPixmap</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale_set_widget</span><span class="o">.</span><span class="n">scale_settings</span><span class="p">[</span><span class="n">path</span><span class="p">]</span><span class="o">.</span><span class="n">new_scale_set</span><span class="o">.</span><span class="n">scale_marker_img</span>  <span class="c1"># TODO replace 7 with a named constant</span>
+        <span class="n">thumbnail</span><span class="p">:</span> <span class="n">QImage</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">data</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">UserRole</span> <span class="o">+</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">rect</span><span class="p">:</span> <span class="n">QRect</span> <span class="o">=</span> <span class="n">option</span><span class="o">.</span><span class="n">rect</span>
+        <span class="k">if</span> <span class="n">scale_marker</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">scale_rect</span> <span class="o">=</span> <span class="n">QRect</span><span class="p">(</span><span class="n">rect</span><span class="o">.</span><span class="n">center</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">()</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">scale_marker</span><span class="o">.</span><span class="n">width</span><span class="p">(),</span> <span class="n">rect</span><span class="o">.</span><span class="n">bottom</span><span class="p">()</span> <span class="o">-</span> <span class="mi">32</span> <span class="o">-</span> <span class="n">scale_marker</span><span class="o">.</span><span class="n">height</span><span class="p">(),</span>
+                           <span class="n">scale_marker</span><span class="o">.</span><span class="n">width</span><span class="p">(),</span> <span class="n">scale_marker</span><span class="o">.</span><span class="n">height</span><span class="p">())</span>
+        <span class="n">painter</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">painter</span><span class="o">.</span><span class="n">setRenderHint</span><span class="p">(</span><span class="n">painter</span><span class="o">.</span><span class="n">SmoothPixmapTransform</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># painter.drawImage(scale_rect, scale_marker)</span>
+        <span class="n">painter</span><span class="o">.</span><span class="n">drawPixmap</span><span class="p">(</span><span class="n">scale_rect</span><span class="p">,</span> <span class="n">scale_marker</span><span class="p">)</span>
+        <span class="n">painter</span><span class="o">.</span><span class="n">restore</span><span class="p">()</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, CBIA @ FI MUNI.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

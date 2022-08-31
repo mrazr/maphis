@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arthropod_describer.custom_graphics_view &mdash; MAPHIS 0.1 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> MAPHIS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">arthropod_describer</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">MAPHIS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>arthropod_describer.custom_graphics_view</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for arthropod_describer.custom_graphics_view</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">mouse</span>
+
+<span class="kn">from</span> <span class="nn">PySide2.QtCore</span> <span class="kn">import</span> <span class="n">Signal</span><span class="p">,</span> <span class="n">QPointF</span><span class="p">,</span> <span class="n">Qt</span><span class="p">,</span> <span class="n">QEvent</span><span class="p">,</span> <span class="n">QPoint</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtGui</span> <span class="kn">import</span> <span class="n">QPainter</span><span class="p">,</span> <span class="n">QWheelEvent</span><span class="p">,</span> <span class="n">QResizeEvent</span><span class="p">,</span> <span class="n">QMouseEvent</span><span class="p">,</span> <span class="n">QKeyEvent</span><span class="p">,</span> <span class="n">QCursor</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtWidgets</span> <span class="kn">import</span> <span class="n">QGraphicsView</span><span class="p">,</span> <span class="n">QWidget</span><span class="p">,</span> <span class="n">QSizePolicy</span>
+
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.state</span> <span class="kn">import</span> <span class="n">State</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.tool</span> <span class="kn">import</span> <span class="n">Tool</span>
+
+
+<div class="viewcode-block" id="CustomGraphicsView"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.custom_graphics_view.CustomGraphicsView">[docs]</a><span class="k">class</span> <span class="nc">CustomGraphicsView</span><span class="p">(</span><span class="n">QGraphicsView</span><span class="p">):</span>
+
+    <span class="n">view_changed</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">()</span>
+    <span class="n">rubber_band_started</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">()</span>
+    <span class="n">mouse_move</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">(</span><span class="n">QPointF</span><span class="p">)</span>
+    <span class="n">view_dragging</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">(</span><span class="nb">bool</span><span class="p">,</span> <span class="n">QPoint</span><span class="p">)</span>
+    <span class="n">double_shift</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">()</span>
+    <span class="n">escape_pressed</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">()</span>
+    <span class="n">space_pressed</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">()</span>
+    <span class="n">tab_pressed</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">State</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">QWidget</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">QGraphicsView</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setHorizontalScrollBarPolicy</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">ScrollBarAsNeeded</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setVerticalScrollBarPolicy</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">ScrollBarAsNeeded</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setSizePolicy</span><span class="p">(</span><span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Expanding</span><span class="p">,</span> <span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Expanding</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setViewportUpdateMode</span><span class="p">(</span><span class="n">QGraphicsView</span><span class="o">.</span><span class="n">SmartViewportUpdate</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setRenderHint</span><span class="p">(</span><span class="n">QPainter</span><span class="o">.</span><span class="n">Antialiasing</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">setTransformationAnchor</span><span class="p">(</span><span class="n">QGraphicsView</span><span class="o">.</span><span class="n">AnchorUnderMouse</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setInteractive</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">verticalScrollBar</span><span class="p">()</span><span class="o">.</span><span class="n">valueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">view_changed</span><span class="o">.</span><span class="n">emit</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalScrollBar</span><span class="p">()</span><span class="o">.</span><span class="n">valueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">view_changed</span><span class="o">.</span><span class="n">emit</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_of_first_shift</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_allow_zoom</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">state</span>
+        <span class="c1">#self.setCursor(QCursor(Qt.CursorShape.BlankCursor))</span>
+        
+<div class="viewcode-block" id="CustomGraphicsView.wheelEvent"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.custom_graphics_view.CustomGraphicsView.wheelEvent">[docs]</a>    <span class="k">def</span> <span class="nf">wheelEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">QWheelEvent</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">modifiers</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">Qt</span><span class="o">.</span><span class="n">ControlModifier</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">key_modifier</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">Key_Control</span>
+            <span class="n">QGraphicsView</span><span class="o">.</span><span class="n">wheelEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">key_modifier</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">modifiers</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">Qt</span><span class="o">.</span><span class="n">ShiftModifier</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">QGraphicsView</span><span class="o">.</span><span class="n">wheelEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="n">delta</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">angleDelta</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">delta</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+        <span class="n">m</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">()</span>
+        <span class="n">m11</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">m11</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">delta</span> <span class="o">*</span> <span class="mf">0.05</span><span class="p">)</span>
+        <span class="n">m31</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">m22</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">m22</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">delta</span> <span class="o">*</span> <span class="mf">0.05</span><span class="p">)</span>
+        <span class="n">m32</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="n">m</span><span class="o">.</span><span class="n">setMatrix</span><span class="p">(</span><span class="n">m11</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">m12</span><span class="p">(),</span> <span class="n">m</span><span class="o">.</span><span class="n">m13</span><span class="p">(),</span> <span class="n">m</span><span class="o">.</span><span class="n">m21</span><span class="p">(),</span> <span class="n">m22</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">m23</span><span class="p">(),</span>
+                    <span class="n">m</span><span class="o">.</span><span class="n">m31</span><span class="p">()</span> <span class="o">+</span> <span class="n">m31</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">m32</span><span class="p">()</span> <span class="o">+</span> <span class="n">m32</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">m33</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setTransform</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="n">srect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sceneRect</span><span class="p">()</span>
+        <span class="n">rrect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapToScene</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rect</span><span class="p">())</span><span class="o">.</span><span class="n">boundingRect</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">delta</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">rrect</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">srect</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="ow">and</span> <span class="n">rrect</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">srect</span><span class="o">.</span><span class="n">width</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fitInView</span><span class="p">(</span><span class="n">srect</span><span class="p">,</span> <span class="n">Qt</span><span class="o">.</span><span class="n">KeepAspectRatio</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="p">()</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">view_changed</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CustomGraphicsView.resizeEvent"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.custom_graphics_view.CustomGraphicsView.resizeEvent">[docs]</a>    <span class="k">def</span> <span class="nf">resizeEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">QResizeEvent</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">view_changed</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CustomGraphicsView.mousePressEvent"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.custom_graphics_view.CustomGraphicsView.mousePressEvent">[docs]</a>    <span class="k">def</span> <span class="nf">mousePressEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">QMouseEvent</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">button</span><span class="p">()</span> <span class="o">==</span> <span class="n">Qt</span><span class="o">.</span><span class="n">MidButton</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setDragMode</span><span class="p">(</span><span class="n">QGraphicsView</span><span class="o">.</span><span class="n">ScrollHandDrag</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">viewport</span><span class="p">()</span><span class="o">.</span><span class="n">setCursor</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">ClosedHandCursor</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">original_event</span> <span class="o">=</span> <span class="n">event</span>
+            <span class="n">handmade_event</span> <span class="o">=</span> <span class="n">QMouseEvent</span><span class="p">(</span><span class="n">QEvent</span><span class="o">.</span><span class="n">MouseButtonPress</span><span class="p">,</span> <span class="n">QPointF</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">pos</span><span class="p">()),</span> <span class="n">Qt</span><span class="o">.</span><span class="n">LeftButton</span><span class="p">,</span> <span class="n">event</span><span class="o">.</span><span class="n">buttons</span><span class="p">(),</span>
+                                         <span class="n">Qt</span><span class="o">.</span><span class="n">KeyboardModifiers</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">view_dragging</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapToScene</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">pos</span><span class="p">()))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mousePressEvent</span><span class="p">(</span><span class="n">handmade_event</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">mousePressEvent</span><span class="p">(</span><span class="n">event</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CustomGraphicsView.mouseReleaseEvent"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.custom_graphics_view.CustomGraphicsView.mouseReleaseEvent">[docs]</a>    <span class="k">def</span> <span class="nf">mouseReleaseEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">QMouseEvent</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">button</span><span class="p">()</span> <span class="o">==</span> <span class="n">Qt</span><span class="o">.</span><span class="n">RightButton</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">elif</span> <span class="n">event</span><span class="o">.</span><span class="n">button</span><span class="p">()</span> <span class="o">==</span> <span class="n">Qt</span><span class="o">.</span><span class="n">LeftButton</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">elif</span> <span class="n">event</span><span class="o">.</span><span class="n">button</span><span class="p">()</span> <span class="o">==</span> <span class="n">Qt</span><span class="o">.</span><span class="n">MidButton</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">viewport</span><span class="p">()</span><span class="o">.</span><span class="n">setCursor</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">OpenHandCursor</span><span class="p">)</span>
+            <span class="n">handmade_event</span> <span class="o">=</span> <span class="n">QMouseEvent</span><span class="p">(</span><span class="n">QEvent</span><span class="o">.</span><span class="n">MouseButtonRelease</span><span class="p">,</span> <span class="n">QPointF</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">pos</span><span class="p">()),</span> <span class="n">Qt</span><span class="o">.</span><span class="n">LeftButton</span><span class="p">,</span>
+                                         <span class="n">event</span><span class="o">.</span><span class="n">buttons</span><span class="p">(),</span> <span class="n">Qt</span><span class="o">.</span><span class="n">KeyboardModifiers</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mouseReleaseEvent</span><span class="p">(</span><span class="n">handmade_event</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setDragMode</span><span class="p">(</span><span class="n">QGraphicsView</span><span class="o">.</span><span class="n">NoDrag</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">view_dragging</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapToScene</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">pos</span><span class="p">()))</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">mouseReleaseEvent</span><span class="p">(</span><span class="n">event</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CustomGraphicsView.mouseMoveEvent"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.custom_graphics_view.CustomGraphicsView.mouseMoveEvent">[docs]</a>    <span class="k">def</span> <span class="nf">mouseMoveEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">QMouseEvent</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mouse_move</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mapToScene</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">pos</span><span class="p">()))</span>
+        <span class="n">QGraphicsView</span><span class="o">.</span><span class="n">mouseMoveEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">)</span>
+
+        <span class="c1"># Auto scrolling near viewport edges.</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">buttons</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">Qt</span><span class="o">.</span><span class="n">LeftButton</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">current_tool</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">current_tool</span><span class="o">.</span><span class="n">should_auto_scroll_with_left_button_released</span><span class="p">()):</span>
+            <span class="n">auto_scroll_edge_width</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">current_tool</span><span class="o">.</span><span class="n">get_auto_scroll_distance</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">current_tool</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">Tool</span><span class="o">.</span><span class="n">DEFAULT_AUTO_SCROLL_DISTANCE</span><span class="p">,</span>
+                                         <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">3</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span>
+            <span class="c1"># Auto scroll left.</span>
+            <span class="n">displacement</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">auto_scroll_edge_width</span> <span class="o">-</span> <span class="n">event</span><span class="o">.</span><span class="n">pos</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">())</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">horizontalScrollBar</span><span class="p">()</span><span class="o">.</span><span class="n">value</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">displacement</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">mouse</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">displacement</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">horizontalScrollBar</span><span class="p">()</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">horizontalScrollBar</span><span class="p">()</span><span class="o">.</span><span class="n">value</span><span class="p">()</span> <span class="o">-</span> <span class="n">displacement</span><span class="p">)</span>
+            <span class="c1"># Auto scroll up.</span>
+            <span class="n">displacement</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">auto_scroll_edge_width</span> <span class="o">-</span> <span class="n">event</span><span class="o">.</span><span class="n">pos</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">())</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verticalScrollBar</span><span class="p">()</span><span class="o">.</span><span class="n">value</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">displacement</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">mouse</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">displacement</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">verticalScrollBar</span><span class="p">()</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">verticalScrollBar</span><span class="p">()</span><span class="o">.</span><span class="n">value</span><span class="p">()</span> <span class="o">-</span> <span class="n">displacement</span><span class="p">)</span>
+            <span class="c1"># Auto scroll right.</span>
+            <span class="n">displacement</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">viewport</span><span class="p">()</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">-</span> <span class="n">auto_scroll_edge_width</span> <span class="o">-</span> <span class="n">event</span><span class="o">.</span><span class="n">pos</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">())</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">horizontalScrollBar</span><span class="p">()</span><span class="o">.</span><span class="n">value</span><span class="p">()</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">horizontalScrollBar</span><span class="p">()</span><span class="o">.</span><span class="n">maximum</span><span class="p">()</span> <span class="ow">and</span> <span class="n">displacement</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">mouse</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">displacement</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">horizontalScrollBar</span><span class="p">()</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">horizontalScrollBar</span><span class="p">()</span><span class="o">.</span><span class="n">value</span><span class="p">()</span> <span class="o">-</span> <span class="n">displacement</span><span class="p">)</span>
+            <span class="c1"># Auto scroll down.</span>
+            <span class="n">displacement</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">viewport</span><span class="p">()</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">-</span> <span class="n">auto_scroll_edge_width</span> <span class="o">-</span> <span class="n">event</span><span class="o">.</span><span class="n">pos</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">())</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verticalScrollBar</span><span class="p">()</span><span class="o">.</span><span class="n">value</span><span class="p">()</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">verticalScrollBar</span><span class="p">()</span><span class="o">.</span><span class="n">maximum</span><span class="p">()</span> <span class="ow">and</span> <span class="n">displacement</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">mouse</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">displacement</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">verticalScrollBar</span><span class="p">()</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">verticalScrollBar</span><span class="p">()</span><span class="o">.</span><span class="n">value</span><span class="p">()</span> <span class="o">-</span> <span class="n">displacement</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CustomGraphicsView.keyPressEvent"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.custom_graphics_view.CustomGraphicsView.keyPressEvent">[docs]</a>    <span class="k">def</span> <span class="nf">keyPressEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">QKeyEvent</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">key</span><span class="p">()</span> <span class="o">==</span> <span class="n">Qt</span><span class="o">.</span><span class="n">Key_Control</span><span class="p">:</span>
+            <span class="c1"># self.setDragMode(QGraphicsView.ScrollHandDrag)</span>
+            <span class="k">pass</span>
+        <span class="k">elif</span> <span class="n">event</span><span class="o">.</span><span class="n">key</span><span class="p">()</span> <span class="o">==</span> <span class="n">Qt</span><span class="o">.</span><span class="n">Key_Shift</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rubber_band_started</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setDragMode</span><span class="p">(</span><span class="n">QGraphicsView</span><span class="o">.</span><span class="n">RubberBandDrag</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setRubberBandSelectionMode</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">ContainsItemBoundingRect</span><span class="p">)</span>
+        <span class="n">QGraphicsView</span><span class="o">.</span><span class="n">keyPressEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CustomGraphicsView.keyReleaseEvent"><a class="viewcode-back" href="../../arthropod_describer.html#arthropod_describer.custom_graphics_view.CustomGraphicsView.keyReleaseEvent">[docs]</a>    <span class="k">def</span> <span class="nf">keyReleaseEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">QKeyEvent</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">key</span><span class="p">()</span> <span class="o">==</span> <span class="n">Qt</span><span class="o">.</span><span class="n">Key_Control</span> <span class="ow">or</span> <span class="n">event</span><span class="o">.</span><span class="n">key</span><span class="p">()</span> <span class="o">==</span> <span class="n">Qt</span><span class="o">.</span><span class="n">Key_Shift</span><span class="p">:</span>
+            <span class="c1"># self.setDragMode(QGraphicsView.NoDrag)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_of_first_shift</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">time_of_first_shift</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">*</span> <span class="mi">1000</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="mi">1000</span> <span class="o">*</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_of_first_shift</span> <span class="o">&lt;</span> <span class="mi">500</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">double_shift</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_allow_zoom</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">time_of_first_shift</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">key</span><span class="p">()</span> <span class="o">==</span> <span class="n">Qt</span><span class="o">.</span><span class="n">Key_Escape</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">escape_pressed</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_allow_zoom</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">elif</span> <span class="n">event</span><span class="o">.</span><span class="n">key</span><span class="p">()</span> <span class="o">==</span> <span class="n">Qt</span><span class="o">.</span><span class="n">Key_Space</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">space_pressed</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">event</span><span class="o">.</span><span class="n">key</span><span class="p">()</span> <span class="o">==</span> <span class="n">Qt</span><span class="o">.</span><span class="n">Key_Tab</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tab_pressed</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+        <span class="n">QGraphicsView</span><span class="o">.</span><span class="n">keyReleaseEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">)</span></div></div>
+
+    <span class="c1"># def allow_zoom(self, allow: bool):</span>
+    <span class="c1">#     self._allow_zoom = allow</span>
+    <span class="c1">#     self.horizontalScrollBar().setEnabled(allow)</span>
+    <span class="c1">#     self.verticalScrollBar().setEnabled(allow)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, CBIA @ FI MUNI.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

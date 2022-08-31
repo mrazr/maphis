@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arthropod_describer.common.label_change &mdash; MAPHIS 0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> MAPHIS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">arthropod_describer</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">MAPHIS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>arthropod_describer.common.label_change</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for arthropod_describer.common.label_change</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">typing</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">IntEnum</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Any</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.photo</span> <span class="kn">import</span> <span class="n">LabelImg</span>
+
+
+<div class="viewcode-block" id="LabelChange"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_change.LabelChange">[docs]</a><span class="nd">@dataclass</span><span class="p">(</span><span class="n">eq</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">LabelChange</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Class representing a set of pixels (`coords`) changing their value from `old_label` to `new_label`.</span>
+
+<span class="sd">    coords: the pixels that changed their value</span>
+<span class="sd">    new_label: their new value</span>
+<span class="sd">    old_label: their previous value</span>
+<span class="sd">    label_name: which label image this change pertains to</span>
+<span class="sd">    _change_bbox: a bounding box enclosing the pixels (`coords`)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">coords</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span>
+    <span class="n">new_label</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">old_label</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">label_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">_change_bbox</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="LabelChange.swap_labels"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_change.LabelChange.swap_labels">[docs]</a>    <span class="k">def</span> <span class="nf">swap_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;LabelChange&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">LabelChange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">old_label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_name</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">bbox</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_change_bbox</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_change_bbox</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                                 <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_change_bbox</span>
+
+<div class="viewcode-block" id="LabelChange.local_coords"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_change.LabelChange.local_coords">[docs]</a>    <span class="k">def</span> <span class="nf">local_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bbox</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+        <span class="n">bbox_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bbox</span> <span class="k">if</span> <span class="n">bbox</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">bbox</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">bbox_</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">bbox_</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="LabelChange.from_dict"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_change.LabelChange.from_dict">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s1">&#39;LabelChange&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">LabelChange</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">decode_rle</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="s1">&#39;coords&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">])),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">decode_rle</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="s1">&#39;coords&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]))),</span>
+            <span class="n">obj</span><span class="p">[</span><span class="s1">&#39;new_label&#39;</span><span class="p">],</span>
+            <span class="n">obj</span><span class="p">[</span><span class="s1">&#39;old_label&#39;</span><span class="p">],</span>
+            <span class="n">obj</span><span class="p">[</span><span class="s1">&#39;label_name&#39;</span><span class="p">],</span>
+            <span class="n">obj</span><span class="p">[</span><span class="s1">&#39;_change_bbox&#39;</span><span class="p">]</span>
+        <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="DoType"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_change.DoType">[docs]</a><span class="k">class</span> <span class="nc">DoType</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+    <span class="n">Do</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">Undo</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span></div>
+
+
+<div class="viewcode-block" id="CommandKind"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_change.CommandKind">[docs]</a><span class="k">class</span> <span class="nc">CommandKind</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+    <span class="n">LabelImgChange</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">Rot_90_CW</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">Rot_90_CCW</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+<div class="viewcode-block" id="CommandKind.invert"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_change.CommandKind.invert">[docs]</a>    <span class="k">def</span> <span class="nf">invert</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;CommandKind&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">CommandKind</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="bp">self</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="CommandEntry"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_change.CommandEntry">[docs]</a><span class="nd">@dataclass</span><span class="p">(</span><span class="n">eq</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">CommandEntry</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;A class representing an edit command.</span>
+
+<span class="sd">    change_chain: see `LabelChange`</span>
+<span class="sd">    do_type: whether this command is either Undo or Do(Redo)</span>
+<span class="sd">    _bbox: a box enclosing all modified pixels</span>
+<span class="sd">    update_canvas: whether to update the view</span>
+<span class="sd">    source: name of the tool/plugin that is responsible for the change. Will appear in Edit menu as e.g. &#39;Undo {source}`</span>
+<span class="sd">    image_name: name of the photo that was of whose label image was modified</span>
+<span class="sd">    label_name: name of the label image that this command pertains to</span>
+<span class="sd">    old_approval: what was the approval before this change?</span>
+<span class="sd">    new_approval: what is the approval after this change?</span>
+<span class="sd">    command_kind: see `CommandKind`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">change_chain</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">LabelChange</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">do_type</span><span class="p">:</span> <span class="n">DoType</span> <span class="o">=</span> <span class="n">DoType</span><span class="o">.</span><span class="n">Do</span>
+    <span class="n">_bbox</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">update_canvas</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">image_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">label_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">old_approval</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">new_approval</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">command_kind</span><span class="p">:</span> <span class="n">CommandKind</span> <span class="o">=</span> <span class="n">CommandKind</span><span class="o">.</span><span class="n">LabelImgChange</span>
+
+<div class="viewcode-block" id="CommandEntry.add_label_change"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_change.CommandEntry.add_label_change">[docs]</a>    <span class="k">def</span> <span class="nf">add_label_change</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">change</span><span class="p">:</span> <span class="n">LabelChange</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">change_chain</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">change</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">bbox</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bbox</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">bbox</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">change_chain</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">bbox</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">change</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">change_chain</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+                <span class="n">bbox2</span> <span class="o">=</span> <span class="n">change</span><span class="o">.</span><span class="n">bbox</span>
+                <span class="n">bbox</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">bbox</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bbox2</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">bbox</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">bbox</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">bbox2</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">bbox</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">bbox</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">bbox2</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+                <span class="n">bbox</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">bbox</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">bbox2</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_bbox</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">bbox</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bbox</span>
+
+<div class="viewcode-block" id="CommandEntry.from_dict"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_change.CommandEntry.from_dict">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s1">&#39;CommandEntry&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">CommandEntry</span><span class="p">(</span>
+            <span class="c1">#[LabelChange.from_dict(lab_ch_dict) for lab_ch_dict in obj[&#39;change_chain&#39;]],</span>
+            <span class="n">obj</span><span class="p">[</span><span class="s1">&#39;change_chain&#39;</span><span class="p">],</span>
+            <span class="n">DoType</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="s1">&#39;do_type&#39;</span><span class="p">]),</span>
+            <span class="n">obj</span><span class="p">[</span><span class="s1">&#39;_bbox&#39;</span><span class="p">],</span>
+            <span class="n">obj</span><span class="p">[</span><span class="s1">&#39;update_canvas&#39;</span><span class="p">],</span>
+            <span class="n">obj</span><span class="p">[</span><span class="s1">&#39;source&#39;</span><span class="p">]</span>
+        <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="ce_object_hook"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_change.ce_object_hook">[docs]</a><span class="k">def</span> <span class="nf">ce_object_hook</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">CommandEntry</span><span class="p">,</span> <span class="n">LabelChange</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="s1">&#39;coords&#39;</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">LabelChange</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">CommandEntry</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span></div>
+
+
+<span class="c1"># TODO maybe remove this</span>
+<div class="viewcode-block" id="CommandEntryJsonEncoder"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_change.CommandEntryJsonEncoder">[docs]</a><span class="k">class</span> <span class="nc">CommandEntryJsonEncoder</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">JSONEncoder</span><span class="p">):</span>
+
+<div class="viewcode-block" id="CommandEntryJsonEncoder.default"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_change.CommandEntryJsonEncoder.default">[docs]</a>    <span class="k">def</span> <span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">LabelChange</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s1">&#39;coords&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">encode_into_rle</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()),</span> <span class="n">encode_into_rle</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">())),</span>
+                <span class="s1">&#39;new_label&#39;</span><span class="p">:</span> <span class="n">o</span><span class="o">.</span><span class="n">new_label</span><span class="p">,</span>
+                <span class="s1">&#39;old_label&#39;</span><span class="p">:</span> <span class="n">o</span><span class="o">.</span><span class="n">old_label</span><span class="p">,</span>
+                <span class="s1">&#39;label_name&#39;</span><span class="p">:</span> <span class="n">o</span><span class="o">.</span><span class="n">label_name</span><span class="p">,</span>
+                <span class="s1">&#39;_change_bbox&#39;</span><span class="p">:</span> <span class="n">o</span><span class="o">.</span><span class="n">_change_bbox</span>
+            <span class="p">}</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">CommandEntry</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s1">&#39;change_chain&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="n">change</span><span class="p">)</span> <span class="k">for</span> <span class="n">change</span> <span class="ow">in</span> <span class="n">o</span><span class="o">.</span><span class="n">change_chain</span><span class="p">],</span>
+                <span class="s1">&#39;do_type&#39;</span><span class="p">:</span> <span class="n">o</span><span class="o">.</span><span class="n">do_type</span><span class="p">,</span>
+                <span class="s1">&#39;_bbox&#39;</span><span class="p">:</span> <span class="n">o</span><span class="o">.</span><span class="n">_bbox</span><span class="p">,</span>
+                <span class="s1">&#39;update_canvas&#39;</span><span class="p">:</span> <span class="n">o</span><span class="o">.</span><span class="n">update_canvas</span>
+            <span class="p">}</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="n">o</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="encode_into_rle"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_change.encode_into_rle">[docs]</a><span class="k">def</span> <span class="nf">encode_into_rle</span><span class="p">(</span><span class="n">arr</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+    <span class="n">rle</span> <span class="o">=</span> <span class="p">[</span><span class="n">arr</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">arr</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+        <span class="k">if</span> <span class="n">val</span> <span class="o">==</span> <span class="n">rle</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">i</span><span class="p">]:</span>
+            <span class="n">rle</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">rle</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+            <span class="n">rle</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">rle</span></div>
+
+
+<div class="viewcode-block" id="decode_rle"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_change.decode_rle">[docs]</a><span class="k">def</span> <span class="nf">decode_rle</span><span class="p">(</span><span class="n">rle</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rle</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span><span class="p">):</span>
+        <span class="n">_vals</span> <span class="o">=</span> <span class="p">[</span><span class="n">rle</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
+        <span class="n">values</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">_vals</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">values</span></div>
+
+
+<div class="viewcode-block" id="remove_coords"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_change.remove_coords">[docs]</a><span class="k">def</span> <span class="nf">remove_coords</span><span class="p">(</span><span class="n">cmd</span><span class="p">:</span> <span class="n">CommandEntry</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">CommandEntry</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]]:</span>
+    <span class="n">coords_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">lab_change</span> <span class="ow">in</span> <span class="n">cmd</span><span class="o">.</span><span class="n">change_chain</span><span class="p">:</span>
+        <span class="n">coords_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lab_change</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span>
+        <span class="n">lab_change</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="p">([],</span> <span class="p">[])</span>
+    <span class="k">return</span> <span class="n">cmd</span><span class="p">,</span> <span class="n">coords_list</span></div>
+
+
+<div class="viewcode-block" id="compute_label_difference"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_change.compute_label_difference">[docs]</a><span class="k">def</span> <span class="nf">compute_label_difference</span><span class="p">(</span><span class="n">old_label</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">new_label</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Returns an image that contains values from `new_label` where `new_label` has different values from `old_label`,</span>
+<span class="sd">    otherwise contains `-1`.&quot;&quot;&quot;</span>
+    <span class="n">non_equal_mask</span> <span class="o">=</span> <span class="n">old_label</span> <span class="o">!=</span> <span class="n">new_label</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">non_equal_mask</span><span class="p">,</span> <span class="n">new_label</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="label_difference_to_command"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_change.label_difference_to_command">[docs]</a><span class="k">def</span> <span class="nf">label_difference_to_command</span><span class="p">(</span><span class="n">label_diff</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">label_img</span><span class="p">:</span> <span class="n">LabelImg</span><span class="p">,</span> <span class="n">bbox</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CommandEntry</span><span class="p">:</span>
+    <span class="c1">#label_nd = label_img.label_img</span>
+    <span class="c1">#new_labels = np.unique(label_diff)[1:]  # filter out the -1 label which is the first on in the returned array</span>
+    <span class="c1">#command = CommandEntry()</span>
+
+    <span class="c1">#for label in new_labels:</span>
+    <span class="c1">#    old_and_new = np.where(label_diff == label, label_nd, -1)</span>
+    <span class="c1">#    old_labels = np.unique(old_and_new)[1:]  # filter out -1</span>
+    <span class="c1">#    for old_label in old_labels:</span>
+    <span class="c1">#        coords = np.nonzero(old_and_new == old_label)</span>
+    <span class="c1">#        change = LabelChange(coords, label, old_label, label_img.label_type)</span>
+    <span class="c1">#        command.add_label_change(change)</span>
+    <span class="c1">#</span>
+    <span class="c1">#return command</span>
+    <span class="k">return</span> <span class="n">CommandEntry</span><span class="p">(</span><span class="n">label_difference_to_label_changes</span><span class="p">(</span><span class="n">label_diff</span><span class="p">,</span> <span class="n">label_img</span><span class="p">,</span> <span class="n">bbox</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="label_difference_to_label_changes"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_change.label_difference_to_label_changes">[docs]</a><span class="k">def</span> <span class="nf">label_difference_to_label_changes</span><span class="p">(</span><span class="n">label_diff</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">label_img</span><span class="p">:</span> <span class="n">LabelImg</span><span class="p">,</span>
+                                      <span class="n">bbox</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">LabelChange</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For a label difference image and a `LabelImg` returns a list of `LabelChange`.</span>
+<span class="sd">    What is a label difference image, see the function `compute_label_difference`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">bbox</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">lab_diff</span> <span class="o">=</span> <span class="n">label_diff</span><span class="p">[</span><span class="n">bbox</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">bbox</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">bbox</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span><span class="n">bbox</span><span class="p">[</span><span class="mi">3</span><span class="p">]]</span>
+        <span class="n">lab_nd</span> <span class="o">=</span> <span class="n">label_img</span><span class="o">.</span><span class="n">label_image</span><span class="p">[</span><span class="n">bbox</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">bbox</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">bbox</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span><span class="n">bbox</span><span class="p">[</span><span class="mi">3</span><span class="p">]]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">bbox</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">lab_diff</span> <span class="o">=</span> <span class="n">label_diff</span>
+        <span class="n">lab_nd</span> <span class="o">=</span> <span class="n">label_img</span><span class="o">.</span><span class="n">label_image</span>
+    <span class="c1"># label_nd = label_img.label_image</span>
+    <span class="n">new_labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">lab_diff</span><span class="p">)</span>  <span class="c1"># these are all the new labels that were painted in by the user (except -1 which means `no change`)</span>
+    <span class="k">if</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">in</span> <span class="n">new_labels</span><span class="p">:</span>
+        <span class="n">new_labels</span> <span class="o">=</span> <span class="n">new_labels</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>  <span class="c1"># filter out the -1 label which is the first on in the returned array</span>
+
+    <span class="n">label_changes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">LabelChange</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># now for each `label` in `new_labels` we need to generate one or more `LabelChange` objects</span>
+    <span class="c1"># if `label` was painted over a region with a single label, say `1`, we would need to generate only one `LabelChange`,</span>
+    <span class="c1"># specifying the coordinates of the pixels painted over and their old label value (`1`) and their new label value (`label`).</span>
+    <span class="c1"># The number of `LabelChange` objects we need to create for `label` depends on how many different labels were painted</span>
+    <span class="c1"># over by `label`.</span>
+    <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">new_labels</span><span class="p">:</span>
+        <span class="n">old_and_new</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">lab_diff</span> <span class="o">==</span> <span class="n">label</span><span class="p">,</span> <span class="n">lab_nd</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># reveal only those pixels of `label_nd` where `label_diff` is equal to `label`</span>
+        <span class="n">old_labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">old_and_new</span><span class="p">)</span>  <span class="c1"># Get the all the different labels that were painted over by `label`.</span>
+        <span class="k">if</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">in</span> <span class="n">old_labels</span><span class="p">:</span>  <span class="c1"># get rid of -1 (`no change`)</span>
+            <span class="n">old_labels</span> <span class="o">=</span> <span class="n">old_labels</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="k">for</span> <span class="n">old_label</span> <span class="ow">in</span> <span class="n">old_labels</span><span class="p">:</span>  <span class="c1"># here we are actually creating the `LabelChange` objects, the pixels changing their value from `old_label` to `label`.</span>
+            <span class="n">yy</span><span class="p">,</span> <span class="n">xx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">old_and_new</span> <span class="o">==</span> <span class="n">old_label</span><span class="p">)</span>  <span class="c1"># these are the coordinates of the pixels</span>
+            <span class="n">label_changes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">LabelChange</span><span class="p">((</span><span class="n">yy</span><span class="o">+</span><span class="n">bbox</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">xx</span><span class="o">+</span><span class="n">bbox</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span> <span class="n">label</span><span class="p">,</span> <span class="n">old_label</span><span class="p">,</span> <span class="n">label_img</span><span class="o">.</span><span class="n">label_semantic</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">label_changes</span></div>
+
+
+<div class="viewcode-block" id="restrict_label_to_mask"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_change.restrict_label_to_mask">[docs]</a><span class="k">def</span> <span class="nf">restrict_label_to_mask</span><span class="p">(</span><span class="n">label</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">LabelImg</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">mask</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">LabelImg</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">CommandEntry</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks whether `label`-s non-zero entries are located entirely within `mask` and if not, returns a CommandEntry</span>
+<span class="sd">    which, when performed on `label` will modify `label` so that it is contained inside `mask`.</span>
+<span class="sd">    :param label: LabelImg or np.ndarray</span>
+<span class="sd">    :param mask: LabelImg or np.ndarray</span>
+<span class="sd">    :return: CommandEntry if `label` is not contained within `mask` else None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">label_mask</span> <span class="o">=</span> <span class="n">label</span><span class="o">.</span><span class="n">label_image</span> <span class="o">!=</span> <span class="mi">0</span>
+    <span class="n">mask_mask</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">label_image</span> <span class="o">!=</span> <span class="mi">0</span>
+
+    <span class="n">within</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">label_mask</span><span class="p">,</span> <span class="n">mask_mask</span><span class="p">)</span> <span class="o">==</span> <span class="n">label_mask</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">within</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="n">to_modify</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_xor</span><span class="p">(</span><span class="n">label_mask</span><span class="p">,</span> <span class="n">mask_mask</span><span class="p">)</span>
+
+    <span class="n">edit_img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">to_modify</span><span class="p">,</span> <span class="n">label</span><span class="o">.</span><span class="n">label_image</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">label_difference_to_command</span><span class="p">(</span><span class="n">edit_img</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span></div>
+
+
+<span class="c1"># TODO remove this</span>
+<span class="c1">#def propagate_mask_changes_to(label_img: LabelImg, command: CommandEntry) -&gt; Optional[CommandEntry]:</span>
+<span class="c1">#    if label_img.label_type == LabelType.BUG:</span>
+<span class="c1">#        return None</span>
+<span class="c1">#</span>
+<span class="c1">#    label_nd = label_img.label_image</span>
+<span class="c1">#</span>
+<span class="c1">#    label_modifications = {}</span>
+<span class="c1">#</span>
+<span class="c1">#    for change in command.change_chain:</span>
+<span class="c1">#        if change.new_label &gt; 0:  # augmentation of mask, so `label_img` is within the mask</span>
+<span class="c1">#            continue</span>
+<span class="c1">#</span>
+<span class="c1">#        labels = label_nd[change.coords[0], change.coords[1]]</span>
+<span class="c1">#</span>
+<span class="c1">#        for label, y, x in zip(labels, *change.coords):</span>
+<span class="c1">#            label_coords_list_tuple = label_modifications.setdefault(label, ([], []))</span>
+<span class="c1">#            label_coords_list_tuple[0].append(y)</span>
+<span class="c1">#            label_coords_list_tuple[1].append(x)</span>
+<span class="c1">#    label_changes = [LabelChange(coords_list_tuple, 0, label, label_img.label_type) for label, coords_list_tuple in</span>
+<span class="c1">#                     label_modifications.items()]</span>
+<span class="c1">#    return CommandEntry(label_changes, label_type=label_img.label_type)</span>
+
+
+<div class="viewcode-block" id="generate_change_command"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_change.generate_change_command">[docs]</a><span class="k">def</span> <span class="nf">generate_change_command</span><span class="p">(</span><span class="n">old_lab_img</span><span class="p">:</span> <span class="n">LabelImg</span><span class="p">,</span> <span class="n">new_label</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">CommandEntry</span><span class="p">]:</span>
+    <span class="n">lab_diff</span> <span class="o">=</span> <span class="n">compute_label_difference</span><span class="p">(</span><span class="n">old_lab_img</span><span class="o">.</span><span class="n">label_image</span><span class="p">,</span> <span class="n">new_label</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">label_difference_to_command</span><span class="p">(</span><span class="n">lab_diff</span><span class="p">,</span> <span class="n">old_lab_img</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="generate_command_from_coordinates"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_change.generate_command_from_coordinates">[docs]</a><span class="k">def</span> <span class="nf">generate_command_from_coordinates</span><span class="p">(</span><span class="n">label_img</span><span class="p">:</span> <span class="n">LabelImg</span><span class="p">,</span> <span class="n">coords_x</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">coords_y</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">new_label</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CommandEntry</span><span class="p">:</span>
+    <span class="n">lab_img</span> <span class="o">=</span> <span class="n">label_img</span><span class="o">.</span><span class="n">label_image</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="n">lab_img</span><span class="p">[</span><span class="n">coords_y</span><span class="p">,</span> <span class="n">coords_x</span><span class="p">]</span>
+
+    <span class="n">unique_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+
+    <span class="n">change_chain</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">LabelChange</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">unique_values</span><span class="p">:</span>
+        <span class="n">r</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">coords_y</span><span class="p">[</span><span class="n">values</span> <span class="o">==</span> <span class="n">val</span><span class="p">],</span> <span class="n">coords_x</span><span class="p">[</span><span class="n">values</span> <span class="o">==</span> <span class="n">val</span><span class="p">]</span>
+        <span class="n">lab_change</span> <span class="o">=</span> <span class="n">LabelChange</span><span class="p">((</span><span class="n">r</span><span class="p">,</span> <span class="n">c</span><span class="p">),</span> <span class="n">new_label</span><span class="o">=</span><span class="n">new_label</span><span class="p">,</span> <span class="n">old_label</span><span class="o">=</span><span class="n">val</span><span class="p">,</span> <span class="n">label_name</span><span class="o">=</span><span class="n">label_img</span><span class="o">.</span><span class="n">label_semantic</span><span class="p">)</span>
+        <span class="n">change_chain</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lab_change</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">CommandEntry</span><span class="p">(</span><span class="n">change_chain</span><span class="o">=</span><span class="n">change_chain</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, CBIA @ FI MUNI.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arthropod_describer.tools.knife &mdash; MAPHIS 0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> MAPHIS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">arthropod_describer</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">MAPHIS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>arthropod_describer.tools.knife</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for arthropod_describer.tools.knife</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">importlib.resources</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">typing</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Dict</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtCore</span> <span class="kn">import</span> <span class="n">QPoint</span><span class="p">,</span> <span class="n">QRect</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtGui</span> <span class="kn">import</span> <span class="n">QPainter</span><span class="p">,</span> <span class="n">QColor</span><span class="p">,</span> <span class="n">QPen</span><span class="p">,</span> <span class="n">QIcon</span>
+<span class="kn">import</span> <span class="nn">skimage.draw</span>
+<span class="kn">import</span> <span class="nn">skimage.measure</span>
+<span class="kn">from</span> <span class="nn">skimage</span> <span class="kn">import</span> <span class="n">io</span>
+<span class="kn">from</span> <span class="nn">skimage.morphology</span> <span class="kn">import</span> <span class="n">binary_dilation</span><span class="p">,</span> <span class="n">disk</span>
+
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.label_change</span> <span class="kn">import</span> <span class="n">LabelChange</span><span class="p">,</span> <span class="n">CommandEntry</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.state</span> <span class="kn">import</span> <span class="n">State</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.tool</span> <span class="kn">import</span> <span class="n">Tool</span><span class="p">,</span> <span class="n">EditContext</span><span class="p">,</span> <span class="n">PaintCommand</span><span class="p">,</span> <span class="n">line_command</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.user_params</span> <span class="kn">import</span> <span class="n">UserParam</span><span class="p">,</span> <span class="n">ParamType</span>
+
+
+<div class="viewcode-block" id="Tool_Knife"><a class="viewcode-back" href="../../../arthropod_describer.tools.html#arthropod_describer.tools.knife.Tool_Knife">[docs]</a><span class="k">class</span> <span class="nc">Tool_Knife</span><span class="p">(</span><span class="n">Tool</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">State</span><span class="p">):</span>
+        <span class="n">Tool</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tool_name</span> <span class="o">=</span> <span class="s2">&quot;Knife&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_active</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_first_endpoint</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_user_params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Cut width&#39;</span><span class="p">:</span> <span class="n">UserParam</span><span class="p">(</span><span class="s1">&#39;Cut width&#39;</span><span class="p">,</span> <span class="n">ParamType</span><span class="o">.</span><span class="n">INT</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">min_val</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_val</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">2</span><span class="p">)}</span>
+        <span class="k">with</span> <span class="n">importlib</span><span class="o">.</span><span class="n">resources</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="s2">&quot;tools.icons&quot;</span><span class="p">,</span> <span class="s2">&quot;cutter.png&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">path</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_tool_icon</span> <span class="o">=</span> <span class="n">QIcon</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pen</span> <span class="o">=</span> <span class="n">QPen</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">state</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">tool_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tool_name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">active</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_active</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">viz_active</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_active</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">user_params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">UserParam</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_params</span>
+
+<div class="viewcode-block" id="Tool_Knife.left_press"><a class="viewcode-back" href="../../../arthropod_describer.tools.html#arthropod_describer.tools.knife.Tool_Knife.left_press">[docs]</a>    <span class="k">def</span> <span class="nf">left_press</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">painter</span><span class="p">:</span> <span class="n">QPainter</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="n">QPoint</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">EditContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span>
+        <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">CommandEntry</span><span class="p">],</span> <span class="n">QRect</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">QRect</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Tool_Knife.left_release"><a class="viewcode-back" href="../../../arthropod_describer.tools.html#arthropod_describer.tools.knife.Tool_Knife.left_release">[docs]</a>    <span class="k">def</span> <span class="nf">left_release</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">painter</span><span class="p">:</span> <span class="n">QPainter</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="n">QPoint</span><span class="p">,</span> <span class="n">ctx</span><span class="p">:</span> <span class="n">EditContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span>
+        <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">CommandEntry</span><span class="p">],</span> <span class="n">QRect</span><span class="p">]:</span>
+        <span class="n">ctx</span><span class="o">.</span><span class="n">tool_viz_commands</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">line_coords</span> <span class="o">=</span> <span class="n">skimage</span><span class="o">.</span><span class="n">draw</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_first_endpoint</span><span class="p">,</span> <span class="o">*</span><span class="p">(</span><span class="n">pos</span><span class="o">.</span><span class="n">toTuple</span><span class="p">()[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+
+        <span class="n">line_width</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_params</span><span class="p">[</span><span class="s1">&#39;Cut width&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+        <span class="k">if</span> <span class="n">line_width</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+
+            <span class="n">top</span><span class="p">,</span> <span class="n">left</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">line_coords</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">-</span> <span class="n">line_width</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">line_coords</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">-</span> <span class="n">line_width</span> <span class="o">//</span> <span class="mi">2</span>
+            <span class="n">bottom</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">line_coords</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="n">line_width</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">line_coords</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="n">line_width</span> <span class="o">//</span> <span class="mi">2</span>
+
+            <span class="n">line_box</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">bottom</span> <span class="o">-</span> <span class="n">top</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">right</span> <span class="o">-</span> <span class="n">left</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span>
+
+            <span class="n">local_coords</span> <span class="o">=</span> <span class="p">(</span><span class="n">line_coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">top</span><span class="p">,</span> <span class="n">line_coords</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">left</span><span class="p">)</span>
+            <span class="n">line_box</span><span class="p">[</span><span class="n">local_coords</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">local_coords</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">dil</span> <span class="o">=</span> <span class="n">binary_dilation</span><span class="p">(</span><span class="n">line_box</span><span class="p">,</span> <span class="n">disk</span><span class="p">(</span><span class="n">line_width</span> <span class="o">//</span> <span class="mi">2</span><span class="p">))</span>
+            <span class="n">line_coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">dil</span><span class="p">)</span>
+            <span class="n">line_coords</span> <span class="o">=</span> <span class="n">line_coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">top</span><span class="p">,</span> <span class="n">line_coords</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">left</span>
+
+        <span class="n">rr_cc</span> <span class="o">=</span> <span class="p">[(</span><span class="n">r</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">line_coords</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">line_coords</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">r</span> <span class="o">&lt;</span> <span class="n">ctx</span><span class="o">.</span><span class="n">label_img</span><span class="o">.</span><span class="n">label_image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">c</span> <span class="o">&lt;</span> <span class="n">ctx</span><span class="o">.</span><span class="n">label_img</span><span class="o">.</span><span class="n">label_image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="n">line_coords</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span> <span class="k">for</span> <span class="n">r</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">rr_cc</span><span class="p">],</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">r</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">rr_cc</span><span class="p">]</span>
+
+        <span class="n">label_profile</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="o">~</span><span class="n">ctx</span><span class="o">.</span><span class="n">clip_mask</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ctx</span><span class="o">.</span><span class="n">label_img</span><span class="o">.</span><span class="n">label_image</span><span class="p">,</span> <span class="mi">0</span><span class="p">)[</span><span class="n">line_coords</span><span class="p">]</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">label_profile</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">QRect</span><span class="p">()</span>
+        <span class="c1">#labels = set()</span>
+
+        <span class="n">lab_coords</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="p">([],</span> <span class="p">[])</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">}</span>
+        <span class="n">painter</span> <span class="o">=</span> <span class="n">QPainter</span><span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">label_viz</span><span class="p">)</span>
+        <span class="n">painter</span><span class="o">.</span><span class="n">setCompositionMode</span><span class="p">(</span><span class="n">QPainter</span><span class="o">.</span><span class="n">CompositionMode_Source</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">label_profile</span><span class="p">)),</span> <span class="o">*</span><span class="n">line_coords</span><span class="p">):</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="n">label_profile</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">label</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">lab_coords</span><span class="p">[</span><span class="n">label</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+            <span class="n">lab_coords</span><span class="p">[</span><span class="n">label</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+            <span class="n">color</span> <span class="o">=</span> <span class="n">QColor</span><span class="o">.</span><span class="n">fromRgb</span><span class="p">(</span><span class="o">*</span><span class="n">ctx</span><span class="o">.</span><span class="n">colormap</span><span class="p">[</span><span class="n">ctx</span><span class="o">.</span><span class="n">label</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">ctx</span><span class="o">.</span><span class="n">label</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">color</span><span class="o">.</span><span class="n">setAlpha</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">painter</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">color</span><span class="p">)</span>
+            <span class="n">painter</span><span class="o">.</span><span class="n">drawPoint</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="n">painter</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+        <span class="k">if</span> <span class="mi">0</span> <span class="ow">in</span> <span class="n">lab_coords</span><span class="p">:</span>
+            <span class="k">del</span> <span class="n">lab_coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="n">CommandEntry</span><span class="p">([</span><span class="n">LabelChange</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">ctx</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">ctx</span><span class="o">.</span><span class="n">label_img</span><span class="o">.</span><span class="n">label_semantic</span><span class="p">)</span> <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">coords</span> <span class="ow">in</span> <span class="n">lab_coords</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
+        <span class="n">cmd</span><span class="o">.</span><span class="n">source</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tool_name</span>
+        <span class="k">return</span> <span class="n">cmd</span><span class="p">,</span> <span class="n">cmd</span><span class="o">.</span><span class="n">bbox</span></div>
+
+<div class="viewcode-block" id="Tool_Knife.mouse_move"><a class="viewcode-back" href="../../../arthropod_describer.tools.html#arthropod_describer.tools.knife.Tool_Knife.mouse_move">[docs]</a>    <span class="k">def</span> <span class="nf">mouse_move</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">painter</span><span class="p">:</span> <span class="n">QPainter</span><span class="p">,</span> <span class="n">new_pos</span><span class="p">:</span> <span class="n">QPoint</span><span class="p">,</span> <span class="n">old_pos</span><span class="p">:</span> <span class="n">QPoint</span><span class="p">,</span> <span class="n">ctx</span><span class="p">:</span> <span class="n">EditContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">LabelChange</span><span class="p">]:</span>
+        <span class="c1">#ctx.tool_viz_commands = [draw_line(QPoint(*self._first_endpoint[::-1]), new_pos, ctx)]</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">mouse_move</span><span class="p">(</span><span class="n">painter</span><span class="p">,</span> <span class="n">new_pos</span><span class="p">,</span> <span class="n">old_pos</span><span class="p">,</span> <span class="n">ctx</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Tool_Knife.viz_left_press"><a class="viewcode-back" href="../../../arthropod_describer.tools.html#arthropod_describer.tools.knife.Tool_Knife.viz_left_press">[docs]</a>    <span class="k">def</span> <span class="nf">viz_left_press</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="n">QPoint</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">PaintCommand</span><span class="p">]:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_first_endpoint</span> <span class="o">=</span> <span class="n">pos</span><span class="o">.</span><span class="n">toTuple</span><span class="p">()[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">label_hierarchy</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">primary_label</span><span class="p">]</span><span class="o">.</span><span class="n">color</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pen</span><span class="o">.</span><span class="n">setColor</span><span class="p">(</span><span class="n">QColor</span><span class="p">(</span><span class="o">*</span><span class="n">color</span><span class="p">,</span> <span class="mi">255</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pen</span><span class="o">.</span><span class="n">setWidth</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_user_params</span><span class="p">[</span><span class="s1">&#39;Cut width&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_active</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">viz_mouse_move</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">pos</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Tool_Knife.viz_mouse_move"><a class="viewcode-back" href="../../../arthropod_describer.tools.html#arthropod_describer.tools.knife.Tool_Knife.viz_mouse_move">[docs]</a>    <span class="k">def</span> <span class="nf">viz_mouse_move</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_pos</span><span class="p">:</span> <span class="n">QPoint</span><span class="p">,</span> <span class="n">old_pos</span><span class="p">:</span> <span class="n">QPoint</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">PaintCommand</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">line_command</span><span class="p">(</span><span class="n">QPoint</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_first_endpoint</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span> <span class="n">new_pos</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pen</span><span class="p">)]</span></div>
+
+<div class="viewcode-block" id="Tool_Knife.viz_left_release"><a class="viewcode-back" href="../../../arthropod_describer.tools.html#arthropod_describer.tools.knife.Tool_Knife.viz_left_release">[docs]</a>    <span class="k">def</span> <span class="nf">viz_left_release</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="n">QPoint</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">PaintCommand</span><span class="p">]:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_active</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="p">[]</span></div></div>
+
+
+<div class="viewcode-block" id="draw_line"><a class="viewcode-back" href="../../../arthropod_describer.tools.html#arthropod_describer.tools.knife.draw_line">[docs]</a><span class="k">def</span> <span class="nf">draw_line</span><span class="p">(</span><span class="n">pos1</span><span class="p">:</span> <span class="n">QPoint</span><span class="p">,</span> <span class="n">pos2</span><span class="p">:</span> <span class="n">QPoint</span><span class="p">,</span> <span class="n">ctx</span><span class="p">:</span> <span class="n">EditContext</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">draw</span><span class="p">(</span><span class="n">painter</span><span class="p">:</span> <span class="n">QPainter</span><span class="p">):</span>
+        <span class="n">painter</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">pen</span> <span class="o">=</span> <span class="n">QPen</span><span class="p">(</span><span class="n">QColor</span><span class="o">.</span><span class="n">fromRgb</span><span class="p">(</span><span class="o">*</span><span class="n">ctx</span><span class="o">.</span><span class="n">colormap</span><span class="p">[</span><span class="n">ctx</span><span class="o">.</span><span class="n">label</span><span class="p">]))</span>
+        <span class="n">pen</span><span class="o">.</span><span class="n">setWidth</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+        <span class="n">painter</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">pen</span><span class="p">)</span>
+        <span class="n">painter</span><span class="o">.</span><span class="n">drawLine</span><span class="p">(</span><span class="n">pos1</span><span class="p">,</span> <span class="n">pos2</span><span class="p">)</span>
+        <span class="n">painter</span><span class="o">.</span><span class="n">restore</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">draw</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, CBIA @ FI MUNI.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

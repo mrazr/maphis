@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arthropod_describer.plugins.profile_register.general.profiles &mdash; MAPHIS 0.1 documentation</title>
+      <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
+        <script src="../../../../../_static/jquery.js"></script>
+        <script src="../../../../../_static/underscore.js"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../../../_static/doctools.js"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../../../index.html" class="icon icon-home"> MAPHIS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../modules.html">arthropod_describer</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">MAPHIS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../../../index.html">Module code</a> &raquo;</li>
+      <li>arthropod_describer.plugins.profile_register.general.profiles</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for arthropod_describer.plugins.profile_register.general.profiles</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="c1"># import matplotlib.pyplot as plt</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">from</span> <span class="nn">scipy.signal</span> <span class="kn">import</span> <span class="n">find_peaks</span>
+<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">linear_sum_assignment</span>
+
+
+<div class="viewcode-block" id="Profile"><a class="viewcode-back" href="../../../../../arthropod_describer.plugins.profile_register.general.html#arthropod_describer.plugins.profile_register.general.profiles.Profile">[docs]</a><span class="k">class</span> <span class="nc">Profile</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">x</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">values</span>
+
+<div class="viewcode-block" id="Profile.move_point_x"><a class="viewcode-back" href="../../../../../arthropod_describer.plugins.profile_register.general.html#arthropod_describer.plugins.profile_register.general.profiles.Profile.move_point_x">[docs]</a>    <span class="k">def</span> <span class="nf">move_point_x</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">old_idx</span><span class="p">,</span> <span class="n">new_x</span><span class="p">,</span> <span class="n">start_idx</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">end_idx</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">end_idx</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">end_idx</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="n">start_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">start_idx</span><span class="p">]</span>
+        <span class="n">end_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">end_idx</span><span class="p">]</span>
+
+        <span class="k">assert</span> <span class="n">start_idx</span> <span class="o">&lt;</span> <span class="n">old_idx</span> <span class="o">&lt;</span> <span class="n">end_idx</span>  <span class="c1"># only inner points can be moved</span>
+        <span class="k">assert</span> <span class="n">start_x</span> <span class="o">&lt;</span> <span class="n">new_x</span> <span class="o">&lt;</span> <span class="n">end_x</span>  <span class="c1"># and only within profile&#39;s x limits</span>
+
+        <span class="n">old_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">old_idx</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">start_idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">old_idx</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">new_x</span> <span class="o">-</span> <span class="n">start_x</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">old_x</span> <span class="o">-</span> <span class="n">start_x</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">-</span> <span class="n">start_x</span><span class="p">)</span> <span class="o">+</span> <span class="n">start_x</span>
+
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">old_idx</span><span class="p">,</span> <span class="n">end_idx</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">new_x</span> <span class="o">-</span> <span class="n">end_x</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">old_x</span> <span class="o">-</span> <span class="n">end_x</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">-</span> <span class="n">end_x</span><span class="p">)</span> <span class="o">+</span> <span class="n">end_x</span></div>
+
+<div class="viewcode-block" id="Profile.get_y"><a class="viewcode-back" href="../../../../../arthropod_describer.plugins.profile_register.general.html#arthropod_describer.plugins.profile_register.general.profiles.Profile.get_y">[docs]</a>    <span class="k">def</span> <span class="nf">get_y</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">pad_value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">or</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="n">pad_value</span>
+
+        <span class="k">for</span> <span class="n">right_id</span><span class="p">,</span> <span class="n">right_x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">right_x</span> <span class="o">-</span> <span class="n">x</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">epsilon</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">[</span><span class="n">right_id</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">right_x</span> <span class="o">&gt;</span> <span class="n">x</span><span class="p">:</span>
+                <span class="n">left_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">right_id</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+                <span class="n">left_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">[</span><span class="n">right_id</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+                <span class="n">right_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">[</span><span class="n">right_id</span><span class="p">]</span>
+                <span class="k">return</span> <span class="p">(</span><span class="n">right_y</span> <span class="o">-</span> <span class="n">left_y</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">left_x</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">right_x</span> <span class="o">-</span> <span class="n">left_x</span><span class="p">)</span> <span class="o">+</span> <span class="n">left_y</span>
+
+        <span class="k">return</span> <span class="n">pad_value</span></div>
+
+<div class="viewcode-block" id="Profile.range_ids"><a class="viewcode-back" href="../../../../../arthropod_describer.plugins.profile_register.general.html#arthropod_describer.plugins.profile_register.general.profiles.Profile.range_ids">[docs]</a>    <span class="k">def</span> <span class="nf">range_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">min_x</span><span class="p">,</span> <span class="n">max_x</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">xx</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">min_x</span> <span class="o">&lt;=</span> <span class="n">xx</span> <span class="o">&lt;=</span> <span class="n">max_x</span><span class="p">:</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="Profile.plot"><a class="viewcode-back" href="../../../../../arthropod_describer.plugins.profile_register.general.html#arthropod_describer.plugins.profile_register.general.profiles.Profile.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># plt.plot(self.x, self.y)</span>
+        <span class="k">pass</span></div></div>
+
+
+<div class="viewcode-block" id="derivative_penalty"><a class="viewcode-back" href="../../../../../arthropod_describer.plugins.profile_register.general.html#arthropod_describer.plugins.profile_register.general.profiles.derivative_penalty">[docs]</a><span class="k">def</span> <span class="nf">derivative_penalty</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">Profile</span><span class="p">,</span> <span class="n">reference</span><span class="p">:</span> <span class="n">Profile</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="c1"># x-points shared by both profiles</span>
+    <span class="n">both_x</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">both_x</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">reference</span><span class="o">.</span><span class="n">x</span><span class="p">))</span>
+    <span class="n">both_x</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">both_x</span><span class="p">))</span>
+
+    <span class="c1"># y-points of both profiles</span>
+    <span class="n">segments</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">get_y</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">reference</span><span class="o">.</span><span class="n">get_y</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">both_x</span><span class="p">]</span>
+
+    <span class="c1"># penalize area differences segment by segment</span>
+    <span class="n">penalty</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">left_segment</span><span class="p">,</span> <span class="n">right_segment</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">segments</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">segments</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+        <span class="n">x_left</span><span class="p">,</span> <span class="n">y_left_model</span><span class="p">,</span> <span class="n">y_left_reference</span> <span class="o">=</span> <span class="n">left_segment</span>
+        <span class="n">x_right</span><span class="p">,</span> <span class="n">y_right_model</span><span class="p">,</span> <span class="n">y_right_reference</span> <span class="o">=</span> <span class="n">right_segment</span>
+        <span class="n">model_slope</span> <span class="o">=</span> <span class="n">y_right_model</span> <span class="o">-</span> <span class="n">y_left_model</span>
+        <span class="n">reference_slope</span> <span class="o">=</span> <span class="n">y_right_reference</span> <span class="o">-</span> <span class="n">y_left_reference</span>
+        <span class="n">penalty</span> <span class="o">+=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">model_slope</span> <span class="o">-</span> <span class="n">reference_slope</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">x_right</span> <span class="o">-</span> <span class="n">x_left</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">penalty</span></div>
+
+
+<div class="viewcode-block" id="valid_matching"><a class="viewcode-back" href="../../../../../arthropod_describer.plugins.profile_register.general.html#arthropod_describer.plugins.profile_register.general.profiles.valid_matching">[docs]</a><span class="k">def</span> <span class="nf">valid_matching</span><span class="p">(</span><span class="n">matched_pairs</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">matched_pairs</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="n">prev_pair</span> <span class="o">=</span> <span class="n">matched_pairs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">cur_pair</span> <span class="ow">in</span> <span class="n">matched_pairs</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+        <span class="k">if</span> <span class="n">prev_pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">cur_pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">or</span> <span class="n">prev_pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">cur_pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="merge_profiles"><a class="viewcode-back" href="../../../../../arthropod_describer.plugins.profile_register.general.html#arthropod_describer.plugins.profile_register.general.profiles.merge_profiles">[docs]</a><span class="k">def</span> <span class="nf">merge_profiles</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">reference</span><span class="p">,</span> <span class="n">x_weight</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">y_weight</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">show_matches</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fig_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Register the given profiles and merge them into one with their relative influence given by weights.</span>
+<span class="sd">    :param model: model profile</span>
+<span class="sd">    :param reference: reference profile</span>
+<span class="sd">    :param x_weight: number in range 0-1 (0 =&gt; x-coordinates moved to reference, 1 =&gt; x-coordinates moved to model)</span>
+<span class="sd">    :param y_weight: number in range 0-1 (0 =&gt; y-values taken from reference, 1 =&gt; y-values taken from model)</span>
+<span class="sd">    :param show_matches: if True the function shows found matches as a plot</span>
+<span class="sd">    :param fig_name: filename for saving plots</span>
+<span class="sd">    :return: merged profile</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">model</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">reference</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">fig_name</span><span class="p">:</span>
+        <span class="n">show_matches</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="n">model_profile</span> <span class="o">=</span> <span class="n">Profile</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+    <span class="n">reference_profile</span> <span class="o">=</span> <span class="n">Profile</span><span class="p">(</span><span class="n">reference</span><span class="p">)</span>
+
+    <span class="c1"># 1. match minima between end points</span>
+    <span class="n">model_minima_pos</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">find_peaks</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">model</span><span class="p">))</span>
+    <span class="n">reference_minima_pos</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">find_peaks</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">reference</span><span class="p">))</span>
+
+    <span class="n">max_cost</span> <span class="o">=</span> <span class="n">derivative_penalty</span><span class="p">(</span><span class="n">model_profile</span><span class="p">,</span> <span class="n">reference_profile</span><span class="p">)</span>
+    <span class="n">matrix_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">model_minima_pos</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">reference_minima_pos</span><span class="p">)</span>
+    <span class="n">cost_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">matrix_size</span><span class="p">,</span> <span class="n">matrix_size</span><span class="p">),</span> <span class="n">max_cost</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">m_id</span><span class="p">,</span> <span class="n">model_min_pos</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">model_minima_pos</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">r_id</span><span class="p">,</span> <span class="n">reference_min_pos</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">reference_minima_pos</span><span class="p">):</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">model_profile</span><span class="p">)</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">reference_profile</span><span class="p">)</span>
+            <span class="n">new_x</span> <span class="o">=</span> <span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">model_min_pos</span><span class="p">]</span> <span class="o">+</span> <span class="n">r</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">reference_min_pos</span><span class="p">])</span> <span class="o">/</span> <span class="mf">2.0</span>
+            <span class="n">m</span><span class="o">.</span><span class="n">move_point_x</span><span class="p">(</span><span class="n">model_min_pos</span><span class="p">,</span> <span class="n">new_x</span><span class="p">)</span>
+            <span class="n">r</span><span class="o">.</span><span class="n">move_point_x</span><span class="p">(</span><span class="n">reference_min_pos</span><span class="p">,</span> <span class="n">new_x</span><span class="p">)</span>
+            <span class="n">cost_matrix</span><span class="p">[</span><span class="n">m_id</span><span class="p">,</span> <span class="n">r_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">derivative_penalty</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+
+    <span class="n">mi_ind</span><span class="p">,</span> <span class="n">ri_ind</span> <span class="o">=</span> <span class="n">linear_sum_assignment</span><span class="p">(</span><span class="n">cost_matrix</span><span class="p">)</span>
+    <span class="c1"># print(cost_matrix)</span>
+    <span class="n">matched_ids</span> <span class="o">=</span> <span class="p">[(</span><span class="n">m_id</span><span class="p">,</span> <span class="n">r_id</span><span class="p">)</span> <span class="k">for</span> <span class="n">m_id</span><span class="p">,</span> <span class="n">r_id</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">mi_ind</span><span class="p">,</span> <span class="n">ri_ind</span><span class="p">)</span>
+                   <span class="k">if</span> <span class="n">m_id</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">model_minima_pos</span><span class="p">)</span> <span class="ow">and</span> <span class="n">r_id</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">reference_minima_pos</span><span class="p">)]</span>
+    <span class="c1"># print(matched_ids)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">valid_matching</span><span class="p">(</span><span class="n">matched_ids</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Matching is invalid. Matching result is ignored!&quot;</span><span class="p">,</span> <span class="n">matched_ids</span><span class="p">)</span>
+        <span class="n">matched_ids</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># 1. align profiles</span>
+    <span class="n">orig_x</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">model_profile</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">model_start_idx</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">reference_start_idx</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="k">for</span> <span class="n">m_id</span><span class="p">,</span> <span class="n">r_id</span> <span class="ow">in</span> <span class="n">matched_ids</span><span class="p">:</span>
+        <span class="n">new_x</span> <span class="o">=</span> <span class="n">x_weight</span><span class="o">*</span><span class="n">model_minima_pos</span><span class="p">[</span><span class="n">m_id</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">x_weight</span><span class="p">)</span><span class="o">*</span><span class="n">reference_minima_pos</span><span class="p">[</span><span class="n">r_id</span><span class="p">]</span>
+        <span class="c1"># print(&quot;Register model:&quot;, m_id, new_x, model_start_idx)</span>
+        <span class="n">model_profile</span><span class="o">.</span><span class="n">move_point_x</span><span class="p">(</span><span class="n">model_minima_pos</span><span class="p">[</span><span class="n">m_id</span><span class="p">],</span> <span class="n">new_x</span><span class="p">,</span> <span class="n">start_idx</span><span class="o">=</span><span class="n">model_start_idx</span><span class="p">,</span> <span class="n">end_idx</span><span class="o">=-</span><span class="mi">3</span><span class="p">)</span>
+        <span class="c1"># print(&quot;Register reference:&quot;, r_id, new_x, reference_start_idx)</span>
+        <span class="n">reference_profile</span><span class="o">.</span><span class="n">move_point_x</span><span class="p">(</span><span class="n">reference_minima_pos</span><span class="p">[</span><span class="n">r_id</span><span class="p">],</span> <span class="n">new_x</span><span class="p">,</span> <span class="n">start_idx</span><span class="o">=</span><span class="n">reference_start_idx</span><span class="p">,</span> <span class="n">end_idx</span><span class="o">=-</span><span class="mi">3</span><span class="p">)</span>
+        <span class="n">model_start_idx</span> <span class="o">=</span> <span class="n">model_minima_pos</span><span class="p">[</span><span class="n">m_id</span><span class="p">]</span>
+        <span class="n">reference_start_idx</span> <span class="o">=</span> <span class="n">reference_minima_pos</span><span class="p">[</span><span class="n">r_id</span><span class="p">]</span>
+
+    <span class="c1"># if show_matches:</span>
+    <span class="c1">#     ax = plt.subplot(211)</span>
+    <span class="c1">#     plt.plot(model, &#39;r&#39;)</span>
+    <span class="c1">#     plt.plot(reference, &#39;b&#39;)</span>
+    <span class="c1">#     ax.set_xticks([])</span>
+    <span class="c1">#     ax.set_yticks([])</span>
+    <span class="c1">#     plt.xlabel(&#39;Matched extrema&#39;, fontsize=12)</span>
+    <span class="c1">#     for m_id, r_id in matched_ids:</span>
+    <span class="c1">#         plt.plot([model_minima_pos[m_id], reference_minima_pos[r_id]],</span>
+    <span class="c1">#                  [model[model_minima_pos[m_id]], reference[reference_minima_pos[r_id]]], &#39;k-&#39;, linewidth=3)</span>
+    <span class="c1">#     # print(&quot;MODEL:&quot;, model)</span>
+    <span class="c1">#     #print(&quot;minima_pos&quot;, model_minima_pos)</span>
+    <span class="c1">#     plt.plot(model_minima_pos, model[model_minima_pos], &#39;ro&#39;)</span>
+    <span class="c1">#     plt.plot(reference_minima_pos, reference[reference_minima_pos], &#39;bo&#39;)</span>
+    <span class="c1">#     # plt.ylim(0, 0.05)</span>
+    <span class="c1">#</span>
+    <span class="c1">#     ax = plt.subplot(212)</span>
+    <span class="c1">#     ax.set_xticks([])</span>
+    <span class="c1">#     ax.set_yticks([])</span>
+    <span class="c1">#     plt.xlabel(&#39;Aligned profiles&#39;, fontsize=12)</span>
+    <span class="c1">#     plt.plot(model_profile.x, model_profile.y, &#39;r&#39;)</span>
+    <span class="c1">#     plt.plot(reference_profile.x, reference_profile.y, &#39;b&#39;)</span>
+    <span class="c1">#     plt.ylim(0, 0.05)</span>
+
+    <span class="c1"># 2. resample the profiles and average them</span>
+    <span class="n">average_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">y_weight</span><span class="o">*</span><span class="n">model_profile</span><span class="o">.</span><span class="n">get_y</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">y_weight</span><span class="p">)</span><span class="o">*</span><span class="n">reference_profile</span><span class="o">.</span><span class="n">get_y</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">orig_x</span><span class="p">])</span>
+    <span class="c1"># print(&quot;Model:    &quot;, model)</span>
+    <span class="c1"># print(&quot;Reference:&quot;, reference)</span>
+    <span class="c1"># print(&quot;Average:  &quot;, average_y)</span>
+    <span class="c1"># if show_matches:</span>
+    <span class="c1">#     plt.plot(orig_x, average_y, &#39;k--&#39;, linewidth=2)</span>
+    <span class="c1">#     if fig_name:</span>
+    <span class="c1">#         plt.savefig(fig_name)</span>
+    <span class="c1">#     plt.close()</span>
+    <span class="c1">#     # plt.show()</span>
+
+    <span class="k">return</span> <span class="n">average_y</span></div>
+
+
+<div class="viewcode-block" id="get_median_profile"><a class="viewcode-back" href="../../../../../arthropod_describer.plugins.profile_register.general.html#arthropod_describer.plugins.profile_register.general.profiles.get_median_profile">[docs]</a><span class="k">def</span> <span class="nf">get_median_profile</span><span class="p">(</span><span class="n">profiles</span><span class="p">,</span> <span class="n">show_fig</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fig_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a median profile from given profiles</span>
+<span class="sd">    :param profiles: 2D numpy array, where the individual profiles are rows</span>
+<span class="sd">    :param show_fig: indicates whether to show figure or not</span>
+<span class="sd">    :param fig_name: optional name of output file for saving plots</span>
+<span class="sd">    :return: Median profile (1D numpy array) obtained after registration of the input profiles</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">fig_name</span><span class="p">:</span>
+        <span class="n">show_fig</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="c1"># if show_fig:</span>
+    <span class="c1">#     ax = plt.subplot(211)</span>
+    <span class="c1">#     plt.plot(profiles.T)</span>
+    <span class="c1">#     ax.set_xticks([])</span>
+    <span class="c1">#     ax.set_yticks([])</span>
+    <span class="c1">#     plt.xlabel(&#39;Median profile (--) of raw misaligned profiles&#39;, fontsize=12)</span>
+
+    <span class="c1"># Sort the profiles by mean similarity to other profiles</span>
+    <span class="n">similarities</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">([</span><span class="n">derivative_penalty</span><span class="p">(</span><span class="n">Profile</span><span class="p">(</span><span class="n">model</span><span class="p">),</span> <span class="n">Profile</span><span class="p">(</span><span class="n">reference</span><span class="p">))</span>
+                             <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">profiles</span><span class="p">])</span> <span class="k">for</span> <span class="n">reference</span> <span class="ow">in</span> <span class="n">profiles</span><span class="p">]</span>
+    <span class="n">order</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">similarities</span><span class="p">)</span>
+
+    <span class="c1"># Select the most similar profile as a reference</span>
+    <span class="n">reference_profile</span> <span class="o">=</span> <span class="n">profiles</span><span class="p">[</span><span class="n">order</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+    <span class="c1"># mean_profile = profiles[order[0]]</span>
+    <span class="c1">#</span>
+    <span class="c1"># for pid in range(1, len(profiles)):</span>
+    <span class="c1">#     weight = pid/(pid + 1)</span>
+    <span class="c1">#     mean_profile = merge_profiles(mean_profile, profiles[order[pid]], x_weight=weight, y_weight=weight)</span>
+    <span class="c1"># plt.plot(mean_profile, &#39;r--&#39;, linewidth=2)</span>
+    <span class="c1">#</span>
+    <span class="c1"># reference_profile = mean_profile</span>
+    <span class="c1"># if show_fig:</span>
+    <span class="c1">#     plt.plot(np.mean(profiles, axis=0), &#39;k--&#39;, linewidth=2)</span>
+
+    <span class="c1"># Register all profiles to the mean profile</span>
+    <span class="n">registered_profiles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">profiles</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">profiles</span><span class="p">)):</span>
+        <span class="n">registered_profiles</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span> <span class="o">=</span> <span class="n">merge_profiles</span><span class="p">(</span><span class="n">reference_profile</span><span class="p">,</span> <span class="n">profiles</span><span class="p">[</span><span class="n">pid</span><span class="p">],</span> <span class="n">x_weight</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">y_weight</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">median_profile</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">registered_profiles</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+
+    <span class="c1"># if show_fig:</span>
+    <span class="c1">#     ax = plt.subplot(212)</span>
+    <span class="c1">#     ax.set_xticks([])</span>
+    <span class="c1">#     ax.set_yticks([])</span>
+    <span class="c1">#     plt.xlabel(&#39;Median profile (--) of aligned profiles&#39;, fontsize=12)</span>
+    <span class="c1">#     plt.plot(registered_profiles.T)</span>
+    <span class="c1">#     plt.plot(median_profile, &#39;k--&#39;, linewidth=2)</span>
+    <span class="c1">#</span>
+    <span class="c1">#     if fig_name:</span>
+    <span class="c1">#         plt.savefig(fig_name)</span>
+    <span class="c1">#         plt.close()</span>
+    <span class="c1">#     else:</span>
+    <span class="c1">#         plt.show()</span>
+
+    <span class="k">return</span> <span class="n">median_profile</span></div>
+
+
+<span class="c1"># An example how to use get_median_profile function</span>
+<span class="c1"># def test_median_profiles():</span>
+<span class="c1">#     profiles = ProfileTable(&#39;bodyprofiles.csv&#39;)</span>
+<span class="c1">#</span>
+<span class="c1">#     codes = profiles.get_codes()</span>
+<span class="c1">#     # codes = codes[0:1]</span>
+<span class="c1">#     for code in codes:</span>
+<span class="c1">#         selection = profiles.get_profiles(code)</span>
+<span class="c1">#         get_median_profile(selection, fig_name=code + &#39;.png&#39;)</span>
+<span class="c1">#</span>
+
+<span class="c1"># An example code for comparing two profiles (e.g., mimic vs. model) using merge_profiles function</span>
+<span class="c1">#</span>
+<span class="c1"># def save_model_vs_mimic(pair_number):</span>
+<span class="c1">#     profiles = ProfileTable(&#39;bodyprofiles.csv&#39;)</span>
+<span class="c1">#</span>
+<span class="c1">#     mimic_profile = get_median_profile(profiles.get_profiles(&#39;mimic&#39; + str(pair_number)))</span>
+<span class="c1">#     model_profile = get_median_profile(profiles.get_profiles(&#39;model&#39; + str(pair_number)))</span>
+<span class="c1">#</span>
+<span class="c1">#     merge_profiles(mimic_profile, model_profile, fig_name=&#39;matching_model_mimic_&#39; + str(pair_number) + &#39;.png&#39;)</span>
+<span class="c1">#</span>
+<span class="c1">#     reg_mimic_profile = merge_profiles(mimic_profile, model_profile, y_weight=1)</span>
+<span class="c1">#     reg_model_profile = merge_profiles(mimic_profile, model_profile, y_weight=0)</span>
+<span class="c1">#</span>
+<span class="c1">#     ax = plt.subplot(211)</span>
+<span class="c1">#     plt.plot(mimic_profile, &#39;r&#39;)</span>
+<span class="c1">#     plt.plot(model_profile, &#39;b&#39;)</span>
+<span class="c1">#     ax.set_xticks([])</span>
+<span class="c1">#     ax.set_yticks([])</span>
+<span class="c1">#     plt.xlabel(&#39;Model and mimic unaligned&#39;, fontsize=12)</span>
+<span class="c1">#</span>
+<span class="c1">#     ax = plt.subplot(212)</span>
+<span class="c1">#     plt.plot(reg_mimic_profile, &#39;r&#39;)</span>
+<span class="c1">#     plt.plot(reg_model_profile, &#39;b&#39;)</span>
+<span class="c1">#     ax.set_xticks([])</span>
+<span class="c1">#     ax.set_yticks([])</span>
+<span class="c1">#     plt.xlabel(&#39;Model and mimic aligned&#39;, fontsize=12)</span>
+<span class="c1">#</span>
+<span class="c1">#     # plt.show()</span>
+<span class="c1">#     plt.savefig(&#39;model_mimic_&#39; + str(pair_number) + &#39;.png&#39;)</span>
+<span class="c1">#     plt.close()</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, CBIA @ FI MUNI.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

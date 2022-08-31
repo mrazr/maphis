@@ -1,0 +1,30 @@
+{
+  "name": "Mask colormap",
+  "counts_of_bits": [
+    32
+  ],
+  "mask_names": [
+    "mask"
+  ],
+  "constraint_mask_label": null,
+  "labels": {
+    "0": {
+      "name": "Nothing",
+      "color": {
+        "red": 0,
+        "green": 0,
+        "blue": 0
+      },
+      "code": "0"
+    },
+    "16777216": {
+      "name": "Reflection",
+      "color": {
+        "red": 255,
+        "green": 0,
+        "blue": 255
+      },
+      "code": "1"
+    }
+  }
+}

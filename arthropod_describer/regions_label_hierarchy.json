@@ -1,0 +1,369 @@
+{
+    "name": "arthropods",
+    "counts_of_bits": [
+        8,
+        8,
+        8,
+        8
+    ],
+    "mask_names": [
+        "Specimen",
+        "Body/Appendages",
+        "Segments",
+        "Sections"
+    ],
+    "constraint_mask_label": 16777216,
+    "labels": {
+        "0": {
+            "name": "nothing",
+            "color": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "code": "0:0:0:0"
+        },
+        "16777216": {
+            "name": "specimen",
+            "color": {
+                "red": 255,
+                "green": 255,
+                "blue": 255
+            },
+            "code": "1:0:0:0"
+        },
+        "16842752": {
+            "name": "body",
+            "color": {
+                "red": 175,
+                "green": 175,
+                "blue": 175
+            },
+            "code": "1:1:0:0"
+        },
+        "16843008": {
+            "name": "head",
+            "color": {
+                "red": 0,
+                "green": 0,
+                "blue": 255
+            },
+            "code": "1:1:1:0"
+        },
+        "16843264": {
+            "name": "thorax",
+            "color": {
+                "red": 0,
+                "green": 255,
+                "blue": 0
+            },
+            "code": "1:1:2:0"
+        },
+        "16843520": {
+            "name": "abdomen",
+            "color": {
+                "red": 255,
+                "green": 0,
+                "blue": 0
+            },
+            "code": "1:1:3:0"
+        },
+        "16908288": {
+            "name": "appendages",
+            "color": {
+                "red": 100,
+                "green": 100,
+                "blue": 100
+            },
+            "code": "1:2:0:0"
+        },
+        "16908544": {
+            "name": "appendage 1L",
+            "color": {
+                "red": 255,
+                "green": 116,
+                "blue": 207
+            },
+            "code": "1:2:1:0"
+        },
+        "16908545": {
+            "name": "appendage 1L P1",
+            "color": {
+                "red": 253,
+                "green": 176,
+                "blue": 255
+            },
+            "code": "1:2:1:1"
+        },
+        "16908546": {
+            "name": "appendage 1L P2",
+            "color": {
+                "red": 243,
+                "green": 0,
+                "blue": 251
+            },
+            "code": "1:2:1:2"
+        },
+        "16908547": {
+            "name": "appendage 1L P3",
+            "color": {
+                "red": 139,
+                "green": 0,
+                "blue": 189
+            },
+            "code": "1:2:1:3"
+        },
+        "16908800": {
+            "name": "appendage 1R",
+            "color": {
+                "red": 255,
+                "green": 116,
+                "blue": 207
+            },
+            "code": "1:2:2:0"
+        },
+        "16908801": {
+            "name": "appendage 1R P1",
+            "color": {
+                "red": 253,
+                "green": 176,
+                "blue": 255
+            },
+            "code": "1:2:2:1"
+        },
+        "16908802": {
+            "name": "appendage 1R P2",
+            "color": {
+                "red": 243,
+                "green": 0,
+                "blue": 251
+            },
+            "code": "1:2:2:2"
+        },
+        "16908803": {
+            "name": "appendage 1R P3",
+            "color": {
+                "red": 139,
+                "green": 0,
+                "blue": 189
+            },
+            "code": "1:2:2:3"
+        },
+        "16909056": {
+            "name": "appendage 2L",
+            "color": {
+                "red": 140,
+                "green": 92,
+                "blue": 8
+            },
+            "code": "1:2:3:0"
+        },
+        "16909057": {
+            "name": "appendage 2L P1",
+            "color": {
+                "red": 229,
+                "green": 140,
+                "blue": 140
+            },
+            "code": "1:2:3:1"
+        },
+        "16909058": {
+            "name": "appendage 2L P2",
+            "color": {
+                "red": 183,
+                "green": 28,
+                "blue": 28
+            },
+            "code": "1:2:3:2"
+        },
+        "16909059": {
+            "name": "appendage 2L P3",
+            "color": {
+                "red": 106,
+                "green": 0,
+                "blue": 0
+            },
+            "code": "1:2:3:3"
+        },
+        "16909312": {
+            "name": "appendage 2R ",
+            "color": {
+                "red": 140,
+                "green": 92,
+                "blue": 8
+            },
+            "code": "1:2:4:0"
+        },
+        "16909313": {
+            "name": "appendage 2R P1",
+            "color": {
+                "red": 229,
+                "green": 140,
+                "blue": 140
+            },
+            "code": "1:2:4:1"
+        },
+        "16909314": {
+            "name": "appendage 2R P2",
+            "color": {
+                "red": 183,
+                "green": 28,
+                "blue": 28
+            },
+            "code": "1:2:4:2"
+        },
+        "16909315": {
+            "name": "appendage 2R P3",
+            "color": {
+                "red": 106,
+                "green": 0,
+                "blue": 0
+            },
+            "code": "1:2:4:3"
+        },
+        "16909568": {
+            "name": "appendage 3L",
+            "color": {
+                "red": 234,
+                "green": 253,
+                "blue": 13
+            },
+            "code": "1:2:5:0"
+        },
+        "16909569": {
+            "name": "appendage 3L P1",
+            "color": {
+                "red": 220,
+                "green": 237,
+                "blue": 200
+            },
+            "code": "1:2:5:1"
+        },
+        "16909570": {
+            "name": "appendage 3L P2",
+            "color": {
+                "red": 139,
+                "green": 195,
+                "blue": 74
+            },
+            "code": "1:2:5:2"
+        },
+        "16909571": {
+            "name": "appendage 3L P3",
+            "color": {
+                "red": 51,
+                "green": 105,
+                "blue": 30
+            },
+            "code": "1:2:5:3"
+        },
+        "16909824": {
+            "name": "appendage 3R",
+            "color": {
+                "red": 234,
+                "green": 253,
+                "blue": 13
+            },
+            "code": "1:2:6:0"
+        },
+        "16909825": {
+            "name": "appendage 3R P1",
+            "color": {
+                "red": 220,
+                "green": 237,
+                "blue": 200
+            },
+            "code": "1:2:6:1"
+        },
+        "16909826": {
+            "name": "appendage 3R P2",
+            "color": {
+                "red": 139,
+                "green": 195,
+                "blue": 74
+            },
+            "code": "1:2:6:2"
+        },
+        "16909827": {
+            "name": "appendage 3R P3",
+            "color": {
+                "red": 51,
+                "green": 105,
+                "blue": 30
+            },
+            "code": "1:2:6:3"
+        },
+        "16910080": {
+            "name": "appendage 4L",
+            "color": {
+                "red": 5,
+                "green": 201,
+                "blue": 221
+            },
+            "code": "1:2:7:0"
+        },
+        "16910081": {
+            "name": "appendage 4L P1",
+            "color": {
+                "red": 164,
+                "green": 210,
+                "blue": 255
+            },
+            "code": "1:2:7:1"
+        },
+        "16910082": {
+            "name": "appendage 4L P2",
+            "color": {
+                "red": 33,
+                "green": 150,
+                "blue": 243
+            },
+            "code": "1:2:7:2"
+        },
+        "16910083": {
+            "name": "appendage 4L P3",
+            "color": {
+                "red": 13,
+                "green": 71,
+                "blue": 161
+            },
+            "code": "1:2:7:3"
+        },
+        "16910336": {
+            "name": "appendage 4R",
+            "color": {
+                "red": 5,
+                "green": 201,
+                "blue": 221
+            },
+            "code": "1:2:8:0"
+        },
+        "16910337": {
+            "name": "appendage 4R P1",
+            "color": {
+                "red": 164,
+                "green": 210,
+                "blue": 255
+            },
+            "code": "1:2:8:1"
+        },
+        "16910338": {
+            "name": "appendage 4R P2",
+            "color": {
+                "red": 33,
+                "green": 150,
+                "blue": 243
+            },
+            "code": "1:2:8:2"
+        },
+        "16910339": {
+            "name": "appendage 4R P3",
+            "color": {
+                "red": 13,
+                "green": 71,
+                "blue": 161
+            },
+            "code": "1:2:8:3"
+        }
+    }
+}

@@ -1,7 +1,16 @@
 setuptools~=57.0.0
-numpy~=1.20.0
+numpy~=1.19.5
 scikit-image~=0.19.0
 PySide2~=5.14.2.3
 opencv-python~=4.2.0.34
 ExifRead~=2.3.2
 Pillow~=8.4.0
+imagecodecs
+numba~=0.55.1
+qimage2ndarray~=1.8.3
+openpyxl~=3.0.9
+scikit-learn~=1.0.2
+scipy~=1.8.0
+pytesseract~=0.3.9
+mouse
+pyinstaller

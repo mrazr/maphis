@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arthropod_describer.measurements_viewer.ui_measurement_assign_dialog &mdash; MAPHIS 0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> MAPHIS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">arthropod_describer</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">MAPHIS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>arthropod_describer.measurements_viewer.ui_measurement_assign_dialog</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for arthropod_describer.measurements_viewer.ui_measurement_assign_dialog</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1">################################################################################</span>
+<span class="c1">## Form generated from reading UI file &#39;measurement_assign_dialog.ui&#39;</span>
+<span class="c1">##</span>
+<span class="c1">## Created by: Qt User Interface Compiler version 5.14.2</span>
+<span class="c1">##</span>
+<span class="c1">## WARNING! All changes made in this file will be lost when recompiling UI file!</span>
+<span class="c1">################################################################################</span>
+
+<span class="kn">from</span> <span class="nn">PySide2.QtCore</span> <span class="kn">import</span> <span class="p">(</span><span class="n">QCoreApplication</span><span class="p">,</span> <span class="n">QDate</span><span class="p">,</span> <span class="n">QDateTime</span><span class="p">,</span> <span class="n">QMetaObject</span><span class="p">,</span>
+    <span class="n">QObject</span><span class="p">,</span> <span class="n">QPoint</span><span class="p">,</span> <span class="n">QRect</span><span class="p">,</span> <span class="n">QSize</span><span class="p">,</span> <span class="n">QTime</span><span class="p">,</span> <span class="n">QUrl</span><span class="p">,</span> <span class="n">Qt</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtGui</span> <span class="kn">import</span> <span class="p">(</span><span class="n">QBrush</span><span class="p">,</span> <span class="n">QColor</span><span class="p">,</span> <span class="n">QConicalGradient</span><span class="p">,</span> <span class="n">QCursor</span><span class="p">,</span> <span class="n">QFont</span><span class="p">,</span>
+    <span class="n">QFontDatabase</span><span class="p">,</span> <span class="n">QIcon</span><span class="p">,</span> <span class="n">QKeySequence</span><span class="p">,</span> <span class="n">QLinearGradient</span><span class="p">,</span> <span class="n">QPalette</span><span class="p">,</span> <span class="n">QPainter</span><span class="p">,</span>
+    <span class="n">QPixmap</span><span class="p">,</span> <span class="n">QRadialGradient</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtWidgets</span> <span class="kn">import</span> <span class="o">*</span>
+
+
+<div class="viewcode-block" id="Ui_MeasurementAssignDialog"><a class="viewcode-back" href="../../../arthropod_describer.measurements_viewer.html#arthropod_describer.measurements_viewer.ui_measurement_assign_dialog.Ui_MeasurementAssignDialog">[docs]</a><span class="k">class</span> <span class="nc">Ui_MeasurementAssignDialog</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Ui_MeasurementAssignDialog.setupUi"><a class="viewcode-back" href="../../../arthropod_describer.measurements_viewer.html#arthropod_describer.measurements_viewer.ui_measurement_assign_dialog.Ui_MeasurementAssignDialog.setupUi">[docs]</a>    <span class="k">def</span> <span class="nf">setupUi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">MeasurementAssignDialog</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">MeasurementAssignDialog</span><span class="o">.</span><span class="n">objectName</span><span class="p">():</span>
+            <span class="n">MeasurementAssignDialog</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;MeasurementAssignDialog&quot;</span><span class="p">)</span>
+        <span class="n">MeasurementAssignDialog</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="mi">1113</span><span class="p">,</span> <span class="mi">563</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verticalLayout</span> <span class="o">=</span> <span class="n">QVBoxLayout</span><span class="p">(</span><span class="n">MeasurementAssignDialog</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verticalLayout</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;verticalLayout&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mainLayout</span> <span class="o">=</span> <span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mainLayout</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;mainLayout&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labelLayout</span> <span class="o">=</span> <span class="n">QVBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labelLayout</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;labelLayout&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labelLayout</span><span class="o">.</span><span class="n">setContentsMargins</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">QLabel</span><span class="p">(</span><span class="n">MeasurementAssignDialog</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;label&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">setAutoFillBackground</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">labelLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">Qt</span><span class="o">.</span><span class="n">AlignHCenter</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">labelTree</span> <span class="o">=</span> <span class="n">QTreeView</span><span class="p">(</span><span class="n">MeasurementAssignDialog</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labelTree</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;labelTree&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labelTree</span><span class="o">.</span><span class="n">setSelectionMode</span><span class="p">(</span><span class="n">QAbstractItemView</span><span class="o">.</span><span class="n">MultiSelection</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labelTree</span><span class="o">.</span><span class="n">setVerticalScrollMode</span><span class="p">(</span><span class="n">QAbstractItemView</span><span class="o">.</span><span class="n">ScrollPerPixel</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labelTree</span><span class="o">.</span><span class="n">setIndentation</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labelTree</span><span class="o">.</span><span class="n">header</span><span class="p">()</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">labelLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">labelTree</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout_3</span> <span class="o">=</span> <span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout_3</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;horizontalLayout_3&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout_3</span><span class="o">.</span><span class="n">setContentsMargins</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btnLabelSelectAll</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">(</span><span class="n">MeasurementAssignDialog</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btnLabelSelectAll</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;btnLabelSelectAll&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout_3</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">btnLabelSelectAll</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">btnLabelDeselectAll</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">(</span><span class="n">MeasurementAssignDialog</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btnLabelDeselectAll</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;btnLabelDeselectAll&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout_3</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">btnLabelDeselectAll</span><span class="p">)</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">labelLayout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout_3</span><span class="p">)</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mainLayout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">labelLayout</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">measurementLayout</span> <span class="o">=</span> <span class="n">QVBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">measurementLayout</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;measurementLayout&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">measurementLayout</span><span class="o">.</span><span class="n">setContentsMargins</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_2</span> <span class="o">=</span> <span class="n">QLabel</span><span class="p">(</span><span class="n">MeasurementAssignDialog</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_2</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;label_2&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">measurementLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label_2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">Qt</span><span class="o">.</span><span class="n">AlignHCenter</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">measurementTree</span> <span class="o">=</span> <span class="n">QTreeWidget</span><span class="p">(</span><span class="n">MeasurementAssignDialog</span><span class="p">)</span>
+        <span class="n">__qtreewidgetitem</span> <span class="o">=</span> <span class="n">QTreeWidgetItem</span><span class="p">()</span>
+        <span class="n">__qtreewidgetitem</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;1&quot;</span><span class="p">);</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">measurementTree</span><span class="o">.</span><span class="n">setHeaderItem</span><span class="p">(</span><span class="n">__qtreewidgetitem</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">measurementTree</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;measurementTree&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">measurementTree</span><span class="o">.</span><span class="n">setSelectionMode</span><span class="p">(</span><span class="n">QAbstractItemView</span><span class="o">.</span><span class="n">MultiSelection</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">measurementTree</span><span class="o">.</span><span class="n">setExpandsOnDoubleClick</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">measurementTree</span><span class="o">.</span><span class="n">header</span><span class="p">()</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">measurementLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">measurementTree</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout_2</span> <span class="o">=</span> <span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout_2</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;horizontalLayout_2&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout_2</span><span class="o">.</span><span class="n">setContentsMargins</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btnMeasSelectAll</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">(</span><span class="n">MeasurementAssignDialog</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btnMeasSelectAll</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;btnMeasSelectAll&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout_2</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">btnMeasSelectAll</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">btnMeasDeselectAll</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">(</span><span class="n">MeasurementAssignDialog</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btnMeasDeselectAll</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;btnMeasDeselectAll&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout_2</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">btnMeasDeselectAll</span><span class="p">)</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">measurementLayout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout_2</span><span class="p">)</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mainLayout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">measurementLayout</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">btnAssign</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">(</span><span class="n">MeasurementAssignDialog</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btnAssign</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;btnAssign&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btnAssign</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mainLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">btnAssign</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assignmentLayout</span> <span class="o">=</span> <span class="n">QVBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assignmentLayout</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;assignmentLayout&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assignmentLayout</span><span class="o">.</span><span class="n">setContentsMargins</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_3</span> <span class="o">=</span> <span class="n">QLabel</span><span class="p">(</span><span class="n">MeasurementAssignDialog</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_3</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;label_3&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assignmentLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label_3</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">Qt</span><span class="o">.</span><span class="n">AlignHCenter</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assignmentTree</span> <span class="o">=</span> <span class="n">QTreeWidget</span><span class="p">(</span><span class="n">MeasurementAssignDialog</span><span class="p">)</span>
+        <span class="n">__qtreewidgetitem1</span> <span class="o">=</span> <span class="n">QTreeWidgetItem</span><span class="p">()</span>
+        <span class="n">__qtreewidgetitem1</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;1&quot;</span><span class="p">);</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assignmentTree</span><span class="o">.</span><span class="n">setHeaderItem</span><span class="p">(</span><span class="n">__qtreewidgetitem1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assignmentTree</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;assignmentTree&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assignmentTree</span><span class="o">.</span><span class="n">setSelectionMode</span><span class="p">(</span><span class="n">QAbstractItemView</span><span class="o">.</span><span class="n">MultiSelection</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assignmentTree</span><span class="o">.</span><span class="n">setExpandsOnDoubleClick</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assignmentTree</span><span class="o">.</span><span class="n">header</span><span class="p">()</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assignmentLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assignmentTree</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout</span> <span class="o">=</span> <span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;horizontalLayout&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout</span><span class="o">.</span><span class="n">setContentsMargins</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btnAssignmentSelectAll</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">(</span><span class="n">MeasurementAssignDialog</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btnAssignmentSelectAll</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;btnAssignmentSelectAll&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">btnAssignmentSelectAll</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">btnAssignmentDeselectAll</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">(</span><span class="n">MeasurementAssignDialog</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btnAssignmentDeselectAll</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;btnAssignmentDeselectAll&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">btnAssignmentDeselectAll</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">btnAssignmentRemove</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">(</span><span class="n">MeasurementAssignDialog</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btnAssignmentRemove</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;btnAssignmentRemove&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btnAssignmentRemove</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">btnAssignmentRemove</span><span class="p">)</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assignmentLayout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout</span><span class="p">)</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mainLayout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assignmentLayout</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">settingsLayout</span> <span class="o">=</span> <span class="n">QVBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">settingsLayout</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;settingsLayout&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">settingsLayout</span><span class="o">.</span><span class="n">setContentsMargins</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_4</span> <span class="o">=</span> <span class="n">QLabel</span><span class="p">(</span><span class="n">MeasurementAssignDialog</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_4</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;label_4&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">settingsLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label_4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">Qt</span><span class="o">.</span><span class="n">AlignHCenter</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">settingsScrollArea</span> <span class="o">=</span> <span class="n">QScrollArea</span><span class="p">(</span><span class="n">MeasurementAssignDialog</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">settingsScrollArea</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;settingsScrollArea&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">settingsScrollArea</span><span class="o">.</span><span class="n">setWidgetResizable</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scrollAreaWidgetContents</span> <span class="o">=</span> <span class="n">QWidget</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scrollAreaWidgetContents</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;scrollAreaWidgetContents&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scrollAreaWidgetContents</span><span class="o">.</span><span class="n">setGeometry</span><span class="p">(</span><span class="n">QRect</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">216</span><span class="p">,</span> <span class="mi">480</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">settingsScrollArea</span><span class="o">.</span><span class="n">setWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scrollAreaWidgetContents</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">settingsLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">settingsScrollArea</span><span class="p">)</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mainLayout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">settingsLayout</span><span class="p">)</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">verticalLayout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mainLayout</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout_4</span> <span class="o">=</span> <span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout_4</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;horizontalLayout_4&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout_4</span><span class="o">.</span><span class="n">setContentsMargins</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btnDemoSelectColorAndTolerance</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">(</span><span class="n">MeasurementAssignDialog</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btnDemoSelectColorAndTolerance</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;btnDemoSelectColorAndTolerance&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout_4</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">btnDemoSelectColorAndTolerance</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">buttonBox</span> <span class="o">=</span> <span class="n">QDialogButtonBox</span><span class="p">(</span><span class="n">MeasurementAssignDialog</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buttonBox</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;buttonBox&quot;</span><span class="p">)</span>
+        <span class="n">sizePolicy</span> <span class="o">=</span> <span class="n">QSizePolicy</span><span class="p">(</span><span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Expanding</span><span class="p">,</span> <span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Fixed</span><span class="p">)</span>
+        <span class="n">sizePolicy</span><span class="o">.</span><span class="n">setHorizontalStretch</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">sizePolicy</span><span class="o">.</span><span class="n">setVerticalStretch</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">sizePolicy</span><span class="o">.</span><span class="n">setHeightForWidth</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buttonBox</span><span class="o">.</span><span class="n">sizePolicy</span><span class="p">()</span><span class="o">.</span><span class="n">hasHeightForWidth</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buttonBox</span><span class="o">.</span><span class="n">setSizePolicy</span><span class="p">(</span><span class="n">sizePolicy</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buttonBox</span><span class="o">.</span><span class="n">setOrientation</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">Horizontal</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buttonBox</span><span class="o">.</span><span class="n">setStandardButtons</span><span class="p">(</span><span class="n">QDialogButtonBox</span><span class="o">.</span><span class="n">Apply</span><span class="o">|</span><span class="n">QDialogButtonBox</span><span class="o">.</span><span class="n">Cancel</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buttonBox</span><span class="o">.</span><span class="n">setCenterButtons</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout_4</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buttonBox</span><span class="p">)</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">verticalLayout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout_4</span><span class="p">)</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">retranslateUi</span><span class="p">(</span><span class="n">MeasurementAssignDialog</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buttonBox</span><span class="o">.</span><span class="n">accepted</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">MeasurementAssignDialog</span><span class="o">.</span><span class="n">accept</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buttonBox</span><span class="o">.</span><span class="n">rejected</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">MeasurementAssignDialog</span><span class="o">.</span><span class="n">reject</span><span class="p">)</span>
+
+        <span class="n">QMetaObject</span><span class="o">.</span><span class="n">connectSlotsByName</span><span class="p">(</span><span class="n">MeasurementAssignDialog</span><span class="p">)</span></div>
+    <span class="c1"># setupUi</span>
+
+<div class="viewcode-block" id="Ui_MeasurementAssignDialog.retranslateUi"><a class="viewcode-back" href="../../../arthropod_describer.measurements_viewer.html#arthropod_describer.measurements_viewer.ui_measurement_assign_dialog.Ui_MeasurementAssignDialog.retranslateUi">[docs]</a>    <span class="k">def</span> <span class="nf">retranslateUi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">MeasurementAssignDialog</span><span class="p">):</span>
+        <span class="n">MeasurementAssignDialog</span><span class="o">.</span><span class="n">setWindowTitle</span><span class="p">(</span><span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;MeasurementAssignDialog&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;Compute new measurements&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;MeasurementAssignDialog&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;Select regions to compute measurements for:&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btnLabelSelectAll</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;MeasurementAssignDialog&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;Select all&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btnLabelDeselectAll</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;MeasurementAssignDialog&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;Deselect all&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_2</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;MeasurementAssignDialog&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;Specify measurements for selected regions:&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btnMeasSelectAll</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;MeasurementAssignDialog&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;Select all&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btnMeasDeselectAll</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;MeasurementAssignDialog&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;Deselect all&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btnAssign</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;MeasurementAssignDialog&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;Assign&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_3</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;MeasurementAssignDialog&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;This will be computed:&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btnAssignmentSelectAll</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;MeasurementAssignDialog&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;Select all&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btnAssignmentDeselectAll</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;MeasurementAssignDialog&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;Deselect all&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btnAssignmentRemove</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;MeasurementAssignDialog&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;Remove&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_4</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;MeasurementAssignDialog&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;Measurement settings&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btnDemoSelectColorAndTolerance</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">QCoreApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;MeasurementAssignDialog&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;demo: Select Color and Tolerance&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span></div></div>
+    <span class="c1"># retranslateUi</span>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, CBIA @ FI MUNI.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

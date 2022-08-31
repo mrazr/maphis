@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arthropod_describer.common.state &mdash; MAPHIS 0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> MAPHIS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">arthropod_describer</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">MAPHIS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>arthropod_describer.common.state</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for arthropod_describer.common.state</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">typing</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span>
+
+<span class="kn">import</span> <span class="nn">PySide2</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtCore</span> <span class="kn">import</span> <span class="n">QObject</span><span class="p">,</span> <span class="n">Signal</span><span class="p">,</span> <span class="n">Qt</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtGui</span> <span class="kn">import</span> <span class="n">QTransform</span>
+
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.label_hierarchy</span> <span class="kn">import</span> <span class="n">LabelHierarchy</span><span class="p">,</span> <span class="n">Node</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.label_image</span> <span class="kn">import</span> <span class="n">LabelImg</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.local_storage</span> <span class="kn">import</span> <span class="n">Storage</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.photo</span> <span class="kn">import</span> <span class="n">Photo</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.units</span> <span class="kn">import</span> <span class="n">UnitStore</span>
+
+
+<div class="viewcode-block" id="LabelConstraint"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.state.LabelConstraint">[docs]</a><span class="k">class</span> <span class="nc">LabelConstraint</span><span class="p">(</span><span class="n">QObject</span><span class="p">):</span>
+    <span class="n">constraint_changed</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">(</span><span class="s1">&#39;LabelConstraint&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">PySide2</span><span class="o">.</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QObject</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">label_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_constraint_label_name</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_level</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_label_node</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Node</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">primary_label</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">constraint_label_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_constraint_label_name</span>
+
+    <span class="nd">@constraint_label_name</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">constraint_label_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lab_name</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_constraint_label_name</span> <span class="o">=</span> <span class="n">lab_name</span>
+        <span class="c1"># self.constraint_changed.emit(self)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">label_node</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Node</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_node</span>
+
+    <span class="nd">@label_node</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">label_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label_node</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Node</span><span class="p">]):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_label_node</span> <span class="o">=</span> <span class="n">label_node</span>
+        <span class="c1"># self.constraint_changed.emit(self)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">label</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">0</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_node</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_node</span><span class="o">.</span><span class="n">label</span></div>
+
+
+<div class="viewcode-block" id="LabelState"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.state.LabelState">[docs]</a><span class="k">class</span> <span class="nc">LabelState</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_label_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">label_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_label</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_level</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">constraint</span><span class="p">:</span> <span class="n">LabelConstraint</span> <span class="o">=</span> <span class="n">LabelConstraint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_label_name</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">label_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_name</span></div>
+
+
+<div class="viewcode-block" id="State"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.state.State">[docs]</a><span class="k">class</span> <span class="nc">State</span><span class="p">(</span><span class="n">QObject</span><span class="p">):</span>
+    <span class="n">colormap_changed</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">([</span><span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]])</span>
+    <span class="n">storage_changed</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">([</span><span class="n">Storage</span><span class="p">,</span> <span class="n">Storage</span><span class="p">])</span>
+    <span class="n">photo_changed</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">(</span><span class="n">Photo</span><span class="p">)</span>
+    <span class="n">photo_index_changed</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">label_img_changed</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">(</span><span class="n">LabelImg</span><span class="p">)</span>
+    <span class="n">label_hierarchy_changed</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">(</span><span class="n">LabelHierarchy</span><span class="p">)</span>
+    <span class="n">label_constraint_changed</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">(</span><span class="n">LabelConstraint</span><span class="p">)</span>
+    <span class="n">update_used_label_list</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">()</span>
+    <span class="n">new_label_constraint</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">primary_label_changed</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">tags_filter_changed</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">QObject</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">arthropod_describer.common.tool</span> <span class="kn">import</span> <span class="n">Tool</span>
+        <span class="n">QObject</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Storage</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_photo</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Photo</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_photo_idx</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_label_img</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">LabelImg</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_primary_label</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_secondary_label</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_label_hierarchy</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">LabelHierarchy</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># self.current_label_level: int = 0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_label_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_label_constraint</span><span class="p">:</span> <span class="n">LabelConstraint</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redraw_canvas</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_constraint_label</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">LabelConstraint</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_states</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">LabelState</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">units</span><span class="p">:</span> <span class="n">UnitStore</span> <span class="o">=</span> <span class="n">UnitStore</span><span class="p">()</span>
+        <span class="c1">#self.viz_layer: typing.Optional[VisualizationLayer] = None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key_modifier</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Qt</span><span class="o">.</span><span class="n">Key</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_tool</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Tool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_view_transform</span><span class="p">:</span> <span class="n">QTransform</span> <span class="o">=</span> <span class="n">QTransform</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_active_tags_filter</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_hidden_photos_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">colormap</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">get_label_hierarchy2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_label_name</span><span class="p">)</span><span class="o">.</span><span class="n">colormap</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">storage</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Storage</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span>
+
+    <span class="nd">@storage</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">storage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">storage</span><span class="p">:</span> <span class="n">Storage</span><span class="p">):</span>
+        <span class="n">old_storage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span> <span class="o">=</span> <span class="n">storage</span>
+        <span class="c1"># This if should not be necessary</span>
+        <span class="c1">#if self._storage.label_hierarchy is None:</span>
+        <span class="c1">#    self._storage.label_hierarchy = self._label_hierarchy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">label_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="o">.</span><span class="n">label_image_names</span><span class="p">:</span>
+            <span class="n">lab_state</span> <span class="o">=</span> <span class="n">LabelState</span><span class="p">(</span><span class="n">label_name</span><span class="p">)</span>
+            <span class="c1"># constr = LabelConstraint(label_name)</span>
+            <span class="c1"># self.constraints[label_name] = constr</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">label_states</span><span class="p">[</span><span class="n">label_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">lab_state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_label_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="o">.</span><span class="n">default_label_image</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_hierarchy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="o">.</span><span class="n">get_label_hierarchy2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_label_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_hierarchy</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_label_level</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label_hierarchy</span><span class="o">.</span><span class="n">masks</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">storage_changed</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="p">,</span> <span class="n">old_storage</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="o">.</span><span class="n">storage_update</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_handle_storage_update</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">current_photo</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Photo</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_photo</span>
+
+    <span class="nd">@current_photo</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">current_photo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">photo</span><span class="p">:</span> <span class="n">Photo</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_photo</span> <span class="o">=</span> <span class="n">photo</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">photo_changed</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_photo</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">current_photo_index</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_photo_idx</span>
+
+    <span class="nd">@current_photo_index</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">current_photo_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_photo_idx</span> <span class="o">=</span> <span class="n">idx</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_photo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">get_photo_by_idx</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_photo_idx</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">photo_index_changed</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_photo_idx</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">label_img</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LabelImg</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_label_img</span>
+
+    <span class="nd">@label_img</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">label_img</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_label_img</span><span class="p">:</span> <span class="n">LabelImg</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_label_img</span> <span class="o">=</span> <span class="n">_label_img</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">colormap</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1">#ulabels = set(list(np.unique(self._current_photo.regions_image.label_img)))</span>
+            <span class="n">ulabels</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_photo</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">current_label_name</span><span class="p">]</span><span class="o">.</span><span class="n">label_image</span><span class="p">)))</span>
+            <span class="c1"># TODO REMOVE</span>
+            <span class="c1">#self.colormap._used_labels = ulabels</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_used_label_list</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_img_changed</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_label_img</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">primary_label</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="c1"># return self.constraints[self.current_label_name].primary_label</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_states</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">current_label_name</span><span class="p">]</span><span class="o">.</span><span class="n">current_label</span>
+
+    <span class="nd">@primary_label</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">primary_label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="c1"># self.constraints[self.current_label_name].primary_label = label</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_states</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">current_label_name</span><span class="p">]</span><span class="o">.</span><span class="n">current_label</span> <span class="o">=</span> <span class="n">label</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">primary_label_changed</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">secondary_label</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_secondary_label</span>
+
+    <span class="nd">@secondary_label</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">secondary_label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_secondary_label</span> <span class="o">=</span> <span class="n">label</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">label_hierarchy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LabelHierarchy</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">get_label_hierarchy2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_label_name</span><span class="p">)</span>
+
+    <span class="nd">@label_hierarchy</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">label_hierarchy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lab_hier</span><span class="p">:</span> <span class="n">LabelHierarchy</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_label_hierarchy</span> <span class="o">=</span> <span class="n">lab_hier</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="o">.</span><span class="n">label_hierarchy</span> <span class="o">=</span> <span class="n">lab_hier</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_hierarchy_changed</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_label_hierarchy</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">current_label_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_label_name</span>
+
+    <span class="nd">@current_label_name</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">current_label_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lab_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_label_name</span> <span class="o">=</span> <span class="n">lab_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_label_constraint</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_states</span><span class="p">[</span><span class="n">lab_name</span><span class="p">]</span><span class="o">.</span><span class="n">constraint</span>
+        <span class="n">lbl_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">label_img_info</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_label_name</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">lbl_info</span><span class="o">.</span><span class="n">can_be_constrained</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">lbl_info</span><span class="o">.</span><span class="n">constrain_to</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">current_constraint</span><span class="o">.</span><span class="n">label_name</span> <span class="o">=</span> <span class="n">lbl_info</span><span class="o">.</span><span class="n">constrain_to</span>
+                <span class="n">constr_lab_hier</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">get_label_hierarchy2</span><span class="p">(</span><span class="n">lbl_info</span><span class="o">.</span><span class="n">constrain_to</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">current_constraint</span><span class="o">.</span><span class="n">label_node</span> <span class="o">=</span> <span class="n">constr_lab_hier</span><span class="o">.</span><span class="n">mask_label</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">constraint_label</span> <span class="o">=</span> <span class="n">constr_lab_hier</span><span class="o">.</span><span class="n">mask_label</span><span class="o">.</span><span class="n">label</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">current_constraint</span><span class="o">.</span><span class="n">label_node</span> <span class="o">=</span> <span class="n">constr_lab_hier</span><span class="o">.</span><span class="n">mask_label</span>
+            <span class="c1"># else:</span>
+            <span class="c1">#     # TODO maybe restore the latest constraint for the particular image:label combination?</span>
+            <span class="c1">#     self.current_constraint.label_name = None</span>
+            <span class="c1">#     self.current_constraint.label_node = None</span>
+            <span class="c1">#     self.current_constraint.label_level = -1</span>
+            <span class="c1"># elif lbl_info.can_constrain_to is not None:</span>
+            <span class="c1">#     self.current_constraint.label_name = lbl_info.can_constrain_to[0]</span>
+        <span class="c1"># TODO maybe emit a signal</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">current_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LabelConstraint</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_states</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">current_label_name</span><span class="p">]</span><span class="o">.</span><span class="n">constraint</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">constraint_label</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_constraint</span><span class="o">.</span><span class="n">label</span>
+
+    <span class="nd">@constraint_label</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">constraint_label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="c1"># self._constraint_label = label</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_constraint</span><span class="o">.</span><span class="n">label_node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_hierarchy</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">label</span><span class="p">]</span>
+        <span class="c1">#print(&#39;emitting&#39;)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">image_count</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_photo</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">new_label_constraint</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_constraint</span><span class="o">.</span><span class="n">label_node</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">label_can_be_constrained</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">label_img_info</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">current_label_name</span><span class="p">]</span><span class="o">.</span><span class="n">can_be_constrained</span>
+
+<div class="viewcode-block" id="State.set_label_constraint"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.state.State.set_label_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">set_label_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label_name</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">emit</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">label_name</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="n">label_name</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">label_name</span> <span class="o">==</span> <span class="s1">&#39;None&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_constraint</span><span class="o">.</span><span class="n">label_name</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_level_constraint</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">emit</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_constraint</span><span class="o">.</span><span class="n">label_name</span> <span class="o">=</span> <span class="n">label_name</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_level_constraint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_label_level</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">emit</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="State.set_level_constraint"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.state.State.set_level_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">set_level_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label_level</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">emit</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_constraint</span><span class="o">.</span><span class="n">label_level</span> <span class="o">=</span> <span class="n">label_level</span>
+        <span class="k">if</span> <span class="n">emit</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">label_constraint_changed</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_constraint</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">current_label_level</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_states</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">current_label_name</span><span class="p">]</span><span class="o">.</span><span class="n">current_level</span>
+
+    <span class="nd">@current_label_level</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">current_label_level</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label_states</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_states</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">current_label_name</span><span class="p">]</span><span class="o">.</span><span class="n">current_level</span> <span class="o">=</span> <span class="n">level</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">active_tags_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_active_tags_filter</span>
+
+    <span class="nd">@active_tags_filter</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">active_tags_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tags</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_active_tags_filter</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">tags</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_hidden_photos_count</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tags_filter_changed</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_active_tags_filter</span><span class="p">)</span>
+
+<div class="viewcode-block" id="State.add_filtering_tag"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.state.State.add_filtering_tag">[docs]</a>    <span class="k">def</span> <span class="nf">add_filtering_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_active_tags_filter</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_active_tags_filter</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_active_tags_filter</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_hidden_photos_count</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tags_filter_changed</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_active_tags_filter</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="State.remove_filtering_tag"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.state.State.remove_filtering_tag">[docs]</a>    <span class="k">def</span> <span class="nf">remove_filtering_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">tag</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_active_tags_filter</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_active_tags_filter</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_hidden_photos_count</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tags_filter_changed</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_active_tags_filter</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="State.toggle_filtering_tag"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.state.State.toggle_filtering_tag">[docs]</a>    <span class="k">def</span> <span class="nf">toggle_filtering_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">active</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">active</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_active_tags_filter</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_active_tags_filter</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_active_tags_filter</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_active_tags_filter</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_hidden_photos_count</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tags_filter_changed</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_active_tags_filter</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="State.clear_tag_filter"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.state.State.clear_tag_filter">[docs]</a>    <span class="k">def</span> <span class="nf">clear_tag_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_active_tags_filter</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_hidden_photos_count</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tags_filter_changed</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_active_tags_filter</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_update_hidden_photos_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">shown_photos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">photos_satisfying_tags</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_active_tags_filter</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_hidden_photos_count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">image_count</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">shown_photos</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_handle_storage_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="s1">&#39;tags&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;tags&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;deleted&#39;</span><span class="p">,</span> <span class="p">[]):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">remove_filtering_tag</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">hidden_photos_count</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hidden_photos_count</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, CBIA @ FI MUNI.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arthropod_describer.common.label_tree_model &mdash; MAPHIS 0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> MAPHIS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">arthropod_describer</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">MAPHIS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>arthropod_describer.common.label_tree_model</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for arthropod_describer.common.label_tree_model</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">typing</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">IntEnum</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+
+<span class="kn">import</span> <span class="nn">PySide2</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtCore</span> <span class="kn">import</span> <span class="n">QAbstractItemModel</span><span class="p">,</span> <span class="n">QModelIndex</span><span class="p">,</span> <span class="n">Qt</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtGui</span> <span class="kn">import</span> <span class="n">QColor</span>
+
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.label_hierarchy</span> <span class="kn">import</span> <span class="n">Node</span><span class="p">,</span> <span class="n">LabelHierarchy</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.state</span> <span class="kn">import</span> <span class="n">State</span>
+
+
+<div class="viewcode-block" id="LabelTreeMode"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_tree_model.LabelTreeMode">[docs]</a><span class="k">class</span> <span class="nc">LabelTreeMode</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+    <span class="n">Choosing</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">ChoosingAndConstraint</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span></div>
+
+
+<div class="viewcode-block" id="LabelTreeModel"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_tree_model.LabelTreeModel">[docs]</a><span class="k">class</span> <span class="nc">LabelTreeModel</span><span class="p">(</span><span class="n">QAbstractItemModel</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">State</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="n">LabelTreeMode</span> <span class="o">=</span> <span class="n">LabelTreeMode</span><span class="o">.</span><span class="n">ChoosingAndConstraint</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">PySide2</span><span class="o">.</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QObject</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">:</span> <span class="n">LabelTreeMode</span> <span class="o">=</span> <span class="n">mode</span>
+
+<div class="viewcode-block" id="LabelTreeModel.columnCount"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_tree_model.LabelTreeModel.columnCount">[docs]</a>    <span class="k">def</span> <span class="nf">columnCount</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">PySide2</span><span class="o">.</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QModelIndex</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">1</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="n">LabelTreeMode</span><span class="o">.</span><span class="n">Choosing</span> <span class="k">else</span> <span class="mi">2</span></div>
+
+<div class="viewcode-block" id="LabelTreeModel.data"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_tree_model.LabelTreeModel.data">[docs]</a>    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="n">PySide2</span><span class="o">.</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QModelIndex</span><span class="p">,</span> <span class="n">role</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">DisplayRole</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">:</span>
+        <span class="n">label_node</span><span class="p">:</span> <span class="n">Node</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">internalPointer</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">index</span><span class="o">.</span><span class="n">internalPointer</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">index</span><span class="o">.</span><span class="n">column</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">role</span> <span class="o">==</span> <span class="n">Qt</span><span class="o">.</span><span class="n">DisplayRole</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">label_node</span><span class="o">.</span><span class="n">name</span> <span class="c1">#self.state.colormap.label_names[label_node.label]</span>
+            <span class="k">elif</span> <span class="n">role</span> <span class="o">==</span> <span class="n">Qt</span><span class="o">.</span><span class="n">DecorationRole</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">QColor</span><span class="p">(</span><span class="o">*</span><span class="n">label_node</span><span class="o">.</span><span class="n">color</span><span class="p">)</span> <span class="c1">#QColor(*self.state.colormap.colormap[label_node.label])</span>
+            <span class="k">elif</span> <span class="n">role</span> <span class="o">==</span> <span class="n">Qt</span><span class="o">.</span><span class="n">ForegroundRole</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="n">LabelTreeMode</span><span class="o">.</span><span class="n">Choosing</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">QColor</span><span class="o">.</span><span class="n">fromRgb</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">label_node</span><span class="o">.</span><span class="n">label</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">primary_label</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">QColor</span><span class="o">.</span><span class="n">fromRgb</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">constraint_label</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">label_hierarchy</span><span class="o">.</span><span class="n">is_descendant_of</span><span class="p">(</span><span class="n">label_node</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">constraint_label</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="n">QColor</span><span class="o">.</span><span class="n">fromRgb</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">QColor</span><span class="o">.</span><span class="n">fromRgb</span><span class="p">(</span><span class="mi">192</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">192</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">role</span> <span class="o">==</span> <span class="n">Qt</span><span class="o">.</span><span class="n">BackgroundRole</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="n">LabelTreeMode</span><span class="o">.</span><span class="n">ChoosingAndConstraint</span> <span class="ow">and</span> <span class="n">label_node</span><span class="o">.</span><span class="n">label</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">primary_label</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">QColor</span><span class="o">.</span><span class="n">fromRgb</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="LabelTreeModel.index"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_tree_model.LabelTreeModel.index">[docs]</a>    <span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">PySide2</span><span class="o">.</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QModelIndex</span> <span class="o">=</span> <span class="n">QModelIndex</span><span class="p">())</span> <span class="o">-&gt;</span> <span class="n">PySide2</span><span class="o">.</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QModelIndex</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">parent</span><span class="o">.</span><span class="n">isValid</span><span class="p">():</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">createIndex</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">label_hierarchy</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">LabelHierarchy</span><span class="o">.</span><span class="n">ROOT</span><span class="p">]</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">row</span><span class="p">])</span>
+
+        <span class="n">parent_node</span><span class="p">:</span> <span class="n">Node</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">internalPointer</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">row</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">parent_node</span><span class="o">.</span><span class="n">children</span><span class="p">):</span>  <span class="c1"># TODO this should not be necessary, but alas</span>
+            <span class="k">return</span> <span class="n">QModelIndex</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">createIndex</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="n">parent_node</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">row</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="LabelTreeModel.rowCount"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_tree_model.LabelTreeModel.rowCount">[docs]</a>    <span class="k">def</span> <span class="nf">rowCount</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">PySide2</span><span class="o">.</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QModelIndex</span> <span class="o">=</span> <span class="n">QModelIndex</span><span class="p">())</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">label_hierarchy</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">parent</span><span class="o">.</span><span class="n">isValid</span><span class="p">():</span>
+            <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">label_hierarchy</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">LabelHierarchy</span><span class="o">.</span><span class="n">ROOT</span><span class="p">])</span>
+
+        <span class="n">parent_node</span><span class="p">:</span> <span class="n">Node</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">internalPointer</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">parent_node</span><span class="o">.</span><span class="n">children</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LabelTreeModel.parent"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_tree_model.LabelTreeModel.parent">[docs]</a>    <span class="k">def</span> <span class="nf">parent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">child</span><span class="p">:</span> <span class="n">QModelIndex</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QModelIndex</span><span class="p">:</span>
+        <span class="n">label_node</span><span class="p">:</span> <span class="n">Node</span> <span class="o">=</span> <span class="n">child</span><span class="o">.</span><span class="n">internalPointer</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">label_node</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">label_node</span><span class="o">.</span><span class="n">label</span> <span class="o">==</span> <span class="n">LabelHierarchy</span><span class="o">.</span><span class="n">ROOT</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">QModelIndex</span><span class="p">()</span>
+        <span class="n">parent_node</span> <span class="o">=</span> <span class="n">label_node</span><span class="o">.</span><span class="n">parent</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">createIndex</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">label_hierarchy</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">parent_node</span><span class="o">.</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">label_node</span><span class="o">.</span><span class="n">label</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="n">parent_node</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LabelTreeModel.flags"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_tree_model.LabelTreeModel.flags">[docs]</a>    <span class="k">def</span> <span class="nf">flags</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span><span class="n">PySide2</span><span class="o">.</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QModelIndex</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PySide2</span><span class="o">.</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">ItemFlags</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="n">LabelTreeMode</span><span class="o">.</span><span class="n">ChoosingAndConstraint</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">index</span><span class="o">.</span><span class="n">column</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">index</span><span class="o">.</span><span class="n">internalPointer</span><span class="p">()</span><span class="o">.</span><span class="n">label</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">Qt</span><span class="o">.</span><span class="n">ItemIsEnabled</span> <span class="o">|</span> <span class="n">Qt</span><span class="o">.</span><span class="n">ItemIsSelectable</span>
+            <span class="k">return</span> <span class="n">Qt</span><span class="o">.</span><span class="n">ItemIsEnabled</span> <span class="o">|</span> <span class="n">Qt</span><span class="o">.</span><span class="n">ItemIsEditable</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">index</span><span class="o">.</span><span class="n">internalPointer</span><span class="p">()</span><span class="o">.</span><span class="n">label</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">Qt</span><span class="o">.</span><span class="n">NoItemFlags</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">internalPointer</span><span class="p">()</span><span class="o">.</span><span class="n">label</span>
+            <span class="n">used_labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">used_regions</span><span class="p">(</span><span class="s1">&#39;Labels&#39;</span><span class="p">)</span> <span class="c1"># TODO un-hard-code &#39;Labels&#39;</span>
+            <span class="n">hierarchy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">label_hierarchy</span>
+            <span class="k">if</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">used_labels</span> <span class="ow">or</span> <span class="nb">any</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">hierarchy</span><span class="o">.</span><span class="n">is_ancestor_of</span><span class="p">,</span> <span class="n">label</span><span class="p">),</span> <span class="n">used_labels</span><span class="p">)):</span>
+                <span class="k">return</span> <span class="n">Qt</span><span class="o">.</span><span class="n">ItemIsEnabled</span> <span class="o">|</span> <span class="n">Qt</span><span class="o">.</span><span class="n">ItemIsSelectable</span>
+            <span class="k">return</span> <span class="n">Qt</span><span class="o">.</span><span class="n">NoItemFlags</span></div>
+
+<div class="viewcode-block" id="LabelTreeModel.set_constraint"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_tree_model.LabelTreeModel.set_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">set_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_index</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataChanged</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">QModelIndex</span><span class="p">()),</span>
+                              <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rowCount</span><span class="p">(</span><span class="n">QModelIndex</span><span class="p">())</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">QModelIndex</span><span class="p">()),</span>
+                              <span class="p">[</span><span class="n">Qt</span><span class="o">.</span><span class="n">ForegroundRole</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="LabelTreeModel.find_index"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_tree_model.LabelTreeModel.find_index">[docs]</a>    <span class="k">def</span> <span class="nf">find_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QModelIndex</span><span class="p">:</span>
+        <span class="n">lab_hier</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">label_hierarchy</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+
+        <span class="k">while</span> <span class="n">index</span><span class="o">.</span><span class="n">isValid</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">child_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rowCount</span><span class="p">(</span><span class="n">index</span><span class="p">)):</span>
+                <span class="n">child</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">child</span><span class="p">(</span><span class="n">child_idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="n">label_node</span><span class="p">:</span> <span class="n">Node</span> <span class="o">=</span> <span class="n">child</span><span class="o">.</span><span class="n">internalPointer</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">label_node</span><span class="o">.</span><span class="n">label</span> <span class="o">==</span> <span class="n">label</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">child</span>
+                <span class="k">elif</span> <span class="n">lab_hier</span><span class="o">.</span><span class="n">is_ancestor_of</span><span class="p">(</span><span class="n">label_node</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+                    <span class="n">index</span> <span class="o">=</span> <span class="n">child</span>
+                    <span class="k">break</span>
+        <span class="k">return</span> <span class="n">index</span></div>
+
+<div class="viewcode-block" id="LabelTreeModel.handle_label_color_changed"><a class="viewcode-back" href="../../../arthropod_describer.common.html#arthropod_describer.common.label_tree_model.LabelTreeModel.handle_label_color_changed">[docs]</a>    <span class="k">def</span> <span class="nf">handle_label_color_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">color</span><span class="p">:</span> <span class="n">QColor</span><span class="p">):</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_index</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+        <span class="n">lab_node</span><span class="p">:</span> <span class="n">Node</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">internalPointer</span><span class="p">()</span>
+        <span class="n">lab_node</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">color</span><span class="o">.</span><span class="n">toTuple</span><span class="p">()[:</span><span class="mi">3</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataChanged</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">Qt</span><span class="o">.</span><span class="n">DecorationRole</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, CBIA @ FI MUNI.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

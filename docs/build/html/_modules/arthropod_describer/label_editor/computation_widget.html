@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arthropod_describer.label_editor.computation_widget &mdash; MAPHIS 0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> MAPHIS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">arthropod_describer</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">MAPHIS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>arthropod_describer.label_editor.computation_widget</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for arthropod_describer.label_editor.computation_widget</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">from</span> <span class="nn">PySide2.QtCore</span> <span class="kn">import</span> <span class="n">Signal</span><span class="p">,</span> <span class="n">QSortFilterProxyModel</span><span class="p">,</span> <span class="n">Qt</span><span class="p">,</span> <span class="n">QItemSelection</span>
+<span class="kn">from</span> <span class="nn">PySide2.QtWidgets</span> <span class="kn">import</span> <span class="n">QWidget</span><span class="p">,</span> <span class="n">QVBoxLayout</span><span class="p">,</span> <span class="n">QSizePolicy</span><span class="p">,</span> <span class="n">QMenu</span><span class="p">,</span> <span class="n">QAction</span>
+
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.plugin</span> <span class="kn">import</span> <span class="n">PropertyComputation</span><span class="p">,</span> <span class="n">RegionComputation</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.state</span> <span class="kn">import</span> <span class="n">State</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.common.user_params</span> <span class="kn">import</span> <span class="n">UserParamWidgetBinding</span><span class="p">,</span> <span class="n">create_params_widget</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.label_editor.ui_computation</span> <span class="kn">import</span> <span class="n">Ui_Computations</span>
+<span class="kn">from</span> <span class="nn">arthropod_describer.plugin_manager</span> <span class="kn">import</span> <span class="n">RegionCompsListModel</span><span class="p">,</span> <span class="n">ProcessType</span>
+
+
+<div class="viewcode-block" id="ComputationWidget"><a class="viewcode-back" href="../../../arthropod_describer.label_editor.html#arthropod_describer.label_editor.computation_widget.ComputationWidget">[docs]</a><span class="k">class</span> <span class="nc">ComputationWidget</span><span class="p">(</span><span class="n">QWidget</span><span class="p">):</span>
+    <span class="n">apply_computation</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">([</span><span class="n">RegionComputation</span><span class="p">,</span> <span class="n">ProcessType</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">State</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">QWidget</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">QWidget</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">settings_group_shown</span><span class="p">:</span><span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">restrict_group_shown</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_colormap_model</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span> <span class="o">=</span> <span class="n">Ui_Computations</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">setupUi</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">grpRegionSettings</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">QVBoxLayout</span><span class="p">())</span>
+        <span class="c1"># self.ui.scrollSettings.setLayout(QVBoxLayout())</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">update_used_label_list</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_update_region_restrict_model</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">computations_model</span> <span class="o">=</span> <span class="n">RegionCompsListModel</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_computation_idx</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">cmbRegComps</span><span class="o">.</span><span class="n">setModel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">computations_model</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">cmbRegComps</span><span class="o">.</span><span class="n">currentIndexChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_handle_computation_selected</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_comp_param_widget</span><span class="p">:</span> <span class="n">QWidget</span> <span class="o">=</span> <span class="n">QWidget</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_reg_comp</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RegionComputation</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_param_binding</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">UserParamWidgetBinding</span><span class="p">]</span> <span class="o">=</span> <span class="n">UserParamWidgetBinding</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">btnRegApply</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handle_apply_clicked</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">btnRegApplyAll</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handle_apply_all_clicked</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_btnRegApplyAllMenu</span> <span class="o">=</span> <span class="n">QMenu</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">action_applyToUnsegmented</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s1">&#39;Apply to all unsegmented&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">action_applyToUnsegmented</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handle_apply_all_unseg_clicked</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_btnRegApplyAllMenu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">action_applyToUnsegmented</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">btnRegApplyAll</span><span class="o">.</span><span class="n">setMenu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_btnRegApplyAllMenu</span><span class="p">)</span>
+
+        <span class="c1"># self.ui.btnRegApplyAllUnseg.clicked.connect(self.handle_apply_all_unseg_clicked)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">region_restrict_model</span> <span class="o">=</span> <span class="n">QSortFilterProxyModel</span><span class="p">()</span>
+        <span class="c1"># FIXME set a correct color model</span>
+        <span class="c1">#self.region_restrict_model.setSourceModel(self.state.colormap)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">regRestrictView</span><span class="o">.</span><span class="n">setModel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">region_restrict_model</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">region_restrict_model</span><span class="o">.</span><span class="n">setFilterRole</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">UserRole</span> <span class="o">+</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">region_restrict_model</span><span class="o">.</span><span class="n">setFilterFixedString</span><span class="p">(</span><span class="s1">&#39;used&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">selected_regions</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">region_sel_model</span><span class="p">:</span> <span class="n">QItemSelection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">regRestrictView</span><span class="o">.</span><span class="n">selectionModel</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">region_sel_model</span><span class="o">.</span><span class="n">selectionChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_handle_label_selection_changed</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ComputationWidget.handle_apply_clicked"><a class="viewcode-back" href="../../../arthropod_describer.label_editor.html#arthropod_describer.label_editor.computation_widget.ComputationWidget.handle_apply_clicked">[docs]</a>    <span class="k">def</span> <span class="nf">handle_apply_clicked</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chkd</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">apply_computation</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">computations_model</span><span class="o">.</span><span class="n">region_comps</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">current_computation_idx</span><span class="p">],</span>
+                                    <span class="n">ProcessType</span><span class="o">.</span><span class="n">SELECTED_PHOTOS</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ComputationWidget.handle_apply_all_clicked"><a class="viewcode-back" href="../../../arthropod_describer.label_editor.html#arthropod_describer.label_editor.computation_widget.ComputationWidget.handle_apply_all_clicked">[docs]</a>    <span class="k">def</span> <span class="nf">handle_apply_all_clicked</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chkd</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">apply_computation</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">computations_model</span><span class="o">.</span><span class="n">region_comps</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">current_computation_idx</span><span class="p">],</span>
+                                           <span class="n">ProcessType</span><span class="o">.</span><span class="n">ALL_PHOTOS</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ComputationWidget.handle_apply_all_unseg_clicked"><a class="viewcode-back" href="../../../arthropod_describer.label_editor.html#arthropod_describer.label_editor.computation_widget.ComputationWidget.handle_apply_all_unseg_clicked">[docs]</a>    <span class="k">def</span> <span class="nf">handle_apply_all_unseg_clicked</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chkd</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">apply_computation</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">computations_model</span><span class="o">.</span><span class="n">region_comps</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">current_computation_idx</span><span class="p">],</span>
+                                    <span class="n">ProcessType</span><span class="o">.</span><span class="n">ALL_UNSEGMENTED</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ComputationWidget.register_computation"><a class="viewcode-back" href="../../../arthropod_describer.label_editor.html#arthropod_describer.label_editor.computation_widget.ComputationWidget.register_computation">[docs]</a>    <span class="k">def</span> <span class="nf">register_computation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">computation</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">RegionComputation</span><span class="p">,</span> <span class="n">PropertyComputation</span><span class="p">]):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">computations_model</span><span class="o">.</span><span class="n">add_computation</span><span class="p">(</span><span class="n">computation</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_computation_idx</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">cmbRegComps</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_handle_computation_selected</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_computation_idx</span> <span class="o">=</span> <span class="n">idx</span>
+        <span class="n">computation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">computations_model</span><span class="o">.</span><span class="n">region_comps</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">current_computation_idx</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">lblRegDesc</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">computation</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">description</span><span class="p">)</span>
+        <span class="c1"># self.ui.lblCompDesc.setText(computation.info.description)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_comp_param_widget</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">grpRegionSettings</span><span class="o">.</span><span class="n">layout</span><span class="p">()</span><span class="o">.</span><span class="n">removeWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_comp_param_widget</span><span class="p">)</span>
+            <span class="c1"># self.ui.scrollSettings.layout().removeWidget(self._comp_param_widget)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_param_binding</span><span class="o">.</span><span class="n">param_widget</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_param_binding</span><span class="o">.</span><span class="n">user_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_comp_param_widget</span><span class="o">.</span><span class="n">deleteLater</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_comp_param_widget</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">computation</span><span class="o">.</span><span class="n">user_params</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_comp_param_widget</span> <span class="o">=</span> <span class="n">create_params_widget</span><span class="p">(</span><span class="n">computation</span><span class="o">.</span><span class="n">user_params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_param_binding</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">computation</span><span class="o">.</span><span class="n">user_params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_comp_param_widget</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">grpRegionSettings</span><span class="o">.</span><span class="n">layout</span><span class="p">()</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_comp_param_widget</span><span class="p">)</span>
+            <span class="c1"># self.ui.scrollSettings.layout().addWidget(self._comp_param_widget)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">grpRegionSettings</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">settings_group_shown</span> <span class="ow">and</span> <span class="kc">True</span><span class="p">)</span>
+            <span class="c1"># self.ui.scrollSettings.setVisible(self.settings_group_shown and True)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">grpRegionSettings</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+            <span class="c1"># self.ui.scrollSettings.setVisible(False)</span>
+        <span class="c1"># self.ui.grpRegRestrict.setVisible(self.restrict_group_shown and computation.region_restricted)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">grpRegRestrict</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="c1"># self.ui.pgRegionRestriction.setVisible(self.restrict_group_shown and computation.region_restricted)</span>
+        <span class="c1"># self.ui.scrollRegionRestrictions.update()</span>
+        <span class="c1"># self.ui.pgRegionRestriction.update()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">grpRegionSettings</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">computation</span><span class="o">.</span><span class="n">region_restricted</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">region_restrict_model</span><span class="o">.</span><span class="n">setSourceModel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_colormap_model</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">region_restrict_model</span><span class="o">.</span><span class="n">setFilterFixedString</span><span class="p">(</span><span class="s1">&#39;used&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">regRestrictView</span><span class="o">.</span><span class="n">setModel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">region_restrict_model</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">region_restrict_model</span><span class="o">.</span><span class="n">setFilterFixedString</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">regRestrictView</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">restrict_group_shown</span> <span class="ow">and</span> <span class="n">computation</span><span class="o">.</span><span class="n">region_restricted</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_handle_label_selection_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selection</span><span class="p">:</span> <span class="n">QItemSelection</span><span class="p">):</span>
+        <span class="n">indexes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">region_sel_model</span><span class="o">.</span><span class="n">selectedIndexes</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">selected_regions</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">indexes</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">selected_regions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">region_restrict_model</span><span class="o">.</span><span class="n">data</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">Qt</span><span class="o">.</span><span class="n">UserRole</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_update_region_restrict_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">region_restrict_model</span><span class="o">.</span><span class="n">setSourceModel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_colormap_model</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">regRestrictView</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+
+<div class="viewcode-block" id="ComputationWidget.set_restrict_group_shown"><a class="viewcode-back" href="../../../arthropod_describer.label_editor.html#arthropod_describer.label_editor.computation_widget.ComputationWidget.set_restrict_group_shown">[docs]</a>    <span class="k">def</span> <span class="nf">set_restrict_group_shown</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shown</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">restrict_group_shown</span> <span class="o">=</span> <span class="n">shown</span>
+        <span class="c1"># self.ui.pgRegionRestriction.setHidden(not shown)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">grpRegRestrict</span><span class="o">.</span><span class="n">setHidden</span><span class="p">(</span><span class="ow">not</span> <span class="n">shown</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ComputationWidget.set_settings_group_shown"><a class="viewcode-back" href="../../../arthropod_describer.label_editor.html#arthropod_describer.label_editor.computation_widget.ComputationWidget.set_settings_group_shown">[docs]</a>    <span class="k">def</span> <span class="nf">set_settings_group_shown</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shown</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">settings_group_shown</span> <span class="o">=</span> <span class="n">shown</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">grpRegionSettings</span><span class="o">.</span><span class="n">setHidden</span><span class="p">(</span><span class="ow">not</span> <span class="n">shown</span><span class="p">)</span></div></div>
+        <span class="c1"># self.ui.pgSettings.setHidden(not shown)</span>
+        <span class="c1"># if not shown:</span>
+        <span class="c1">#     self.ui.toolBox.removeItem(1)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, CBIA @ FI MUNI.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
